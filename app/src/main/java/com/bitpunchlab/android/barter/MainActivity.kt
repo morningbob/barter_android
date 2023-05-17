@@ -11,9 +11,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
@@ -28,6 +30,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
+                    //val firebaseClient = ViewModelProvider(this,
+                        //FirebaseClientViewModelFactory(this.application))
+                        //.get(FirebaseClient::class.java)
                     BarterNavigation()
                 }
             }
@@ -41,10 +46,13 @@ fun BarterNavigation() {
 
     NavHost(navController = navController, startDestination = Login.route) {
         composable(Login.route) {
-            LoginScreen()
+            LoginScreen(navController)
         }
         composable(Signup.route) {
-            SignupScreen()
+            SignupScreen(navController)
+        }
+        composable(Main.route) {
+            MainScreen(navController)
         }
     }
 }

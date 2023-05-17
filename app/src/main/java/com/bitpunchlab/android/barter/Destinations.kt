@@ -15,3 +15,7 @@ object Signup : Destinations {
     override val icon: Int = 2
 }
 
+object Main : Destinations {
+    override val route: String = "Main"
+    override val icon: Int = 3
+}
