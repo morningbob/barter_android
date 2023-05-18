@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -71,5 +73,12 @@ dependencies {
 
     // FirebaseAuth
     implementation 'com.google.firebase:firebase-auth-ktx'
+
+    // room database
+    implementation 'androidx.room:room-runtime:2.6.0-alpha01'
+    kapt 'androidx.room:room-compiler:2.6.0-alpha01'
+
+    // Firestore
+    implementation 'com.google.firebase:firebase-firestore-ktx'
 
 }

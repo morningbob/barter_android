@@ -14,6 +14,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,10 +56,20 @@ fun LoginScreen(navController: NavHostController,
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .paint(
+                    painterResource(
+                        id = com.bitpunchlab.android.barter.R.mipmap.helicopter),
+                        contentScale = ContentScale.FillBounds
+                )
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BarterColor.lightGreen)
+                //.background(BarterColor.lightGreen)
+
                 .padding(
                     start = 70.dp,
                     end = 70.dp
@@ -66,79 +78,80 @@ fun LoginScreen(navController: NavHostController,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            Image(
-                painter = painterResource(id = com.bitpunchlab.android.barter.R.mipmap.enter),
-                contentDescription = "Login icon",
-                modifier = Modifier
-                    .padding(top = 40.dp)
-                    .width(120.dp)
+                Image(
+                    painter = painterResource(id = com.bitpunchlab.android.barter.R.mipmap.enter),
+                    contentDescription = "Login icon",
+                    modifier = Modifier
+                        .padding(top = 40.dp)
+                        .width(120.dp)
 
-            )
+                )
 
-            TitleText(
-                title = "Login",
-                modifier = Modifier
-                    .padding(top = 40.dp, bottom = 30.dp)
-            )
+                TitleText(
+                    title = "Login",
+                    modifier = Modifier
+                        .padding(top = 40.dp, bottom = 30.dp)
+                )
 
-            CustomTextField(
-                label = "Email",
-                textValue = userEmail,
-                onChange = { loginViewModel.updateEmail(it) },
-                modifier = Modifier
-                    .padding(bottom = 3.dp)
-                    .fillMaxWidth()
-            )
+                CustomTextField(
+                    label = "Email",
+                    textValue = userEmail,
+                    onChange = { loginViewModel.updateEmail(it) },
+                    modifier = Modifier
+                        .padding(bottom = 3.dp)
+                        .fillMaxWidth()
+                )
 
-            ErrorText(
-                error = emailError,
-                modifier = Modifier
-                    .padding(
+                ErrorText(
+                    error = emailError,
+                    modifier = Modifier
+                        .padding(
+                            bottom = 20.dp
+                        )
+                        .fillMaxWidth()
+                )
+
+                CustomTextField(
+                    label = "Password",
+                    textValue = userPassword,
+                    onChange = { loginViewModel.updatePassword(it) },
+                    hide = true,
+                    modifier = Modifier
+                        .padding(bottom = 3.dp)
+                        .fillMaxWidth()
+                )
+
+                ErrorText(
+                    error = passError,
+                    modifier = Modifier.padding(
                         bottom = 20.dp
                     )
-                    .fillMaxWidth()
-            )
-
-            CustomTextField(
-                label = "Password",
-                textValue = userPassword,
-                onChange = { loginViewModel.updatePassword(it) },
-                hide = true,
-                modifier = Modifier
-                    .padding(bottom = 3.dp)
-                    .fillMaxWidth()
-            )
-
-            ErrorText(
-                error = passError,
-                modifier = Modifier.padding(
-                    bottom = 20.dp
                 )
-            )
-            //}
-            CustomButton(
-                label = "Login",
-                onClick = { loginViewModel.login() },
-                enable = readyLogin,
-                modifier = Modifier
-                    .padding(
-                        top = 30.dp,
-                        bottom = 10.dp
-                    )
-                    .fillMaxWidth()
-            )
+                //}
+                CustomButton(
+                    label = "Login",
+                    onClick = { loginViewModel.login() },
+                    enable = readyLogin,
+                    modifier = Modifier
+                        .padding(
+                            top = 30.dp,
+                            bottom = 10.dp
+                        )
+                        .fillMaxWidth()
+                )
 
-            CustomButton(
-                label = "Sign Up",
-                onClick = {
-                    onSignupClicked.invoke()
-                },
-                modifier = Modifier
-                    .padding(
-                        bottom = 50.dp
-                    )
-                    .fillMaxWidth(),
-            )
+                CustomButton(
+                    label = "Sign Up",
+                    onClick = {
+                        onSignupClicked.invoke()
+                    },
+                    modifier = Modifier
+                        .padding(
+                            bottom = 50.dp
+                        )
+                        .fillMaxWidth(),
+                )
+            }
         }
     }
 }

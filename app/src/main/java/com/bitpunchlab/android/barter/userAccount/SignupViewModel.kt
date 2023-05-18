@@ -1,14 +1,15 @@
 package com.bitpunchlab.android.barter.userAccount
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.util.validateConfirmPassword
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class SignupViewModel() : ViewModel() {
 
@@ -40,9 +41,17 @@ class SignupViewModel() : ViewModel() {
     val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
 
     init {
-        combine(nameError, emailError, passError, confirmPassError) {
-            name, email, pass, confirmPass ->
-            _readySignup.value = name == "" && email == "" && pass == "" && confirmPass == ""
+        CoroutineScope(Dispatchers.IO).launch {
+            combine(
+                nameError,
+                emailError,
+                passError,
+                confirmPassError
+            ) { name, email, pass, confirmPass ->
+                _readySignup.value = name == "" && email == "" && pass == "" && confirmPass == ""
+            }.collect() {
+                Log.i("test error", "ready sign up ${readySignup.value}")
+            }
         }
     }
 
@@ -65,8 +74,10 @@ class SignupViewModel() : ViewModel() {
         _confirmPassError.value = validateConfirmPassword(password.value, newPass)
     }
 
-    fun signup() {
-
+    fun signup(email: String, password: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseClient.signup(email, password)
+        }
     }
 
 }

@@ -1,13 +1,15 @@
 package com.bitpunchlab.android.barter.userAccount
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class LoginViewModel() : ViewModel() {
 
@@ -26,6 +28,15 @@ class LoginViewModel() : ViewModel() {
     private val _passError = MutableStateFlow("")
     val passError : StateFlow<String> get() = _passError.asStateFlow()
 
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            combine(emailError, passError) { email, pass ->
+                _readyLogin.value = email == "" && pass == ""
+            }.collect() {
+                Log.i("test errors", "ready login ${readyLogin.value}")
+            }
+        }
+    }
 
     fun updateEmail(newEmail: String) {
         _userEmail.value = newEmail

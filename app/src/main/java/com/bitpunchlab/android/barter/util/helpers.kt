@@ -15,10 +15,10 @@ fun validatePassword(password: String) : String {
         return "Password must have length within 8 and 20 characters.  It must contains only alphabets."
     }
     val regexLetter = "[a-zA-Z]+".toRegex()
-    if (!regexLetter.matches(password)) {
+    if (!regexLetter.containsMatchIn(password)) {
         return "Password must contains at least one letter."
     }
-    // test content
+
     return ""
 }
 

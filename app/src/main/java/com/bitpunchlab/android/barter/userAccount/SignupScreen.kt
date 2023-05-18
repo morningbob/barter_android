@@ -155,7 +155,7 @@ fun SignupScreen(navController: NavHostController,
 
                 CustomButton(
                     label = "Send",
-                    onClick = { signupViewModel.signup() },
+                    onClick = { signupViewModel.signup(email, password) },
                     modifier = Modifier
                         .padding(
                             bottom = 50.dp

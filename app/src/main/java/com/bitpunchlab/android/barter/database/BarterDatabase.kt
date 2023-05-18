@@ -1,0 +1,43 @@
+package com.bitpunchlab.android.barter.database
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.bitpunchlab.android.barter.models.ProductOffering
+import kotlinx.coroutines.InternalCoroutinesApi
+
+
+@Database(entities = [ProductOffering::class]
+, version = 1, exportSchema = false)
+
+//@TypeConverters(Converters::class)
+abstract class BarterDatabase : RoomDatabase() {
+    abstract val barterDao: BarterDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: BarterDatabase? = null
+
+        @InternalCoroutinesApi
+        fun getInstance(context: Context?): BarterDatabase {
+            synchronized(this) {
+                var instance = INSTANCE
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
+                        context!!.applicationContext,
+                        BarterDatabase::class.java,
+                        "barter_database"
+                    )
+                        .fallbackToDestructiveMigration()
+                        .build()
+
+                    INSTANCE = instance
+                }
+
+                return instance
+            }
+        }
+    }
+}
