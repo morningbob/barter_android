@@ -49,7 +49,7 @@ class LoginViewModel() : ViewModel() {
     }
 
     fun login() {
-        FirebaseClient.login()
+        FirebaseClient.login(userEmail.value, userPassword.value)
     }
 }
 

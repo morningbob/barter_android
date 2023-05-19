@@ -1,11 +1,9 @@
 package com.bitpunchlab.android.barter.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import com.bitpunchlab.android.barter.models.ProductOffering
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.bitpunchlab.android.barter.models.UserAndProductOffering
 
 @Dao
 interface BarterDao {
@@ -14,10 +12,12 @@ interface BarterDao {
     fun insertProductOffering(product: ProductOffering)
 
     @Query("SELECT * FROM products_offering")
-    fun getAllProductOffering() : MutableStateFlow<List<ProductOffering>>
+    fun getAllProductOffering() : LiveData<List<ProductOffering>>
 
-    @Query("SELECT * FROM products_offering WHERE :id == id LIMIT 1")
-    fun getProductOffering(id: String) : MutableStateFlow<ProductOffering>
+    @Query("SELECT * FROM products_offering WHERE :id == productId LIMIT 1")
+    fun getProductOffering(id: String) : LiveData<ProductOffering>
 
-
+    @Transaction
+    @Query("SELECT * from users")
+    fun getUsersAndProductsOffering() : List<UserAndProductOffering>
 }

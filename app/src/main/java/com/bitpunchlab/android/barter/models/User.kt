@@ -10,5 +10,6 @@ data class User(
     val name : String,
     var email : String,
     var dataCreated : String,
-    
+    //var productsOffering : List<ProductOffering>,
+    //var productsBidding : List<ProductBidding>
 )

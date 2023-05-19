@@ -5,14 +5,16 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.models.User
 import kotlinx.coroutines.InternalCoroutinesApi
 
 
-@Database(entities = [ProductOffering::class]
+@Database(entities = [User::class, ProductOffering::class, ProductBidding::class]
 , version = 1, exportSchema = false)
 
-//@TypeConverters(Converters::class)
+@TypeConverters(Converters::class)
 abstract class BarterDatabase : RoomDatabase() {
     abstract val barterDao: BarterDao
 

@@ -15,7 +15,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.main.MainScreen
+import com.bitpunchlab.android.barter.sell.SellScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
@@ -54,18 +56,15 @@ fun BarterNavigation() {
         composable(Main.route) {
             MainScreen(navController)
         }
+        composable(Sell.route) {
+            SellScreen(navController)
+        }
+        composable(Bid.route) {
+            BidScreen(navController)
+        }
+        composable(Report.route) {
+
+        }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    BarterTheme {
-        Greeting("Android")
-    }
-}

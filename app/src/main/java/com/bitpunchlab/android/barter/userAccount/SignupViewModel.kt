@@ -6,6 +6,8 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.util.validateConfirmPassword
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -39,6 +41,10 @@ class SignupViewModel() : ViewModel() {
 
     private val _confirmPassError = MutableStateFlow("")
     val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
+
+    // 1 - failed, 2 - success, 0 - no dialog
+    private val _shouldShowStatus = MutableStateFlow(0)
+    val shouldShowStatus : StateFlow<Int> get() = _shouldShowStatus.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -74,9 +80,13 @@ class SignupViewModel() : ViewModel() {
         _confirmPassError.value = validateConfirmPassword(password.value, newPass)
     }
 
-    fun signup(email: String, password: String) {
+    fun signup() {
         CoroutineScope(Dispatchers.IO).launch {
-            FirebaseClient.signup(email, password)
+            if (FirebaseClient.processSignup(name.value, email.value, password.value, Firebase.firestore)) {
+                _shouldShowStatus.value = 2
+            } else {
+                _shouldShowStatus.value = 1
+            }
         }
     }
 

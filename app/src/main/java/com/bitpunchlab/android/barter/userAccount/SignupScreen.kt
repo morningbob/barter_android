@@ -6,25 +6,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Main
 import com.bitpunchlab.android.barter.R
-import com.bitpunchlab.android.barter.base.CustomButton
-import com.bitpunchlab.android.barter.base.CustomTextField
-import com.bitpunchlab.android.barter.base.ErrorText
-import com.bitpunchlab.android.barter.base.TitleText
+import com.bitpunchlab.android.barter.base.*
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -42,6 +35,7 @@ fun SignupScreen(navController: NavHostController,
     val confirmPassError by signupViewModel.confirmPassError.collectAsState()
     val readySignup by signupViewModel.readySignup.collectAsState()
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
+    val shouldShowStatus by signupViewModel.shouldShowStatus.collectAsState()
 
     // LaunchedEffect is used to run code that won't trigger recomposition of the view
     LaunchedEffect(key1 = isLoggedIn) {
@@ -155,7 +149,7 @@ fun SignupScreen(navController: NavHostController,
 
                 CustomButton(
                     label = "Send",
-                    onClick = { signupViewModel.signup(email, password) },
+                    onClick = { signupViewModel.signup() },
                     modifier = Modifier
                         .padding(
                             bottom = 50.dp
@@ -165,6 +159,31 @@ fun SignupScreen(navController: NavHostController,
                 )
             }
 
+        if (shouldShowStatus != 0) {
+            ShowStatusDialog(status = shouldShowStatus)
+        }
+
     }
+
+}
+
+@Composable
+fun ShowStatusDialog(status: Int) {
+    if (status == 1) {
+        SuccessStatusDialog()
+    } else if (status == 2) {
+
+    }
+}
+
+@Composable
+fun SuccessStatusDialog() {
+    CustomDialog(
+        title = "Registration",
+        message = "You are successfully registered.",
+        positiveText = "OK",
+        onDismiss = {  },
+        onPositive = {  }
+    ) {}
 
 }

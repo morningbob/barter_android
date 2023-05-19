@@ -10,7 +10,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class ProductOffering(
     @PrimaryKey
-    val id: String,
+    val productId: String,
+    val userId: String,
     var name: String,
     var category: String,
     var images : List<String> = listOf(),
