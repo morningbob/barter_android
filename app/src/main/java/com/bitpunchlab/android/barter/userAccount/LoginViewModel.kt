@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.userAccount
 
 import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
@@ -28,6 +29,13 @@ class LoginViewModel() : ViewModel() {
     private val _passError = MutableStateFlow("")
     val passError : StateFlow<String> get() = _passError.asStateFlow()
 
+    // 0 - no login, 1 - failed, 2 - success
+    private val _loginStatus = MutableStateFlow<Int>(0)
+    val loginStatus : StateFlow<Int> get() = _loginStatus
+
+    private val _loadingAlpha = MutableStateFlow<Float>(0f)
+    val loadingAlpha : StateFlow<Float> get() = _loadingAlpha
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             combine(emailError, passError) { email, pass ->
@@ -48,8 +56,27 @@ class LoginViewModel() : ViewModel() {
         _passError.value = validatePassword(newPass)
     }
 
+    fun updateLoginStatus(status: Int) {
+        _loginStatus.value = status
+    }
+
+    fun clearFields() {
+        _userEmail.value = ""
+        _userPassword.value = ""
+    }
+
     fun login() {
-        FirebaseClient.login(userEmail.value, userPassword.value)
+        _loadingAlpha.value = 100f
+        CoroutineScope(Dispatchers.IO).launch {
+            if (FirebaseClient.login(userEmail.value, userPassword.value)) {
+                _loginStatus.value = 2
+                _loadingAlpha.value = 0f // put this here, not after if clause, since login function has delay
+            } else {
+                _loginStatus.value = 1
+                _loadingAlpha.value = 0f //
+            }
+            clearFields()
+        }
     }
 }
 

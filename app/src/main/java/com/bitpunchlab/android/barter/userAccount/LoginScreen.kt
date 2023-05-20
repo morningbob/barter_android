@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -26,10 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Main
 import com.bitpunchlab.android.barter.Signup
-import com.bitpunchlab.android.barter.base.CustomButton
-import com.bitpunchlab.android.barter.base.CustomTextField
-import com.bitpunchlab.android.barter.base.ErrorText
-import com.bitpunchlab.android.barter.base.TitleText
+import com.bitpunchlab.android.barter.base.*
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -43,6 +41,9 @@ fun LoginScreen(navController: NavHostController,
     val passError by loginViewModel.passError.collectAsState()
     val readyLogin by loginViewModel.readyLogin.collectAsState()
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
+    val loginStatus by loginViewModel.loginStatus.collectAsState()
+    val loadingAlpha by loginViewModel.loadingAlpha.collectAsState()
+    //var showFailureDialog = false
 
     val onSignupClicked = { navController.navigate(Signup.route) }
 
@@ -61,8 +62,9 @@ fun LoginScreen(navController: NavHostController,
                 .fillMaxSize()
                 .paint(
                     painterResource(
-                        id = com.bitpunchlab.android.barter.R.mipmap.helicopter),
-                        contentScale = ContentScale.FillBounds
+                        id = com.bitpunchlab.android.barter.R.mipmap.helicopter
+                    ),
+                    contentScale = ContentScale.FillBounds
                 )
         ) {
         Column(
@@ -153,6 +155,29 @@ fun LoginScreen(navController: NavHostController,
                 )
             }
         }
+        if (loginStatus == 1) {
+            LoginFailureDialog(loginViewModel)
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(loadingAlpha)
+        ) {
+            CustomCircularProgressBar()
+        }
     }
+}
+
+@Composable
+fun LoginFailureDialog(loginViewModel: LoginViewModel) {
+    CustomDialog(
+        title = "Login",
+        message = "Can't login.  Please check your email and password.  Make sure wifi is on.",
+        positiveText = "OK",
+        onDismiss = { loginViewModel.updateLoginStatus(0) },
+        onPositive = { loginViewModel.updateLoginStatus(0) }
+    )
+
 }
 

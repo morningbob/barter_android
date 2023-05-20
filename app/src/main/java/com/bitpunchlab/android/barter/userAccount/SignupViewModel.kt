@@ -43,8 +43,11 @@ class SignupViewModel() : ViewModel() {
     val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
 
     // 1 - failed, 2 - success, 0 - no dialog
-    private val _shouldShowStatus = MutableStateFlow(0)
-    val shouldShowStatus : StateFlow<Int> get() = _shouldShowStatus.asStateFlow()
+    //private val _shouldShowStatus = MutableStateFlow(0)
+    //val shouldShowStatus : StateFlow<Int> get() = _shouldShowStatus.asStateFlow()
+
+    private val _loadingAlpha = MutableStateFlow<Float>(0f)
+    val loadingAlpha : StateFlow<Float> get() = _loadingAlpha
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -81,11 +84,12 @@ class SignupViewModel() : ViewModel() {
     }
 
     fun signup() {
+        _loadingAlpha.value = 100f
         CoroutineScope(Dispatchers.IO).launch {
-            if (FirebaseClient.processSignup(name.value, email.value, password.value, Firebase.firestore)) {
-                _shouldShowStatus.value = 2
+            if (FirebaseClient.processSignupAuth(name.value, email.value, password.value)) {
+                //_loadingAlpha.value = 0f
             } else {
-                _shouldShowStatus.value = 1
+                _loadingAlpha.value = 0f
             }
         }
     }

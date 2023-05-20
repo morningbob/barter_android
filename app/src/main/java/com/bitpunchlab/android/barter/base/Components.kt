@@ -1,10 +1,7 @@
 package com.bitpunchlab.android.barter.base
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -108,6 +105,7 @@ fun CustomDialog(
                  Text(
                      text = title,
                      fontSize = 25.sp,
+                     fontWeight = FontWeight.Bold,
                      color = BarterColor.textGreen,
                      modifier = Modifier
                          .padding()
@@ -118,12 +116,12 @@ fun CustomDialog(
                      color = BarterColor.green,
                      modifier = Modifier
                          .fillMaxWidth()
-                         .padding(top = 30.dp, start = 50.dp, end = 50.dp),
+                         .padding(top = 30.dp),
 
                  )
                  Row(
                      modifier = Modifier
-                         .padding(top = 30.dp, start = 50.dp, end = 50.dp)
+                         .padding(top = 30.dp)
                  ) {
                      DialogButton(
                          title = positiveText, onPositive)
@@ -151,7 +149,18 @@ fun DialogButton(title: String,
         Text(
             text = title,
             fontSize = 18.sp,
+            //fontWeight = FontWeight.Bold,
             color = Color.White
         )
     }
+}
+
+@Composable
+fun CustomCircularProgressBar() {
+    CircularProgressIndicator(
+        modifier = Modifier
+            .size(80.dp),
+        color = BarterColor.green,
+        strokeWidth = 10.dp
+    )
 }

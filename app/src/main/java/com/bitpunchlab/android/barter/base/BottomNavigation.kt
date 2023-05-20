@@ -22,7 +22,8 @@ fun BottomBarNavigation(navController: NavHostController) {
         Main,
         Sell,
         Bid,
-        Report
+        Report,
+        Logout
     )
 
     BottomNavigation(
@@ -51,7 +52,7 @@ fun BottomBarNavigation(navController: NavHostController) {
                 icon = { Icon(
                     painter = painterResource(id = item.icon),
                     contentDescription = item.title,
-                    modifier = Modifier.padding(5.dp)
+                    modifier = Modifier.padding(10.dp)
                 ) }
             )
         }

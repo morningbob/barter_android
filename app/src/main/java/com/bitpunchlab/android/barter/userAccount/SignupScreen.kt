@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -35,11 +36,13 @@ fun SignupScreen(navController: NavHostController,
     val confirmPassError by signupViewModel.confirmPassError.collectAsState()
     val readySignup by signupViewModel.readySignup.collectAsState()
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
-    val shouldShowStatus by signupViewModel.shouldShowStatus.collectAsState()
+    //val shouldShowStatus by signupViewModel.shouldShowStatus.collectAsState()
+    val createACStatus by FirebaseClient.createACStatus.collectAsState()
+    val loadingAlpha by signupViewModel.loadingAlpha.collectAsState()
 
     // LaunchedEffect is used to run code that won't trigger recomposition of the view
-    LaunchedEffect(key1 = isLoggedIn) {
-        if (isLoggedIn) {
+    LaunchedEffect(key1 = createACStatus) {
+        if (createACStatus == 2) {
             navController.navigate(Main.route)
         }
     }
@@ -159,8 +162,18 @@ fun SignupScreen(navController: NavHostController,
                 )
             }
 
-        if (shouldShowStatus != 0) {
-            ShowStatusDialog(status = shouldShowStatus)
+        if (createACStatus != 0) {
+            ShowStatusDialog(status = createACStatus)
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(loadingAlpha),
+
+        ) {
+            CustomCircularProgressBar()
         }
 
     }
@@ -169,9 +182,9 @@ fun SignupScreen(navController: NavHostController,
 
 @Composable
 fun ShowStatusDialog(status: Int) {
-    if (status == 1) {
+    if (status == 2) {
         SuccessStatusDialog()
-    } else if (status == 2) {
+    } else if (status == 1) {
 
     }
 }

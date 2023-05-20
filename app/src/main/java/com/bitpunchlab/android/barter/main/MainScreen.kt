@@ -33,10 +33,15 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel = 
 
     val productOfferingList by mainViewModel.productOfferingList.collectAsState()
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
+    val currentUser by FirebaseClient.currentUserFirebase.collectAsState()
 
     LaunchedEffect(key1 = isLoggedIn) {
         if (!isLoggedIn) {
-            navController.navigate(Login.route)
+            navController.navigate(Login.route) {
+                popUpTo(navController.graph.id) {
+                    inclusive = false
+                }
+            }
         }
     }
 
@@ -61,7 +66,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel = 
                         .width(120.dp)
                 )
                 TitleText(
-                    title = "Main",
+                    title = "Hello, ${currentUser?.name}",
                     modifier = Modifier
                         .padding(top = 40.dp)
                 )

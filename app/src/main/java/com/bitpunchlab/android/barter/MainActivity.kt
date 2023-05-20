@@ -20,6 +20,7 @@ import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
+import com.bitpunchlab.android.barter.userAccount.LogoutScreen
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
 
 class MainActivity : ComponentActivity() {
@@ -64,6 +65,9 @@ fun BarterNavigation() {
         }
         composable(Report.route) {
 
+        }
+        composable(Logout.route) {
+            LogoutScreen(navController = navController)
         }
     }
 }
