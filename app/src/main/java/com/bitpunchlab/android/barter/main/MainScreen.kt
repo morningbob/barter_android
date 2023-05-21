@@ -15,8 +15,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Login
@@ -29,11 +31,18 @@ import kotlinx.coroutines.flow.map
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel = MainViewModel()) {
+fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
+    //val mainViewModel = ViewModelProvider(LocalContext.current)
     val productOfferingList by mainViewModel.productOfferingList.collectAsState()
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
-    val currentUser by FirebaseClient.currentUserFirebase.collectAsState()
+    //val currentUser by FirebaseClient.currentUserFirebase.collectAsState()
+    val currentUser by mainViewModel.currentUser.collectAsState()
+
+    // get all products from database
+    //mainViewModel.retrieveProductsOffering()
+
+    val userName = currentUser?.name ?: "there!"
 
     LaunchedEffect(key1 = isLoggedIn) {
         if (!isLoggedIn) {
@@ -66,7 +75,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel = 
                         .width(120.dp)
                 )
                 TitleText(
-                    title = "Hello, ${currentUser?.name}",
+                    title = "Hello, ${userName}!",
                     modifier = Modifier
                         .padding(top = 40.dp)
                 )

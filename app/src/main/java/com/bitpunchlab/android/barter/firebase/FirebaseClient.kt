@@ -17,6 +17,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import org.w3c.dom.DOMImplementationSource
 import java.util.Calendar
 import java.util.Locale
@@ -29,6 +30,10 @@ object FirebaseClient {
     //val password = MutableStateFlow<String>("")
     private var userName = ""
     private var userEmail = ""
+    // we need the id as soon as it is available from Auth
+    //private var udserId = ""
+    private val _userId = MutableStateFlow<String>("")
+    val userId : StateFlow<String> get() = _userId.asStateFlow()
 
     private val _currentUserFirebase = MutableStateFlow<UserFirebase?>(null)
     val currentUserFirebase : StateFlow<UserFirebase?> get() = _currentUserFirebase.asStateFlow()
@@ -40,12 +45,19 @@ object FirebaseClient {
     private val _createACStatus = MutableStateFlow<Int>(0)
     val createACStatus : StateFlow<Int> get() = _createACStatus.asStateFlow()
 
+    val _finishedAuthSignup = MutableStateFlow<Boolean>(false)
+    val finishedAuthSignup : StateFlow<Boolean> get() = _finishedAuthSignup.asStateFlow()
 
-    var authStateListener = FirebaseAuth.AuthStateListener { auth ->
+
+    private var authStateListener = FirebaseAuth.AuthStateListener { auth ->
         if (auth.currentUser != null) {
             Log.i("fire auth", "auth != null")
             isLoggedIn.value = true
+            _userId.value = auth.currentUser!!.uid
+            Log.i("auth listener", "got user id ${userId.value}")
             if (createAccount) {
+                _finishedAuthSignup.value = true
+                /*
                 CoroutineScope(Dispatchers.IO).launch {
                     if (processSignupUserObject(userName, userEmail)) {
                         _createACStatus.value = 2
@@ -53,9 +65,12 @@ object FirebaseClient {
                         _createACStatus.value = 1
                     }
                 }
+
+                 */
             } else {
                 // retrieve user from firestore
                 CoroutineScope(Dispatchers.IO).launch {
+                    //_userId.value = auth.cu
                     Log.i("auth", "user id: ${auth.currentUser!!.uid}")
                     _currentUserFirebase.value = retrieveUserFirebase(auth.currentUser!!.uid)
                 }
@@ -114,28 +129,33 @@ object FirebaseClient {
             if (signupAuth(email, password)) {
                 // pass the info to auth, when it is ready,
                 // we can create user and save to firestore
-                userEmail = email
-                userName = name
+                //userEmail = email
+                //userName = name
+                finishedAuthSignup.collect() { finished ->
+                    // reset
+                    createAccount = false
+                    if (finished) {
+                        if (processSignupUserObject(name, email)) {
+                            _createACStatus.value = 2
+                        } else {
+                            _createACStatus.value = 1
+
+                        }
+                    }
+                }
                 true
             } else {
                 false
             }
-
         }.await()
     }
 
     private suspend fun processSignupUserObject(name: String, email: String) : Boolean {
         val user = createUserFirebase(auth.currentUser!!.uid, name, email)
+        _currentUserFirebase.value = user
         return CoroutineScope(Dispatchers.IO).async {
             saveUserFirebase(user)
         }.await()
-
-    }
-
-    fun processLogin() {
-        // login
-        // retrieve user object from firestore
-
     }
 
     private suspend fun retrieveUserFirebase(uid: String) : UserFirebase? =

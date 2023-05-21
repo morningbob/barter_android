@@ -17,6 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.main.MainScreen
+import com.bitpunchlab.android.barter.main.MainViewModel
+import com.bitpunchlab.android.barter.main.MainViewModelFactory
 import com.bitpunchlab.android.barter.sell.SellScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
@@ -36,7 +38,10 @@ class MainActivity : ComponentActivity() {
                     //val firebaseClient = ViewModelProvider(this,
                         //FirebaseClientViewModelFactory(this.application))
                         //.get(FirebaseClient::class.java)
-                    BarterNavigation()
+                    val mainViewModel = ViewModelProvider(this,
+                        MainViewModelFactory(application))
+                        .get(MainViewModel::class.java)
+                    BarterNavigation(mainViewModel)
                 }
             }
         }
@@ -44,7 +49,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BarterNavigation() {
+fun BarterNavigation(mainViewModel: MainViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Login.route) {
@@ -55,7 +60,7 @@ fun BarterNavigation() {
             SignupScreen(navController)
         }
         composable(Main.route) {
-            MainScreen(navController)
+            MainScreen(navController, mainViewModel)
         }
         composable(Sell.route) {
             SellScreen(navController)

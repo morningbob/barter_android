@@ -163,6 +163,7 @@ fun SignupScreen(navController: NavHostController,
             }
 
         if (createACStatus != 0) {
+            signupViewModel.updateLoadingAlpha(0f)
             ShowStatusDialog(status = createACStatus)
         }
 
@@ -195,8 +196,8 @@ fun SuccessStatusDialog() {
         title = "Registration",
         message = "You are successfully registered.",
         positiveText = "OK",
-        onDismiss = {  },
-        onPositive = {  }
+        onDismiss = { FirebaseClient.updateCreateACStatus(0)},
+        onPositive = { FirebaseClient.updateCreateACStatus(0) }
     ) {}
 
 }

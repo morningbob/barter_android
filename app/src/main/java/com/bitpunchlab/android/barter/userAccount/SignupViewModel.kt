@@ -90,8 +90,13 @@ class SignupViewModel() : ViewModel() {
                 //_loadingAlpha.value = 0f
             } else {
                 _loadingAlpha.value = 0f
+                FirebaseClient.updateCreateACStatus(1)
             }
         }
+    }
+
+    fun updateLoadingAlpha(alpha: Float) {
+        _loadingAlpha.value = alpha
     }
 
 }
