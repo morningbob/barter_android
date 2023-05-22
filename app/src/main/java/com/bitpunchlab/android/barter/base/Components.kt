@@ -164,3 +164,29 @@ fun CustomCircularProgressBar() {
         strokeWidth = 10.dp
     )
 }
+
+@Composable
+fun CustomDropDown(title: String, shouldExpand: Boolean, onClick: () -> Unit,
+    onDismiss: () -> Unit, items: List<String>, modifier: Modifier = Modifier) {
+    var expand = shouldExpand
+    Button(
+        onClick = { expand = !expand }
+    ) {
+        Text(
+            text = title
+        )
+    }
+
+    DropdownMenu(
+        expanded = expand,
+        onDismissRequest = { onDismiss.invoke() }) {
+        
+        items.map { item ->
+            DropdownMenuItem(onClick = { expand = false }) {
+                Text(
+                    text = item
+                )
+            }
+        }
+    }
+}
