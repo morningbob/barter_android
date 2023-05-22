@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import kotlin.reflect.KClass
+//import kotlin.reflect.full.memberProperties
 
 @Composable
 fun CustomTextField(label: String, textValue: String, onChange: (String) -> Unit,
@@ -166,11 +168,13 @@ fun CustomCircularProgressBar() {
 }
 
 @Composable
-fun CustomDropDown(title: String, shouldExpand: Boolean, onClick: () -> Unit,
-    onDismiss: () -> Unit, items: List<String>, modifier: Modifier = Modifier) {
-    var expand = shouldExpand
+fun <T: Any> CustomDropDown(title: String, shouldExpand: Boolean,
+    onClickButton: () -> Unit,
+    onClickItem: (T) -> Unit,
+    onDismiss: () -> Unit, items: List<T>, modifier: Modifier = Modifier) {
+    //var expand = shouldExpand
     Button(
-        onClick = { expand = !expand }
+        onClick = { onClickButton.invoke() }
     ) {
         Text(
             text = title
@@ -178,15 +182,25 @@ fun CustomDropDown(title: String, shouldExpand: Boolean, onClick: () -> Unit,
     }
 
     DropdownMenu(
-        expanded = expand,
+        expanded = shouldExpand,
         onDismissRequest = { onDismiss.invoke() }) {
         
         items.map { item ->
-            DropdownMenuItem(onClick = { expand = false }) {
+            val nameField = item.javaClass.getDeclaredField("label")
+            nameField.isAccessible = true
+            DropdownMenuItem(onClick = { onClickItem(item) }) {
                 Text(
-                    text = item
+                    text = nameField.get(item)!!.toString()
                 )
             }
         }
     }
+}
+
+fun <T> get(comingObject: T) {
+    var comingClass = comingObject!!::class
+
+    var properties = comingClass.members
+
+
 }
