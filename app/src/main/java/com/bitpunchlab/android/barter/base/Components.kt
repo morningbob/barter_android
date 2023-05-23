@@ -172,35 +172,46 @@ fun <T: Any> CustomDropDown(title: String, shouldExpand: Boolean,
     onClickButton: () -> Unit,
     onClickItem: (T) -> Unit,
     onDismiss: () -> Unit, items: List<T>, modifier: Modifier = Modifier) {
-    //var expand = shouldExpand
-    Button(
-        onClick = { onClickButton.invoke() }
+    Column(
+        modifier = Modifier.then(modifier)
     ) {
-        Text(
-            text = title
+        //var expand = shouldExpand
+        ChoiceButton(
+            title = title,
+            onClick = { onClickButton.invoke() }
         )
-    }
 
-    DropdownMenu(
-        expanded = shouldExpand,
-        onDismissRequest = { onDismiss.invoke() }) {
-        
-        items.map { item ->
-            val nameField = item.javaClass.getDeclaredField("label")
-            nameField.isAccessible = true
-            DropdownMenuItem(onClick = { onClickItem(item) }) {
-                Text(
-                    text = nameField.get(item)!!.toString()
-                )
+        DropdownMenu(
+            expanded = shouldExpand,
+            onDismissRequest = { onDismiss.invoke() }) {
+
+            items.map { item ->
+                val nameField = item.javaClass.getDeclaredField("label")
+                nameField.isAccessible = true
+                DropdownMenuItem(onClick = { onClickItem(item) }) {
+                    Text(
+                        text = nameField.get(item)!!.toString()
+                    )
+                }
             }
         }
     }
 }
 
-fun <T> get(comingObject: T) {
-    var comingClass = comingObject!!::class
+@Composable
+fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        onClick = { onClick.invoke() },
+        modifier = Modifier.then(modifier),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = BarterColor.green
+        )
 
-    var properties = comingClass.members
-
-
+    ) {
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            color = Color.White,
+        )
+    }
 }

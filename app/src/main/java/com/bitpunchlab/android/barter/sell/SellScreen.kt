@@ -19,10 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
-import com.bitpunchlab.android.barter.base.BottomBarNavigation
-import com.bitpunchlab.android.barter.base.CustomDropDown
-import com.bitpunchlab.android.barter.base.CustomTextField
-import com.bitpunchlab.android.barter.base.TitleText
+import com.bitpunchlab.android.barter.base.*
 import com.bitpunchlab.android.barter.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -67,7 +64,8 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(start = 30.dp, end = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -88,7 +86,8 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
                 // a form to get the product's detail
                 ProductForm(
                     ProductType.PRODUCT, productName, pickImageLauncher, shouldExpandCategory,
-                    productCategory, shouldExpandDuration, sellingDuration, sellViewModel
+                    productCategory, shouldExpandDuration, sellingDuration, sellViewModel,
+                    Modifier.padding(top = 30.dp)
                 )
             }
         }
@@ -101,21 +100,36 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
 fun ProductForm(productType: ProductType, productName: String, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
                 shouldExpandCat: Boolean, productCategory: Category,
                 shouldExpandDuration: Boolean, sellingDuration: SellingDuration,
-                sellViewModel: SellViewModel) {
+                sellViewModel: SellViewModel, modifier: Modifier = Modifier) {
 
     Log.i("product form", "should expand ${shouldExpandCat}")
 
-    Column() {
+    Column(
+        modifier = Modifier.then(modifier)
+    ) {
+        BaseProductForm(
+            productName = productName,
+            productCategory = productCategory,
+            shouldExpandCat = shouldExpandCat,
+            sellViewModel = sellViewModel
+        )
+        /*
         CustomTextField(
             label = "Product name",
             textValue = productName,
             onChange = { sellViewModel.updateName(it) })
 
-        Row() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(top = 20.dp)
+        ) {
             CustomTextField(
                 label = "Category",
                 textValue = productCategory.label,
-                onChange = {}
+                onChange = {},
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
             )
 
             CustomDropDown(
@@ -130,26 +144,35 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                     sellViewModel.updateShouldExpandCategory(false)
                 },
                 onDismiss = {  },
-                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS)
+                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
+                modifier = Modifier.padding(start = 20.dp)
             )
         }
+
+         */
         if (productType == ProductType.PRODUCT) {
-            Button(
+            ChoiceButton(
+                title = "Upload image",
                 onClick = {
                     sellViewModel.updateImageType(ImageType.PRODUCT_IMAGE)
                     pickImageLauncher.launch("image/*")
-                }
-            ) {
-                Text(
-                    text = "Upload product image"
-                )
-            }
+                },
+                Modifier
+                    .padding(top = 20.dp),
 
-            Row() {
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            ) {
                 CustomTextField(
                     label = "Duration",
                     textValue = sellingDuration.label,
-                    onChange = {}
+                    onChange = {},
+                    modifier = Modifier
+                    .fillMaxWidth(0.4f)
                 )
 
                 CustomDropDown(
@@ -161,17 +184,60 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                         sellViewModel.updateShouldExpandDuration(false)
                     },
                     onDismiss = { },
-                    items = listOf(SellingDuration.ONE_DAY, SellingDuration.TWO_DAYS)
+                    items = listOf(SellingDuration.ONE_DAY, SellingDuration.TWO_DAYS),
+                    modifier = Modifier.padding(start = 20.dp)
                 )
             }
 
-            Row() {
-                Text(
-                    text = "Asking product list"
-                )
+            Row(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            ) {
+                ChoiceButton(
+                    title = "Set exchange product",
+                    onClick = {  })
 
             }
         } // end of if
+    }
+}
+
+@Composable
+fun BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
+    sellViewModel: SellViewModel) {
+    CustomTextField(
+        label = "Product name",
+        textValue = productName,
+        onChange = { sellViewModel.updateName(it) })
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(top = 20.dp)
+    ) {
+        CustomTextField(
+            label = "Category",
+            textValue = productCategory.label,
+            onChange = {},
+            modifier = Modifier
+                .fillMaxWidth(0.4f)
+        )
+
+        CustomDropDown(
+            title = "Category",
+            shouldExpand = shouldExpandCat,
+            onClickButton = {
+                sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
+
+            },
+            onClickItem =  {
+                sellViewModel.updateCategory(it)
+                sellViewModel.updateShouldExpandCategory(false)
+            },
+            onDismiss = {  },
+            items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
+            modifier = Modifier.padding(start = 20.dp)
+        )
     }
 }
 
