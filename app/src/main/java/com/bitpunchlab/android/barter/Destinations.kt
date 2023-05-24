@@ -36,6 +36,12 @@ object Bid : Destinations {
     override val icon: Int = R.mipmap.auction
 }
 
+object AskProduct : Destinations {
+    override val title: String = "Set asking product"
+    override val route: String = "AskProduct"
+    override val icon: Int = R.mipmap.auction
+}
+
 object Report : Destinations {
     override val title: String = "Report"
     override val route: String = "Report"

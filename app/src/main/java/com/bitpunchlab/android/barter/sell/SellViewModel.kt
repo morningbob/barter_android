@@ -39,6 +39,9 @@ class SellViewModel : ViewModel() {
     private val _imageType = MutableStateFlow(ImageType.PRODUCT_IMAGE)
     val imageType : StateFlow<ImageType> get() = _imageType.asStateFlow()
 
+    private val _shouldSetProduct = MutableStateFlow(false)
+    val shouldSetProduct : StateFlow<Boolean> get() = _shouldSetProduct.asStateFlow()
+
     fun updateShouldExpandCategory(should: Boolean) {
         _shouldExpandCategory.value = should
     }
@@ -77,5 +80,9 @@ class SellViewModel : ViewModel() {
 
     fun updateImageType(type: ImageType) {
         _imageType.value = type
+    }
+
+    fun updateShouldSetProduct(set: Boolean) {
+        _shouldSetProduct.value = set
     }
 }

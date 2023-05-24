@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.bitpunchlab.android.barter.AskProduct
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.*
 import com.bitpunchlab.android.barter.util.*
@@ -31,9 +33,11 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
     val productCategory by sellViewModel.productCategory.collectAsState()
     val shouldExpandDuration by sellViewModel.shouldExpandDuration.collectAsState()
     val sellingDuration by sellViewModel.sellingDuration.collectAsState()
+    val shouldSetAskingProduct by sellViewModel.shouldSetProduct.collectAsState()
 
     var imageType = ImageType.PRODUCT_IMAGE
     val screenContext = LocalContext.current
+
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -41,14 +45,14 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
             val bitmap = RetrievePhotoHelper.getBitmap(uri, screenContext)
             bitmap?.let {
                 Log.i("launcher", "got bitmap")
-                when (imageType) {
-                    ImageType.PRODUCT_IMAGE -> {
+                //when (imageType) {
+                //    ImageType.PRODUCT_IMAGE -> {
                         sellViewModel.updateProductImages(it)
-                    }
-                    ImageType.ASKING_IMAGE -> {
-                        sellViewModel.updateAskingImages(it)
-                    }
-                }
+                //    }
+                //    ImageType.ASKING_IMAGE -> {
+                //        sellViewModel.updateAskingImages(it)
+                //    }
+                //}
             }
         }
     }
@@ -87,7 +91,8 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
                 ProductForm(
                     ProductType.PRODUCT, productName, pickImageLauncher, shouldExpandCategory,
                     productCategory, shouldExpandDuration, sellingDuration, sellViewModel,
-                    Modifier.padding(top = 30.dp)
+                    shouldSetAskingProduct,
+                    Modifier.padding(top = 30.dp), navController
                 )
             }
         }
@@ -100,9 +105,18 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
 fun ProductForm(productType: ProductType, productName: String, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
                 shouldExpandCat: Boolean, productCategory: Category,
                 shouldExpandDuration: Boolean, sellingDuration: SellingDuration,
-                sellViewModel: SellViewModel, modifier: Modifier = Modifier) {
+                sellViewModel: SellViewModel, shouldSetProduct: Boolean,
+                modifier: Modifier = Modifier, navController: NavHostController) {
 
     Log.i("product form", "should expand ${shouldExpandCat}")
+
+    LaunchedEffect(key1 = shouldSetProduct) {
+        if (shouldSetProduct) {
+            Log.i("should set", "about to navigate")
+            navController.navigate(AskProduct.route)
+        }
+        Log.i("should set", "is false")
+    }
 
     Column(
         modifier = Modifier.then(modifier)
@@ -111,61 +125,16 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
             productName = productName,
             productCategory = productCategory,
             shouldExpandCat = shouldExpandCat,
-            sellViewModel = sellViewModel
+            viewModel = sellViewModel,
+            pickImageLauncher
         )
-        /*
-        CustomTextField(
-            label = "Product name",
-            textValue = productName,
-            onChange = { sellViewModel.updateName(it) })
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(top = 20.dp)
-        ) {
-            CustomTextField(
-                label = "Category",
-                textValue = productCategory.label,
-                onChange = {},
-                modifier = Modifier
-                    .fillMaxWidth(0.4f)
-            )
-
-            CustomDropDown(
-                title = "Category",
-                shouldExpand = shouldExpandCat,
-                onClickButton = {
-                    sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
-
-                },
-                onClickItem =  {
-                    sellViewModel.updateCategory(it)
-                    sellViewModel.updateShouldExpandCategory(false)
-                },
-                onDismiss = {  },
-                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
-                modifier = Modifier.padding(start = 20.dp)
-            )
-        }
-
-         */
-        if (productType == ProductType.PRODUCT) {
-            ChoiceButton(
-                title = "Upload image",
-                onClick = {
-                    sellViewModel.updateImageType(ImageType.PRODUCT_IMAGE)
-                    pickImageLauncher.launch("image/*")
-                },
-                Modifier
-                    .padding(top = 20.dp),
-
-            )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+
                 modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = 20.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
                 CustomTextField(
                     label = "Duration",
@@ -195,56 +164,78 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
             ) {
                 ChoiceButton(
                     title = "Set exchange product",
-                    onClick = {  })
+                    onClick = {
+                        sellViewModel.updateShouldSetProduct(true)
+                        //navController.navigate(AskProduct.route)
+                    })
 
             }
-        } // end of if
+        //} // end of if
     }
 }
 
 @Composable
-fun BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
-    sellViewModel: SellViewModel) {
-    CustomTextField(
-        label = "Product name",
-        textValue = productName,
-        onChange = { sellViewModel.updateName(it) })
+fun <T: Any> BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
+    viewModel: T, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>) {
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(top = 20.dp)
-    ) {
-        CustomTextField(
-            label = "Category",
-            textValue = productCategory.label,
-            onChange = {},
-            modifier = Modifier
-                .fillMaxWidth(0.4f)
-        )
+    val viewModelCollection = viewModel::class.members
+    val viewModelUpdateName = viewModelCollection.first { it.name == "updateName" }
+    val viewModelUpdateCategory = viewModelCollection.first { it.name == "updateCategory" }
+    val viewModelUpdateShouldExpandCategory = viewModelCollection.first { it.name == "updateShouldExpandCategory"}
 
-        CustomDropDown(
-            title = "Category",
-            shouldExpand = shouldExpandCat,
-            onClickButton = {
-                sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
-
-            },
-            onClickItem =  {
-                sellViewModel.updateCategory(it)
-                sellViewModel.updateShouldExpandCategory(false)
-            },
-            onDismiss = {  },
-            items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
-            modifier = Modifier.padding(start = 20.dp)
-        )
-    }
-}
-
-@Composable
-fun AskingProductForm(sellViewModel: SellViewModel) {
     Column() {
+        CustomTextField(
+            label = "Product name",
+            textValue = productName,
+            onChange = {
+                //viewModelUpdateName.invoke(it)
+                viewModelUpdateName.call(viewModel, it)
+            })
 
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(top = 20.dp)
+        ) {
+            CustomTextField(
+                label = "Category",
+                textValue = productCategory.label,
+                onChange = {},
+                modifier = Modifier
+                    .fillMaxWidth(0.4f)
+            )
+
+            CustomDropDown(
+                title = "Category",
+                shouldExpand = shouldExpandCat,
+                onClickButton = {
+                    viewModelUpdateShouldExpandCategory.call(viewModel, !shouldExpandCat)
+                    //sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
+                },
+                onClickItem =  {
+                    viewModelUpdateCategory.call(viewModel, it)
+                    viewModelUpdateShouldExpandCategory.call(viewModel, false)
+                    //sellViewModel.updateCategory(it)
+                    //sellViewModel.updateShouldExpandCategory(false)
+                },
+                onDismiss = {  },
+                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
+                modifier = Modifier.padding(start = 20.dp)
+            )
+        }
+        ChoiceButton(
+            title = "Upload image",
+            onClick = {
+                //viewModel.updateImageType(ImageType.PRODUCT_IMAGE)
+                pickImageLauncher.launch("image/*")
+            },
+            Modifier
+                .padding(top = 20.dp),
+        )
     }
+
+
 }
+
+
 
