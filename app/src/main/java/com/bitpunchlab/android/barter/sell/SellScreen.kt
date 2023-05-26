@@ -9,12 +9,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -35,8 +33,16 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
     val sellingDuration by sellViewModel.sellingDuration.collectAsState()
     val shouldSetAskingProduct by sellViewModel.shouldSetProduct.collectAsState()
 
+    var shouldCancel by remember { mutableStateOf(false) }
+
     var imageType = ImageType.PRODUCT_IMAGE
     val screenContext = LocalContext.current
+
+    LaunchedEffect(key1 = shouldCancel) {
+        if (shouldCancel) {
+            navController.popBackStack()
+        }
+    }
 
 
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -69,7 +75,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 30.dp, end = 30.dp),
+                    .padding(start = 50.dp, end = 50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -94,6 +100,26 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
                     shouldSetAskingProduct,
                     Modifier.padding(top = 30.dp), navController
                 )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
+                ) {
+                    ChoiceButton(
+                        title = "Send",
+                        onClick = { sellViewModel.onSendClicked() },
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                        )
+                    ChoiceButton(
+                        title = "Cancel",
+                        onClick = { shouldCancel = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 30.dp)
+                    )
+                }
             }
         }
     }
@@ -133,15 +159,16 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                 verticalAlignment = Alignment.CenterVertically,
 
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 20.dp),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start
             ) {
                 CustomTextField(
                     label = "Duration",
                     textValue = sellingDuration.label,
                     onChange = {},
                     modifier = Modifier
-                    .fillMaxWidth(0.4f)
+                    .fillMaxWidth(0.5f)
                 )
 
                 CustomDropDown(
@@ -167,7 +194,10 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                     onClick = {
                         sellViewModel.updateShouldSetProduct(true)
                         //navController.navigate(AskProduct.route)
-                    })
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
 
             }
         //} // end of if
@@ -190,19 +220,25 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
             onChange = {
                 //viewModelUpdateName.invoke(it)
                 viewModelUpdateName.call(viewModel, it)
-            })
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
+
             modifier = Modifier
-                .padding(top = 20.dp)
+                .fillMaxWidth()
+                .padding(top = 20.dp),
+            horizontalArrangement = Arrangement.Start
+
         ) {
             CustomTextField(
                 label = "Category",
                 textValue = productCategory.label,
                 onChange = {},
                 modifier = Modifier
-                    .fillMaxWidth(0.4f)
+                    .fillMaxWidth(0.5f)
             )
 
             CustomDropDown(
@@ -220,7 +256,9 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 },
                 onDismiss = {  },
                 items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
-                modifier = Modifier.padding(start = 20.dp)
+                modifier = Modifier
+                    //.fillMaxWidth()
+                    .padding(start = 20.dp)
             )
         }
         ChoiceButton(
@@ -230,6 +268,7 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 pickImageLauncher.launch("image/*")
             },
             Modifier
+                .fillMaxWidth()
                 .padding(top = 20.dp),
         )
     }

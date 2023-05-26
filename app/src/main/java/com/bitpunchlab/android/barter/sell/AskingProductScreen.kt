@@ -73,7 +73,8 @@ fun AskingProductScreen(navController: NavHostController,
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BarterColor.lightGreen),
+                    .background(BarterColor.lightGreen)
+                    .padding(start = 50.dp, end = 50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 

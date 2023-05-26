@@ -4,10 +4,13 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.*
 
 class AskingProductViewModel : ViewModel() {
 
@@ -39,5 +42,19 @@ class AskingProductViewModel : ViewModel() {
         val newList = askingProductImages.value.toMutableList()
         newList.add(bitmap)
         _askingProductImages.value = newList
+    }
+
+    fun createProduct() {
+        // validate inputs
+        if (validateInputs()) {
+            val newProduct = ProductOffering(productId = UUID.randomUUID().toString(),
+            category = productCategory.value.name,
+            userId = FirebaseClient.currentUserFirebase.value!!.id,
+            name = productName.value)
+        }
+    }
+
+    fun validateInputs() : Boolean {
+        return !(productName.value == "" || productCategory.value == Category.NOT_SET)
     }
 }

@@ -13,7 +13,8 @@ class ProductOfferingFirebase {
     constructor(productId: String, productUserId: String,
                 productName: String, productCategory: String,
                 productImages: HashMap<String, String> = HashMap<String, String>(),
-                productCurrentBids: HashMap<String, String> = HashMap<String, String>()) {
+                productCurrentBids: HashMap<String, String> = HashMap<String, String>())
+    {
         id = productId
         userId = productUserId
         name = productName

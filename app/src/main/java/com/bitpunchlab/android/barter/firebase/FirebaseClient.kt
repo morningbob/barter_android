@@ -1,35 +1,26 @@
 package com.bitpunchlab.android.barter.firebase
 
-import android.app.Application
+import android.graphics.Bitmap
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
-import com.bitpunchlab.android.barter.userAccount.LoginViewModel
+import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.util.convertBitmapToBytes
+import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import org.w3c.dom.DOMImplementationSource
-import java.util.Calendar
-import java.util.Locale
-import java.util.UUID
+import java.util.*
 
 //class FirebaseClient(val application: Application) : AndroidViewModel(application) {
 object FirebaseClient {
-    //val loginViewModel = LoginViewModel()
-    //val email = MutableStateFlow<String>("")
-    //val password = MutableStateFlow<String>("")
-    private var userName = ""
-    private var userEmail = ""
+
+    private val storageRef = Firebase.storage.reference
     // we need the id as soon as it is available from Auth
     //private var udserId = ""
     private val _userId = MutableStateFlow<String>("")
@@ -205,16 +196,112 @@ object FirebaseClient {
                     }
                 }
         }
-}
 /*
-class FirebaseClientViewModelFactory(private val application: Application)
-    : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FirebaseClient::class.java)) {
-            return FirebaseClient(application) as T
+    suspend fun processSelling(productOffering: ProductOffering, askImages: List<Bitmap>)
+    : ProductOffering {
+        // convert product to firebase model
+        // save images in cloud store and local device, and get the url and store in the product
+        // store product id in user's object, both local and firebase
+        // save user's object in firebase
+        // save product in productsOffering collection in firebase
+        // trigger cloud function to
+
+    }
+*/
+    suspend fun processSelling(productOffering: ProductOffering, askImages: List<Bitmap>) : Boolean {
+        val downloadUrlList = mutableListOf<String>()
+        val imageFilenames = mutableListOf<String>()
+        val lock1 = Any()
+
+        for (i in 0..askImages.size - 1) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val filename = "${productOffering.productId}_${i}.jpg"
+                Log.i("process selling", "creating filename $filename")
+                val pair = processSaveImage(askImages[i], filename)
+                synchronized(lock1) {
+                    //val newProductOffering = processSaveImage(askImages[i], productOffering, filename)
+                    if (pair.second != null) {
+                        Log.i("process selling", "editing downloadUrlList")
+                        downloadUrlList.add(pair.second!!)
+                        imageFilenames.add(pair.first)
+                    }
+                }
+            }.join()
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+
+        // update the productOffering for the image list, before sending to firestore
+        val newList = productOffering.images.toMutableList()
+        newList.addAll(downloadUrlList)
+        Log.i(
+            "process selling",
+            "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
+        )
+        productOffering.images = newList
+
+        val productFirebase = convertProductOfferingToFirebase(productOffering, imageFilenames)
+        val resultDeferred = CoroutineScope(Dispatchers.IO).async {
+            saveProductOfferingFirebase(productFirebase)
+        }
+        return resultDeferred.await()
+    }
+
+    private suspend fun processSaveImage(bitmap: Bitmap,
+                                         filename: String) : Pair<String, String?> =
+        suspendCancellableCoroutine<Pair<String, String?>> { cancellableContinuation ->
+            CoroutineScope(Dispatchers.IO).launch {
+
+                val downloadUrl = saveImageCloudStorage(bitmap, filename)
+                if (downloadUrl != null) {
+                    Log.i("process save image", "got downloadUrl $downloadUrl")
+                    cancellableContinuation.resume(Pair(filename, downloadUrl)) {}
+                } else {
+                    // not put that after if because need to wait for the result back
+                    Log.i("process save image", "failed to get downloadUrl")
+                    cancellableContinuation.resume(Pair(filename, null)) {}
+                }
+            }
+
+    }
+
+    private suspend fun saveImageCloudStorage(image: Bitmap, filename: String) : String? =
+        suspendCancellableCoroutine { cancellableContinuation ->
+
+            val imageRef = storageRef.child("images/${filename}")
+            val imageBytes = convertBitmapToBytes(image)
+
+            val uploadTask = imageRef
+                .putBytes(imageBytes)
+                .addOnSuccessListener { taskSnapshot ->
+                    Log.i("save image to storage", "success")
+                    //val urlString = taskSnapshot.metadata?.reference?.downloadUrl.toString()
+                    taskSnapshot.storage.downloadUrl
+                        .addOnSuccessListener { url ->
+                            Log.i("upload image to storage", "success")
+                            cancellableContinuation.resume(url.toString()) {}
+                        }
+                        .addOnFailureListener { e ->
+                            Log.i("upload image to storage", "failed ${e.message}")
+                            cancellableContinuation.resume(null) {}
+                        }
+                }
+                .addOnFailureListener { e ->
+                    Log.i("save image to storage", "failed ${e.message}")
+                    cancellableContinuation.resume(null) {}
+                }
+    }
+
+    private suspend fun saveProductOfferingFirebase(productOffering: ProductOfferingFirebase) : Boolean =
+        suspendCancellableCoroutine {cancellableContinuation ->
+            Firebase.firestore
+                .collection("productsOffering")
+                .document(productOffering.id)
+                .set(productOffering)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("save product offering firebase", "success")
+                    } else {
+                        Log.i("save product offering firebase", "failed ${task.exception}")
+                    }
+                }
     }
 }
-
- */

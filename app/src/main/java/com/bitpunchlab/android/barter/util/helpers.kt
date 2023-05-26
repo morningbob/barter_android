@@ -1,5 +1,8 @@
 package com.bitpunchlab.android.barter.util
 
+import android.graphics.Bitmap
+import java.io.ByteArrayOutputStream
+
 fun validateEmail(email: String) : String {
     if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
         return "Email is invalid."
@@ -27,4 +30,10 @@ fun validateConfirmPassword(password: String, confirmPass: String) : String {
         return "Password and confirm password must be the same."
     }
     return ""
+}
+
+fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+    return baos.toByteArray()
 }

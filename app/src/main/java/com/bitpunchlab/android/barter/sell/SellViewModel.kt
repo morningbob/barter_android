@@ -1,14 +1,23 @@
 package com.bitpunchlab.android.barter.sell
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.SellingDuration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import java.util.*
 
 class SellViewModel : ViewModel() {
 
@@ -33,6 +42,9 @@ class SellViewModel : ViewModel() {
     private val _productImages = MutableStateFlow<List<Bitmap>>(listOf())
     val productImages : StateFlow<List<Bitmap>> get() = _productImages.asStateFlow()
 
+    private val _askingProducts = MutableStateFlow<List<ProductOffering>>(listOf())
+    val askingProducts : StateFlow<List<ProductOffering>> get() = _askingProducts.asStateFlow()
+
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
 
@@ -41,6 +53,17 @@ class SellViewModel : ViewModel() {
 
     private val _shouldSetProduct = MutableStateFlow(false)
     val shouldSetProduct : StateFlow<Boolean> get() = _shouldSetProduct.asStateFlow()
+
+    private val userId = MutableStateFlow("")
+
+    //private val onSendClicked
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseClient.userId.collect() {
+                userId.value = it
+            }
+        }
+    }
 
     fun updateShouldExpandCategory(should: Boolean) {
         _shouldExpandCategory.value = should
@@ -69,6 +92,7 @@ class SellViewModel : ViewModel() {
     fun updateProductImages(bitmap: Bitmap) {
         val newList = productImages.value.toMutableList()
         newList.add(bitmap)
+        Log.i("sellVM", "added one bitmap")
         _productImages.value = newList
     }
 
@@ -84,5 +108,32 @@ class SellViewModel : ViewModel() {
 
     fun updateShouldSetProduct(set: Boolean) {
         _shouldSetProduct.value = set
+    }
+
+    fun onSendClicked() {
+        // validate inputs
+        if (productName.value != "" && productCategory.value != Category.NOT_SET &&
+                //askingProductImages.value.isNotEmpty() &&
+             sellingDuration.value != SellingDuration.NOT_SET //&&
+                    //askingProducts.value.isNotEmpty()
+                ) {
+            processSelling()
+        }
+    }
+
+    // I put empty images list, we will populate it in FirebaseClient
+    fun processSelling() {
+        val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
+        name = productName.value, category = productCategory.value.name,
+            userId = userId.value, images = listOf(), currentBids = listOf()
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.i("process selling", "got images size: ${productImages.value.size}")
+            if (FirebaseClient.processSelling(productOffering, productImages.value)) {
+                Log.i("process selling, from sellVM", "succeeded")
+            } else {
+                Log.i("process selling, from sellVM", "failed")
+            }
+        }
     }
 }
