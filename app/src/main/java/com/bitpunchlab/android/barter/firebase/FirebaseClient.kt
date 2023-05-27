@@ -217,7 +217,7 @@ object FirebaseClient {
             CoroutineScope(Dispatchers.IO).launch {
                 val filename = "${productOffering.productId}_${i}.jpg"
                 Log.i("process selling", "creating filename $filename")
-                val pair = processSaveImage(askImages[i], filename)
+                val pair = saveImageCloudStorage(askImages[i], filename)
                 synchronized(lock1) {
                     //val newProductOffering = processSaveImage(askImages[i], productOffering, filename)
                     if (pair.second != null) {
@@ -244,7 +244,7 @@ object FirebaseClient {
         }
         return resultDeferred.await()
     }
-
+/*
     private suspend fun processSaveImage(bitmap: Bitmap,
                                          filename: String) : Pair<String, String?> =
         suspendCancellableCoroutine<Pair<String, String?>> { cancellableContinuation ->
@@ -262,8 +262,8 @@ object FirebaseClient {
             }
 
     }
-
-    private suspend fun saveImageCloudStorage(image: Bitmap, filename: String) : String? =
+*/
+    private suspend fun saveImageCloudStorage(image: Bitmap, filename: String) : Pair<String, String?> =
         suspendCancellableCoroutine { cancellableContinuation ->
 
             val imageRef = storageRef.child("images/${filename}")
@@ -276,17 +276,17 @@ object FirebaseClient {
                     //val urlString = taskSnapshot.metadata?.reference?.downloadUrl.toString()
                     taskSnapshot.storage.downloadUrl
                         .addOnSuccessListener { url ->
-                            Log.i("upload image to storage", "success")
-                            cancellableContinuation.resume(url.toString()) {}
+                            Log.i("upload image to storage", url.toString())
+                            cancellableContinuation.resume(Pair(filename, url.toString())) {}
                         }
                         .addOnFailureListener { e ->
                             Log.i("upload image to storage", "failed ${e.message}")
-                            cancellableContinuation.resume(null) {}
+                            cancellableContinuation.resume(Pair(filename, null)) {}
                         }
                 }
                 .addOnFailureListener { e ->
                     Log.i("save image to storage", "failed ${e.message}")
-                    cancellableContinuation.resume(null) {}
+                    cancellableContinuation.resume(Pair(filename, null)) {}
                 }
     }
 

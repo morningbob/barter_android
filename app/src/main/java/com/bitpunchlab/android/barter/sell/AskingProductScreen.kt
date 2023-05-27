@@ -34,7 +34,6 @@ fun AskingProductScreen(navController: NavHostController,
     val shouldExpandCategory by askingProductViewModel.shouldExpandCategory.collectAsState()
     val productCategory by askingProductViewModel.productCategory.collectAsState()
 
-    //var imageType = ImageType.PRODUCT_IMAGE
     val screenContext = LocalContext.current
     var popCurrent by remember { mutableStateOf(false) }
 
@@ -102,7 +101,7 @@ fun AskingProductScreen(navController: NavHostController,
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 30.dp, start = 50.dp, end = 50.dp),
+                        .padding(top = 30.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
 
 
@@ -129,12 +128,5 @@ fun AskingProductScreen(navController: NavHostController,
                 }
             }
         }
-    }
-}
-
-@Composable
-fun AskingProductForm() {
-    Column() {
-
     }
 }

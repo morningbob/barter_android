@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
+import kotlin.collections.HashMap
 
 class AskingProductViewModel : ViewModel() {
 
@@ -44,17 +45,30 @@ class AskingProductViewModel : ViewModel() {
         _askingProductImages.value = newList
     }
 
-    fun createProduct() {
+    fun processAskingProduct() {
         // validate inputs
         if (validateInputs()) {
             val newProduct = ProductOffering(productId = UUID.randomUUID().toString(),
             category = productCategory.value.name,
             userId = FirebaseClient.currentUserFirebase.value!!.id,
             name = productName.value)
+            //AskingProductInfo.askingProductList.add(newProduct)
+            //AskingProductInfo.askingProductImages.addAll(askingProductImages.value)
+            val productMap = HashMap<ProductOffering, List<Bitmap>>()
+            productMap.put(newProduct, askingProductImages.value)
+            AskingProductInfo.askingProductsMap.put(newProduct.productId,
+                productMap
+            )
+            // clean up
+
         }
     }
 
     fun validateInputs() : Boolean {
         return !(productName.value == "" || productCategory.value == Category.NOT_SET)
+    }
+
+    private fun clearForm() {
+        
     }
 }
