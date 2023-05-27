@@ -20,6 +20,7 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChoiceButton
+import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ImageType
@@ -36,6 +37,8 @@ fun AskingProductScreen(navController: NavHostController,
 
     val screenContext = LocalContext.current
     var popCurrent by remember { mutableStateOf(false) }
+
+    val status by askingProductViewModel.status.collectAsState()
 
     LaunchedEffect(key1 = popCurrent) {
         if (popCurrent) {
@@ -110,6 +113,7 @@ fun AskingProductScreen(navController: NavHostController,
                         title = "Done",
                         onClick = {
                             // save to database
+                            askingProductViewModel.processAskingProduct()
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.45f)
@@ -127,6 +131,29 @@ fun AskingProductScreen(navController: NavHostController,
                     )
                 }
             }
+            // show success dialog
+            if (status != 0) {
+                showStatus(status = status, askingProductViewModel = askingProductViewModel)
+            }
         }
     }
+}
+
+@Composable
+fun showStatus(status: Int, askingProductViewModel: AskingProductViewModel) {
+    when (status) {
+        2 -> {
+            successDialog(askingProductViewModel)
+        }
+    }
+}
+
+@Composable
+fun successDialog(askingProductViewModel: AskingProductViewModel) {
+    CustomDialog(
+        title = "Product recorded",
+        message = "The asking product was saved.  It will be shown to the user who bid your product.",
+        positiveText = "OK",
+        onDismiss = { askingProductViewModel.updateStatus(0) },
+        onPositive = { askingProductViewModel.updateStatus(0) })
 }

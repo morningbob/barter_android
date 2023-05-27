@@ -9,4 +9,7 @@ object AskingProductInfo {
     //val askingProductList = mutableListOf<ProductOffering>()
     //val askingProductImages = mutableListOf<Bitmap>()
 
+    val askingProducts = mutableListOf<ProductOffering>()
+    val askingProductsImages = mutableListOf<List<Bitmap>>()
+
 }

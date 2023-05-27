@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
+import kotlin.collections.HashMap
 
 //class FirebaseClient(val application: Application) : AndroidViewModel(application) {
 object FirebaseClient {
@@ -208,16 +209,56 @@ object FirebaseClient {
 
     }
 */
-    suspend fun processSelling(productOffering: ProductOffering, askImages: List<Bitmap>) : Boolean {
+    suspend fun processSelling(productOffering: ProductOffering, productImages: List<Bitmap>,
+        askingProducts: List<ProductOffering>, askingProductImages: List<List<Bitmap>>) : Boolean {
+
+        val askingProductsList = mutableListOf<ProductOffering>()
+        for (i in 0..askingProducts.size - 1) {
+            askingProductsList.add(processEachProduct(askingProducts[i], askingProductImages[i]))
+        }
+
+        val semiUpdatedProductOffering = processEachProduct(productOffering, productImages)
+        semiUpdatedProductOffering.askingProducts = askingProductsList
+
+        val productFirebase = convertProductOfferingToFirebase(semiUpdatedProductOffering)
+        val resultDeferred = CoroutineScope(Dispatchers.IO).async {
+            saveProductOfferingFirebase(productFirebase)
+        }
+        return resultDeferred.await()
+    }
+
+    private suspend fun processEachProduct(productOffering: ProductOffering,
+        productImages: List<Bitmap>) : ProductOffering {
         val downloadUrlList = mutableListOf<String>()
         val imageFilenames = mutableListOf<String>()
-        val lock1 = Any()
 
-        for (i in 0..askImages.size - 1) {
+        val pairProductResult = uploadImages(productOffering = productOffering,
+            images = productImages)
+
+        downloadUrlList.addAll(pairProductResult.first)
+        imageFilenames.addAll(pairProductResult.second)
+
+        val newList = productOffering.images.toMutableList()
+        newList.addAll(downloadUrlList)
+        Log.i(
+            "process selling",
+            "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
+        )
+        productOffering.images = newList
+        return productOffering
+    }
+
+    private suspend fun uploadImages(productOffering: ProductOffering, images: List<Bitmap>) :
+     Pair<List<String>, List<String>> {
+        val lock1 = Any()
+        val downloadUrlList = mutableListOf<String>()
+        val imageFilenames = mutableListOf<String>()
+
+        for (i in 0..images.size - 1) {
             CoroutineScope(Dispatchers.IO).launch {
                 val filename = "${productOffering.productId}_${i}.jpg"
                 Log.i("process selling", "creating filename $filename")
-                val pair = saveImageCloudStorage(askImages[i], filename)
+                val pair = saveImageCloudStorage(images[i], filename)
                 synchronized(lock1) {
                     //val newProductOffering = processSaveImage(askImages[i], productOffering, filename)
                     if (pair.second != null) {
@@ -228,21 +269,7 @@ object FirebaseClient {
                 }
             }.join()
         }
-
-        // update the productOffering for the image list, before sending to firestore
-        val newList = productOffering.images.toMutableList()
-        newList.addAll(downloadUrlList)
-        Log.i(
-            "process selling",
-            "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
-        )
-        productOffering.images = newList
-
-        val productFirebase = convertProductOfferingToFirebase(productOffering, imageFilenames)
-        val resultDeferred = CoroutineScope(Dispatchers.IO).async {
-            saveProductOfferingFirebase(productFirebase)
-        }
-        return resultDeferred.await()
+        return Pair(downloadUrlList, imageFilenames)
     }
 /*
     private suspend fun processSaveImage(bitmap: Bitmap,

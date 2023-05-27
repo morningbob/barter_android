@@ -27,6 +27,9 @@ class AskingProductViewModel : ViewModel() {
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
 
+    private val _status = MutableStateFlow(0)
+    val status : StateFlow<Int> get() = _status.asStateFlow()
+
     fun updateShouldExpandCategory(should: Boolean) {
         _shouldExpandCategory.value = should
     }
@@ -54,14 +57,22 @@ class AskingProductViewModel : ViewModel() {
             name = productName.value)
             //AskingProductInfo.askingProductList.add(newProduct)
             //AskingProductInfo.askingProductImages.addAll(askingProductImages.value)
-            val productMap = HashMap<ProductOffering, List<Bitmap>>()
-            productMap.put(newProduct, askingProductImages.value)
-            AskingProductInfo.askingProductsMap.put(newProduct.productId,
-                productMap
-            )
-            // clean up
+            //val productMap = HashMap<ProductOffering, List<Bitmap>>()
+            //productMap.put(newProduct, askingProductImages.value)
+            //AskingProductInfo.askingProductsMap.put(newProduct.productId,
+            //    productMap
+            //)
 
+            AskingProductInfo.askingProducts.add(newProduct)
+            AskingProductInfo.askingProductsImages.add(askingProductImages.value)
+            // clean up
+            clearForm()
+            _status.value = 2
         }
+    }
+
+    fun updateStatus(status: Int) {
+        _status.value = status
     }
 
     fun validateInputs() : Boolean {
@@ -69,6 +80,9 @@ class AskingProductViewModel : ViewModel() {
     }
 
     private fun clearForm() {
-        
+        _productName.value = ""
+        _productCategory.value = Category.NOT_SET
+        _askingProductImages.value = listOf()
+        _shouldExpandCategory.value = false
     }
 }
