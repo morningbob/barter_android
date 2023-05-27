@@ -24,7 +24,7 @@ import com.bitpunchlab.android.barter.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = SellViewModel()) {
+fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 
     val productName by sellViewModel.productName.collectAsState()
     val shouldExpandCategory by sellViewModel.shouldExpandCategory.collectAsState()
@@ -132,6 +132,7 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
     LaunchedEffect(key1 = shouldSetProduct) {
         if (shouldSetProduct) {
             Log.i("should set", "about to navigate")
+            sellViewModel.updateShouldSetProduct(false)
             navController.navigate(AskProduct.route)
         }
         Log.i("should set", "is false")
@@ -185,7 +186,6 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                 ChoiceButton(
                     title = "Set exchange product",
                     onClick = {
-                        sellViewModel.saveProductInfo()
                         sellViewModel.updateShouldSetProduct(true)
                         //navController.navigate(AskProduct.route)
                     },

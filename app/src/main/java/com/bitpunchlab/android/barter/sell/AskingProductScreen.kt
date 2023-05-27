@@ -29,7 +29,8 @@ import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AskingProductScreen(navController: NavHostController,
-                        askingProductViewModel: AskingProductViewModel = AskingProductViewModel()) {
+        //sellViewModel: SellViewModel,
+        askingProductViewModel: AskingProductViewModel = AskingProductViewModel()) {
 
     val productName by askingProductViewModel.productName.collectAsState()
     val shouldExpandCategory by askingProductViewModel.shouldExpandCategory.collectAsState()
@@ -40,11 +41,33 @@ fun AskingProductScreen(navController: NavHostController,
 
     val status by askingProductViewModel.status.collectAsState()
 
+    //val askingProductsList by askingProductViewModel.askingProductsList.collectAsState()
+    //val askingProductsImages by askingProductViewModel.askingProductsImages.collectAsState()
+
+    //val update by askingProductViewModel.update.collectAsState()
+
     LaunchedEffect(key1 = popCurrent) {
         if (popCurrent) {
+            Log.i("asking product screen", "popping current")
             navController.popBackStack()
         }
     }
+/*
+    LaunchedEffect(key1 = update) {
+        if (update) {
+            sellViewModel.updateAskingProductsList(askingProductsList)
+            sellViewModel.updateAskingProductsImages(askingProductsImages)
+            askingProductViewModel.cancelUpdate()
+        }
+    }
+*/
+    //LaunchedEffect(key1 = askingProductsList) {
+    //    sellViewModel.updateAskingProductsList(askingProductsList)
+    //}
+
+    //LaunchedEffect(key1 = askingProductsImages) {
+    //    sellViewModel.updateAskingProductsImages(askingProductsImages)
+    //}
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->

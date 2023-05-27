@@ -30,6 +30,15 @@ class AskingProductViewModel : ViewModel() {
     private val _status = MutableStateFlow(0)
     val status : StateFlow<Int> get() = _status.asStateFlow()
 
+    private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
+    val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
+
+    private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
+    val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
+
+    private val _update = MutableStateFlow(false)
+    val update : StateFlow<Boolean> get() = _update.asStateFlow()
+
     fun updateShouldExpandCategory(should: Boolean) {
         _shouldExpandCategory.value = should
     }
@@ -55,20 +64,32 @@ class AskingProductViewModel : ViewModel() {
             category = productCategory.value.name,
             userId = FirebaseClient.currentUserFirebase.value!!.id,
             name = productName.value)
-            //AskingProductInfo.askingProductList.add(newProduct)
-            //AskingProductInfo.askingProductImages.addAll(askingProductImages.value)
-            //val productMap = HashMap<ProductOffering, List<Bitmap>>()
-            //productMap.put(newProduct, askingProductImages.value)
-            //AskingProductInfo.askingProductsMap.put(newProduct.productId,
-            //    productMap
-            //)
 
-            AskingProductInfo.askingProducts.add(newProduct)
-            AskingProductInfo.askingProductsImages.add(askingProductImages.value)
+            //AskingProductInfo.askingProducts.add(newProduct)
+            //AskingProductInfo.askingProductsImages.add(askingProductImages.value)
+            updateAskingProductsList(newProduct)
+            updateAskingProductsImages(askingProductImages.value)
             // clean up
             clearForm()
             _status.value = 2
+            _update.value = true
         }
+    }
+
+    fun cancelUpdate() {
+        _update.value = false
+    }
+
+    fun updateAskingProductsList(product: ProductOffering) {
+        val newList = askingProductsList.value.toMutableList()
+        newList.add(product)
+        _askingProductsList.value = newList
+    }
+
+    fun updateAskingProductsImages(images: List<Bitmap>) {
+        val newList = askingProductsImages.value.toMutableList()
+        newList.add(images)
+        _askingProductsImages.value = newList
     }
 
     fun updateStatus(status: Int) {

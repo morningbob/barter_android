@@ -54,6 +54,12 @@ class SellViewModel : ViewModel() {
     private val _shouldSetProduct = MutableStateFlow(false)
     val shouldSetProduct : StateFlow<Boolean> get() = _shouldSetProduct.asStateFlow()
 
+    private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
+    val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
+
+    private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
+    val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
+
     private val userId = MutableStateFlow("")
 
     //private val onSendClicked
@@ -110,9 +116,14 @@ class SellViewModel : ViewModel() {
         _shouldSetProduct.value = set
     }
 
-    fun saveProductInfo() {
-
+    fun updateAskingProductsList(productsList: List<ProductOffering>) {
+        _askingProductsList.value = productsList
     }
+
+    fun updateAskingProductsImages(listOfImages: List<List<Bitmap>>) {
+        _askingProductsImages.value = listOfImages
+    }
+
 
     fun onSendClicked() {
         // validate inputs
@@ -133,7 +144,7 @@ class SellViewModel : ViewModel() {
         )
 
         val updatedAskingProducts = mutableListOf<ProductOffering>()
-        for (each in AskingProductInfo.askingProducts) {
+        for (each in askingProductsList.value) {
             val newProduct = each.copy(productOfferingId = productOffering.productId)
             updatedAskingProducts.add(newProduct)
         }
@@ -141,7 +152,7 @@ class SellViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             Log.i("process selling", "got images size: ${productImages.value.size}")
             if (FirebaseClient.processSelling(productOffering, productImages.value,
-                updatedAskingProducts, AskingProductInfo.askingProductsImages)) {
+                updatedAskingProducts, askingProductsImages.value)) {
                 Log.i("process selling, from sellVM", "succeeded")
             } else {
                 Log.i("process selling, from sellVM", "failed")

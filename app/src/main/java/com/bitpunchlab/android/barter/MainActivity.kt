@@ -21,6 +21,7 @@ import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
+import com.bitpunchlab.android.barter.sell.SellViewModel
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.LogoutScreen
@@ -42,7 +43,9 @@ class MainActivity : ComponentActivity() {
                     val mainViewModel = ViewModelProvider(this,
                         MainViewModelFactory(application))
                         .get(MainViewModel::class.java)
-                    BarterNavigation(mainViewModel)
+                    val sellViewModel = ViewModelProvider(this)
+                        .get(SellViewModel::class.java)
+                    BarterNavigation(mainViewModel, sellViewModel)
                 }
             }
         }
@@ -50,7 +53,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BarterNavigation(mainViewModel: MainViewModel) {
+fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Login.route) {
@@ -64,7 +67,7 @@ fun BarterNavigation(mainViewModel: MainViewModel) {
             MainScreen(navController, mainViewModel)
         }
         composable(Sell.route) {
-            SellScreen(navController)
+            SellScreen(navController, sellViewModel)
         }
         composable(AskProduct.route) {
             AskingProductScreen(navController)
