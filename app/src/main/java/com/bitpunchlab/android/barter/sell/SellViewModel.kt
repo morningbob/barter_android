@@ -110,6 +110,10 @@ class SellViewModel : ViewModel() {
         _shouldSetProduct.value = set
     }
 
+    fun saveProductInfo() {
+
+    }
+
     fun onSendClicked() {
         // validate inputs
         if (productName.value != "" && productCategory.value != Category.NOT_SET &&
@@ -127,9 +131,17 @@ class SellViewModel : ViewModel() {
         name = productName.value, category = productCategory.value.name,
             userId = userId.value, images = listOf(), currentBids = listOf()
         )
+
+        val updatedAskingProducts = mutableListOf<ProductOffering>()
+        for (each in AskingProductInfo.askingProducts) {
+            val newProduct = each.copy(productOfferingId = productOffering.productId)
+            updatedAskingProducts.add(newProduct)
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             Log.i("process selling", "got images size: ${productImages.value.size}")
-            if (FirebaseClient.processSelling(productOffering, productImages.value)) {
+            if (FirebaseClient.processSelling(productOffering, productImages.value,
+                updatedAskingProducts, AskingProductInfo.askingProductsImages)) {
                 Log.i("process selling, from sellVM", "succeeded")
             } else {
                 Log.i("process selling, from sellVM", "failed")

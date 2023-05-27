@@ -17,12 +17,6 @@ data class ProductOffering(
     var category: String,
     var images : List<String> = listOf(),
     var currentBids : List<String> = listOf(),
-    @Embedded var askingProducts : List<ProductOffering> = listOf()
-) : Parcelable {
-    constructor(productId: String = "", userId: String = "", name: String = "",
-                category: String = "", images: List<String> = listOf<String>(),
-                currentBids: List<String> = listOf(),
-                //askingProducts: List<ProductOffering> = listOf()
-    ) : this(productId, userId, name, category, images,
-    currentBids)//, askingProducts)
-}
+    var productOfferingId : String = ""
+    //@Embedded var askingProducts : List<ProductOffering> = listOf()
+) : Parcelable

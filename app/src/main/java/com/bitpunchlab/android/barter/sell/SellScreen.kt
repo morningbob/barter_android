@@ -51,14 +51,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel = 
             val bitmap = RetrievePhotoHelper.getBitmap(uri, screenContext)
             bitmap?.let {
                 Log.i("launcher", "got bitmap")
-                //when (imageType) {
-                //    ImageType.PRODUCT_IMAGE -> {
-                        sellViewModel.updateProductImages(it)
-                //    }
-                //    ImageType.ASKING_IMAGE -> {
-                //        sellViewModel.updateAskingImages(it)
-                //    }
-                //}
+                sellViewModel.updateProductImages(it)
             }
         }
     }
@@ -192,6 +185,7 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                 ChoiceButton(
                     title = "Set exchange product",
                     onClick = {
+                        sellViewModel.saveProductInfo()
                         sellViewModel.updateShouldSetProduct(true)
                         //navController.navigate(AskProduct.route)
                     },
@@ -272,8 +266,6 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 .padding(top = 20.dp),
         )
     }
-
-
 }
 
 

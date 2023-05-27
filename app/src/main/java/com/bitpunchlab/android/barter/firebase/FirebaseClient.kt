@@ -5,6 +5,7 @@ import android.util.Log
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.util.ProductType
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.google.firebase.auth.FirebaseAuth
@@ -218,13 +219,32 @@ object FirebaseClient {
         }
 
         val semiUpdatedProductOffering = processEachProduct(productOffering, productImages)
-        semiUpdatedProductOffering.askingProducts = askingProductsList
+        //semiUpdatedProductOffering.askingProducts = askingProductsList
 
-        val productFirebase = convertProductOfferingToFirebase(semiUpdatedProductOffering)
-        val resultDeferred = CoroutineScope(Dispatchers.IO).async {
-            saveProductOfferingFirebase(productFirebase)
+        val productFirebase = convertProductOfferingToFirebase(semiUpdatedProductOffering, askingProductsList)
+        val resultProductDeferred = CoroutineScope(Dispatchers.IO).async {
+            saveProductOfferingFirebase(productFirebase, ProductType.PRODUCT)
+
         }
-        return resultDeferred.await()
+        val resultAskingDeferred = CoroutineScope(Dispatchers.IO).async {
+            askingProductsList.map { each ->
+                saveProductOfferingFirebase(
+                    convertProductOfferingToFirebase(each),
+                    ProductType.ASKING_PRODUCT
+                )
+            }
+        }
+        val resultAsking = resultAskingDeferred.await()
+        var count = 0
+        for (each in resultAsking) {
+            if (each) {
+                count += 1
+            } else {
+                break
+            }
+        }
+
+        return resultProductDeferred.await() && (count == resultAsking.size)
     }
 
     private suspend fun processEachProduct(productOffering: ProductOffering,
@@ -317,10 +337,13 @@ object FirebaseClient {
                 }
     }
 
-    private suspend fun saveProductOfferingFirebase(productOffering: ProductOfferingFirebase) : Boolean =
+    private suspend fun saveProductOfferingFirebase(productOffering: ProductOfferingFirebase, type: ProductType) : Boolean =
+
         suspendCancellableCoroutine {cancellableContinuation ->
+            var collection = if (type == ProductType.PRODUCT) "productsOffering" else "askingProducts"
+
             Firebase.firestore
-                .collection("productsOffering")
+                .collection(collection)
                 .document(productOffering.id)
                 .set(productOffering)
                 .addOnCompleteListener { task ->
@@ -331,4 +354,6 @@ object FirebaseClient {
                     }
                 }
     }
+
+
 }
