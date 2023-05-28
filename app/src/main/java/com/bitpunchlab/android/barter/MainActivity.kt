@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -21,6 +22,7 @@ import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
+import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.sell.SellViewModel
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
@@ -77,6 +79,9 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
         composable(Report.route) {
 
+        }
+        composable(ImagesDisplay.route) {
+            ImagesDisplayScreen(navController, sellViewModel)
         }
         composable(Logout.route) {
             LogoutScreen(navController = navController)

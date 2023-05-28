@@ -42,8 +42,8 @@ class SellViewModel : ViewModel() {
     private val _productImages = MutableStateFlow<List<Bitmap>>(listOf())
     val productImages : StateFlow<List<Bitmap>> get() = _productImages.asStateFlow()
 
-    private val _askingProducts = MutableStateFlow<List<ProductOffering>>(listOf())
-    val askingProducts : StateFlow<List<ProductOffering>> get() = _askingProducts.asStateFlow()
+    //private val _askingProducts = MutableStateFlow<List<ProductOffering>>(listOf())
+    //val askingProducts : StateFlow<List<ProductOffering>> get() = _askingProducts.asStateFlow()
 
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
@@ -54,11 +54,20 @@ class SellViewModel : ViewModel() {
     private val _shouldSetProduct = MutableStateFlow(false)
     val shouldSetProduct : StateFlow<Boolean> get() = _shouldSetProduct.asStateFlow()
 
-    private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
-    val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
+    //private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
+    //val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
 
-    private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
-    val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
+    //private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
+    //val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
+
+    private val _imagesDisplay = MutableStateFlow<List<Bitmap>>(listOf())
+    val imagesDisplay : StateFlow<List<Bitmap>> get() = _imagesDisplay.asStateFlow()
+
+    private val _shouldDisplayImages = MutableStateFlow(false)
+    val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
+
+    private val _shouldPopImages = MutableStateFlow(false)
+    val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
     private val userId = MutableStateFlow("")
 
@@ -117,11 +126,15 @@ class SellViewModel : ViewModel() {
     }
 
     fun updateAskingProductsList(productsList: List<ProductOffering>) {
-        _askingProductsList.value = productsList
+        //_askingProductsList.value = productsList
     }
 
     fun updateAskingProductsImages(listOfImages: List<List<Bitmap>>) {
-        _askingProductsImages.value = listOfImages
+        //_askingProductsImages.value = listOfImages
+    }
+
+    fun updateShouldDisplayImages(should: Boolean) {
+        _shouldDisplayImages.value = should
     }
 
 
@@ -158,5 +171,13 @@ class SellViewModel : ViewModel() {
                 Log.i("process selling, from sellVM", "failed")
             }
         }
+    }
+
+    fun prepareImagesDisplay() {
+        _imagesDisplay.value = productImages.value
+    }
+
+    fun updateShouldPopImages(should: Boolean) {
+        _shouldPopImages.value = should
     }
 }

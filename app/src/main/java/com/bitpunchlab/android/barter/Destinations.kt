@@ -48,6 +48,12 @@ object Report : Destinations {
     override val icon: Int = R.mipmap.report
 }
 
+object ImagesDisplay : Destinations {
+    override val title: String = "Images Display"
+    override val route: String = "ImagesDisplay"
+    override val icon: Int = R.mipmap.report
+}
+
 object Logout : Destinations {
     override val title: String = "Logout"
     override val route: String = "Logout"

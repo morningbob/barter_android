@@ -8,6 +8,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskProduct
+import com.bitpunchlab.android.barter.ImagesDisplay
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.*
 import com.bitpunchlab.android.barter.util.*
@@ -32,6 +35,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val shouldExpandDuration by sellViewModel.shouldExpandDuration.collectAsState()
     val sellingDuration by sellViewModel.sellingDuration.collectAsState()
     val shouldSetAskingProduct by sellViewModel.shouldSetProduct.collectAsState()
+    val shouldDisplayImages by sellViewModel.shouldDisplayImages.collectAsState()
 
     var shouldCancel by remember { mutableStateOf(false) }
 
@@ -41,6 +45,12 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     LaunchedEffect(key1 = shouldCancel) {
         if (shouldCancel) {
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(key1 = shouldDisplayImages) {
+        if (shouldDisplayImages) {
+            navController.navigate(ImagesDisplay.route)
         }
     }
 
@@ -68,8 +78,10 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 50.dp, end = 50.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(start = 50.dp, end = 50.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+
             ) {
 
                 Image(
@@ -110,7 +122,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                         onClick = { shouldCancel = true },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 30.dp)
+                            .padding(start = 30.dp, bottom = 100.dp)
                     )
                 }
             }
@@ -200,12 +212,15 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
 
 @Composable
 fun <T: Any> BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
-    viewModel: T, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>) {
+    viewModel: T, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
+    ) {
 
     val viewModelCollection = viewModel::class.members
     val viewModelUpdateName = viewModelCollection.first { it.name == "updateName" }
     val viewModelUpdateCategory = viewModelCollection.first { it.name == "updateCategory" }
-    val viewModelUpdateShouldExpandCategory = viewModelCollection.first { it.name == "updateShouldExpandCategory"}
+    val viewModelUpdateShouldExpandCategory = viewModelCollection.first { it.name == "updateShouldExpandCategory" }
+    val viewModelPrepareImagesDisplay = viewModelCollection.first { it.name == "prepareImagesDisplay" }
+    val viewModelUpdateShouldDisplayImages = viewModelCollection.first { it.name == "updateShouldDisplayImages" }
 
     Column() {
         CustomTextField(
@@ -260,6 +275,17 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
             onClick = {
                 //viewModel.updateImageType(ImageType.PRODUCT_IMAGE)
                 pickImageLauncher.launch("image/*")
+            },
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
+        )
+
+        ChoiceButton(
+            title = "View images",
+            onClick = {
+                viewModelPrepareImagesDisplay.call(viewModel)
+                viewModelUpdateShouldDisplayImages.call(viewModel, true)
             },
             Modifier
                 .fillMaxWidth()
