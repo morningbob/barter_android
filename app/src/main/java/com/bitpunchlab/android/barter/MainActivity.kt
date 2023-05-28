@@ -70,7 +70,7 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
             SellScreen(navController, sellViewModel)
         }
         composable(AskProduct.route) {
-            AskingProductScreen(navController)
+            AskingProductScreen(navController, sellViewModel)
         }
         composable(Bid.route) {
             BidScreen(navController)

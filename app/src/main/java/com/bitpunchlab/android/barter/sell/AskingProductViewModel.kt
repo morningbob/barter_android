@@ -65,10 +65,10 @@ class AskingProductViewModel : ViewModel() {
             userId = FirebaseClient.currentUserFirebase.value!!.id,
             name = productName.value)
 
-            //AskingProductInfo.askingProducts.add(newProduct)
-            //AskingProductInfo.askingProductsImages.add(askingProductImages.value)
-            updateAskingProductsList(newProduct)
-            updateAskingProductsImages(askingProductImages.value)
+            AskingProductInfo.askingProducts.add(newProduct)
+            AskingProductInfo.askingProductsImages.add(askingProductImages.value)
+            //updateAskingProductsList(newProduct)
+            //updateAskingProductsImages(askingProductImages.value)
             // clean up
             clearForm()
             _status.value = 2

@@ -24,7 +24,6 @@ object FirebaseClient {
 
     private val storageRef = Firebase.storage.reference
     // we need the id as soon as it is available from Auth
-    //private var udserId = ""
     private val _userId = MutableStateFlow<String>("")
     val userId : StateFlow<String> get() = _userId.asStateFlow()
 

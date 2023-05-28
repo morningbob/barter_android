@@ -144,7 +144,7 @@ class SellViewModel : ViewModel() {
         )
 
         val updatedAskingProducts = mutableListOf<ProductOffering>()
-        for (each in askingProductsList.value) {
+        for (each in AskingProductInfo.askingProducts) {
             val newProduct = each.copy(productOfferingId = productOffering.productId)
             updatedAskingProducts.add(newProduct)
         }
@@ -152,7 +152,7 @@ class SellViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             Log.i("process selling", "got images size: ${productImages.value.size}")
             if (FirebaseClient.processSelling(productOffering, productImages.value,
-                updatedAskingProducts, askingProductsImages.value)) {
+                updatedAskingProducts, AskingProductInfo.askingProductsImages)) {
                 Log.i("process selling, from sellVM", "succeeded")
             } else {
                 Log.i("process selling, from sellVM", "failed")

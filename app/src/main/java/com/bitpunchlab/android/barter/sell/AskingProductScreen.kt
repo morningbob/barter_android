@@ -29,7 +29,7 @@ import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AskingProductScreen(navController: NavHostController,
-        //sellViewModel: SellViewModel,
+        sellViewModel: SellViewModel,
         askingProductViewModel: AskingProductViewModel = AskingProductViewModel()) {
 
     val productName by askingProductViewModel.productName.collectAsState()
