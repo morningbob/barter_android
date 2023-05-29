@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.sell
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
@@ -39,6 +40,15 @@ class AskingProductViewModel : ViewModel() {
     private val _update = MutableStateFlow(false)
     val update : StateFlow<Boolean> get() = _update.asStateFlow()
 
+    private val _imagesDisplay = MutableStateFlow<List<Bitmap>>(listOf())
+    val imagesDisplay : StateFlow<List<Bitmap>> get() = _imagesDisplay.asStateFlow()
+
+    private val _shouldDisplayImages = MutableStateFlow(false)
+    val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
+
+    private val _shouldPopImages = MutableStateFlow(false)
+    val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
+
     fun updateShouldExpandCategory(should: Boolean) {
         _shouldExpandCategory.value = should
     }
@@ -55,6 +65,20 @@ class AskingProductViewModel : ViewModel() {
         val newList = askingProductImages.value.toMutableList()
         newList.add(bitmap)
         _askingProductImages.value = newList
+    }
+
+    fun updateShouldDisplayImages(should: Boolean) {
+        Log.i("askingVM", "updating should display images $should")
+        _shouldDisplayImages.value = should
+    }
+
+    fun prepareImagesDisplay() {
+        //Log.i("askingVM", "prepare images, no of images ${askingProductImages.value.size}")
+        _imagesDisplay.value = askingProductImages.value
+    }
+
+    fun updateShouldPopImages(should: Boolean) {
+        _shouldPopImages.value = should
     }
 
     fun processAskingProduct() {

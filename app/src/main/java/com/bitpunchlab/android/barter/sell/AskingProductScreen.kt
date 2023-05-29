@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.bitpunchlab.android.barter.ImagesDisplay
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChoiceButton
@@ -32,7 +33,8 @@ import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 @Composable
 fun AskingProductScreen(navController: NavHostController,
         sellViewModel: SellViewModel,
-        askingProductViewModel: AskingProductViewModel = AskingProductViewModel()) {
+        askingProductViewModel: AskingProductViewModel = remember {
+        AskingProductViewModel()}) {
 
     val productName by askingProductViewModel.productName.collectAsState()
     val shouldExpandCategory by askingProductViewModel.shouldExpandCategory.collectAsState()
@@ -43,10 +45,9 @@ fun AskingProductScreen(navController: NavHostController,
 
     val status by askingProductViewModel.status.collectAsState()
 
-    //val askingProductsList by askingProductViewModel.askingProductsList.collectAsState()
-    //val askingProductsImages by askingProductViewModel.askingProductsImages.collectAsState()
+    val shouldDisplayImages by askingProductViewModel.shouldDisplayImages.collectAsState()
 
-    //val update by askingProductViewModel.update.collectAsState()
+    //var displayImages by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = popCurrent) {
         if (popCurrent) {
@@ -54,22 +55,16 @@ fun AskingProductScreen(navController: NavHostController,
             navController.popBackStack()
         }
     }
-/*
-    LaunchedEffect(key1 = update) {
-        if (update) {
-            sellViewModel.updateAskingProductsList(askingProductsList)
-            sellViewModel.updateAskingProductsImages(askingProductsImages)
-            askingProductViewModel.cancelUpdate()
+
+    LaunchedEffect(key1 = shouldDisplayImages) {
+        if (shouldDisplayImages) {
+            Log.i("asking product screen", "should display images detected true")
+            //displayImages = false
+            //navController.navigate(ImagesDisplay.route)
+        } else {
+            Log.i("asking product screen", "should display images detected false")
         }
     }
-*/
-    //LaunchedEffect(key1 = askingProductsList) {
-    //    sellViewModel.updateAskingProductsList(askingProductsList)
-    //}
-
-    //LaunchedEffect(key1 = askingProductsImages) {
-    //    sellViewModel.updateAskingProductsImages(askingProductsImages)
-    //}
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -133,7 +128,6 @@ fun AskingProductScreen(navController: NavHostController,
                         .padding(top = 30.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
 
-
                 ) {
                     ChoiceButton(
                         title = "Done",
@@ -160,6 +154,9 @@ fun AskingProductScreen(navController: NavHostController,
             // show success dialog
             if (status != 0) {
                 showStatus(status = status, askingProductViewModel = askingProductViewModel)
+            }
+            if (shouldDisplayImages) {
+                ImagesDisplayScreen(viewModel = askingProductViewModel)
             }
         }
     }

@@ -50,7 +50,10 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 
     LaunchedEffect(key1 = shouldDisplayImages) {
         if (shouldDisplayImages) {
-            navController.navigate(ImagesDisplay.route)
+            Log.i("sell screen", "should display images true")
+            //navController.navigate(ImagesDisplay.route)
+        } else {
+            Log.i("sell screen", "should display images false")
         }
     }
 
@@ -125,6 +128,9 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                             .padding(start = 30.dp, bottom = 100.dp)
                     )
                 }
+            }
+            if (shouldDisplayImages) {
+                ImagesDisplayScreen(viewModel = sellViewModel)
             }
         }
     }
@@ -207,6 +213,7 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
 
             }
         //} // end of if
+        
     }
 }
 
@@ -227,7 +234,6 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
             label = "Product name",
             textValue = productName,
             onChange = {
-                //viewModelUpdateName.invoke(it)
                 viewModelUpdateName.call(viewModel, it)
             },
             modifier = Modifier.fillMaxWidth()
@@ -273,7 +279,6 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
         ChoiceButton(
             title = "Upload image",
             onClick = {
-                //viewModel.updateImageType(ImageType.PRODUCT_IMAGE)
                 pickImageLauncher.launch("image/*")
             },
             Modifier
@@ -284,6 +289,7 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
         ChoiceButton(
             title = "View images",
             onClick = {
+                Log.i("base product form", "set should display image true")
                 viewModelPrepareImagesDisplay.call(viewModel)
                 viewModelUpdateShouldDisplayImages.call(viewModel, true)
             },

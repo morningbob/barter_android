@@ -81,7 +81,7 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
 
         }
         composable(ImagesDisplay.route) {
-            ImagesDisplayScreen(navController, sellViewModel)
+            //ImagesDisplayScreen(navController)
         }
         composable(Logout.route) {
             LogoutScreen(navController = navController)

@@ -1,5 +1,8 @@
 package com.bitpunchlab.android.barter.sell
 
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,27 +18,105 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.lang.reflect.Field
+import kotlin.reflect.full.declaredMembers
+import kotlin.reflect.full.staticProperties
+import kotlin.reflect.full.valueParameters
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ImagesDisplayScreen(navController: NavHostController, sellViewModel: SellViewModel) {
+fun <T> ImagesDisplayScreen(viewModel: T) {
 
-    val images by sellViewModel.imagesDisplay.collectAsState()
-    val shouldPopImages by sellViewModel.shouldPopImages.collectAsState()
+    val viewModelCollection = viewModel!!::class.members
 
-    LaunchedEffect(key1 = shouldPopImages) {
-        if (shouldPopImages) {
-            sellViewModel.updateShouldPopImages(false)
-            navController.popBackStack()
+    var images: MutableStateFlow<List<Bitmap>?>
+
+    val field = viewModel.javaClass.getDeclaredField("_imagesDisplay")
+    field.isAccessible = true
+    Log.i("images display", "accessed field ${field.name}")
+    images = field.get(viewModel) as MutableStateFlow<List<Bitmap>?>//.collectAsState()
+    Log.i("images display", images.value?.size.toString())
+
+    val viewModelShouldPopImages = viewModel.javaClass.getDeclaredField("_shouldPopImages")//.get(viewModel) as MutableStateFlow<Boolean>
+    viewModelShouldPopImages.isAccessible = true
+    val shouldPopImages = (viewModelShouldPopImages.get(viewModel) as MutableStateFlow<Boolean>).collectAsState()
+
+    val viewModelUpdateShouldPopImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldPopImages" }
+    viewModelUpdateShouldPopImages.isAccessible = true
+    val viewModelUpdateShouldDisplayImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldDisplayImages" }
+    viewModelUpdateShouldDisplayImages.isAccessible = true
+
+    LaunchedEffect(key1 = shouldPopImages.value) {
+        Log.i("images launched effect", "should pop images changed ${shouldPopImages.value}")
+        if (shouldPopImages.value) {
+            viewModelUpdateShouldPopImages.invoke(viewModel, false)
+            //navController.popBackStack()
+        }
+    }
+    Dialog(onDismissRequest = {  }) {
+
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BarterColor.lightGreen)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp, end = 40.dp, top = 40.dp, bottom = 40.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Image(
+                        painter = painterResource(id = R.mipmap.cross),
+                        contentDescription = "cancel icon",
+                        modifier = Modifier
+                            .width(50.dp)
+                            .clickable {
+                                viewModelUpdateShouldPopImages.invoke(viewModel, true)
+                                viewModelUpdateShouldDisplayImages.invoke(viewModel, false)
+                            },
+                    )
+                }
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
+                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
+                ) {
+
+                    for (each in images.value!!) {
+                        item {
+                            Image(
+                                bitmap = each.asImageBitmap(),
+                                contentDescription = "product image",
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+}
+/*
+@Composable
+fun <T> ImageDisplayDialog(viewModel: T) {
+
+    Dialog(onDismissRequest = {  }) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -53,8 +134,8 @@ fun ImagesDisplayScreen(navController: NavHostController, sellViewModel: SellVie
                     modifier = Modifier
                         .width(50.dp)
                         .clickable {
-                            sellViewModel.updateShouldPopImages(true)
-                            sellViewModel.updateShouldDisplayImages(false)
+                            viewModelUpdateShouldPopImages.invoke(viewModel, true)
+                            viewModelUpdateShouldDisplayImages.invoke(viewModel, false)
                         },
                 )
             }
@@ -66,7 +147,8 @@ fun ImagesDisplayScreen(navController: NavHostController, sellViewModel: SellVie
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                for (each in images) {
+
+                for (each in images.value!!) {
                     item {
                         Image(
                             bitmap = each.asImageBitmap(),
@@ -78,15 +160,13 @@ fun ImagesDisplayScreen(navController: NavHostController, sellViewModel: SellVie
                     }
                 }
             }
-            /*
-            ChoiceButton(
-                title = "Done",
-                onClick = {
-                    sellViewModel.updateShouldPopImages(true)
-                })
-
-             */
         }
     }
-
 }
+
+
+inline fun <reified T: Any> getValue(name: String): MutableStateFlow<Boolean> {
+    return T::class.java.getDeclaredField(name).get(null) as MutableStateFlow<Boolean>
+}
+
+ */
