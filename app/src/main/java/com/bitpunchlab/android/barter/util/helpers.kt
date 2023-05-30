@@ -37,3 +37,8 @@ fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
     return baos.toByteArray()
 }
+
+data class ProductImage(
+    var id : String,
+    var image: Bitmap
+)

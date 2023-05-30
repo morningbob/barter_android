@@ -64,7 +64,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             val bitmap = RetrievePhotoHelper.getBitmap(uri, screenContext)
             bitmap?.let {
                 Log.i("launcher", "got bitmap")
-                sellViewModel.updateProductImages(it)
+                sellViewModel.updateProductImages1(it)
             }
         }
     }

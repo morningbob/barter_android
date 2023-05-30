@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,9 @@ class AskingProductViewModel : ViewModel() {
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
 
+    private val _askingProductImages1 = MutableStateFlow<List<ProductImage>>(mutableListOf())
+    val askingProductImages1 : StateFlow<List<ProductImage>> get() = _askingProductImages1.asStateFlow()
+
     private val _status = MutableStateFlow(0)
     val status : StateFlow<Int> get() = _status.asStateFlow()
 
@@ -37,11 +41,17 @@ class AskingProductViewModel : ViewModel() {
     private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
     val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
 
+    private val _askingProductsImages1 = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
+    val askingProductsImages1 : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages1.asStateFlow()
+
     private val _update = MutableStateFlow(false)
     val update : StateFlow<Boolean> get() = _update.asStateFlow()
 
     private val _imagesDisplay = MutableStateFlow<List<Bitmap>>(listOf())
     val imagesDisplay : StateFlow<List<Bitmap>> get() = _imagesDisplay.asStateFlow()
+
+    private val _imagesDisplay1 = MutableStateFlow<List<ProductImage>>(listOf())
+    val imagesDisplay1 : StateFlow<List<ProductImage>> get() = _imagesDisplay1.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -65,6 +75,14 @@ class AskingProductViewModel : ViewModel() {
         val newList = askingProductImages.value.toMutableList()
         newList.add(bitmap)
         _askingProductImages.value = newList
+    }
+
+    fun updateAskingImages1(image: Bitmap) {
+        val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
+        val newList = askingProductImages1.value.toMutableList()
+        newList.add(productImage)
+        Log.i("sellVM", "added one bitmap")
+        _askingProductImages1.value = newList
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -104,7 +122,33 @@ class AskingProductViewModel : ViewModel() {
         _update.value = false
     }
 
-    fun updateAskingProductsList(product: ProductOffering) {
+
+
+    fun updateStatus(status: Int) {
+        _status.value = status
+    }
+
+    fun validateInputs() : Boolean {
+        return !(productName.value == "" || productCategory.value == Category.NOT_SET)
+    }
+
+    fun deleteImage(image: ProductImage) {
+        Log.i("askingVM", "got image")
+        val newList = imagesDisplay1.value.toMutableList()
+        newList.remove(image)
+        _imagesDisplay1.value = newList
+    }
+
+    private fun clearForm() {
+        _productName.value = ""
+        _productCategory.value = Category.NOT_SET
+        _askingProductImages.value = listOf()
+        _shouldExpandCategory.value = false
+    }
+}
+
+/*
+fun updateAskingProductsList(product: ProductOffering) {
         val newList = askingProductsList.value.toMutableList()
         newList.add(product)
         _askingProductsList.value = newList
@@ -115,19 +159,4 @@ class AskingProductViewModel : ViewModel() {
         newList.add(images)
         _askingProductsImages.value = newList
     }
-
-    fun updateStatus(status: Int) {
-        _status.value = status
-    }
-
-    fun validateInputs() : Boolean {
-        return !(productName.value == "" || productCategory.value == Category.NOT_SET)
-    }
-
-    private fun clearForm() {
-        _productName.value = ""
-        _productCategory.value = Category.NOT_SET
-        _askingProductImages.value = listOf()
-        _shouldExpandCategory.value = false
-    }
-}
+ */

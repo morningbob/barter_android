@@ -9,6 +9,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
+import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,9 @@ class SellViewModel : ViewModel() {
     private val _productImages = MutableStateFlow<List<Bitmap>>(listOf())
     val productImages : StateFlow<List<Bitmap>> get() = _productImages.asStateFlow()
 
+    private val _productImages1 = MutableStateFlow<List<ProductImage>>(listOf())
+    val productImages1 : StateFlow<List<ProductImage>> get() = _productImages1.asStateFlow()
+
     //private val _askingProducts = MutableStateFlow<List<ProductOffering>>(listOf())
     //val askingProducts : StateFlow<List<ProductOffering>> get() = _askingProducts.asStateFlow()
 
@@ -62,6 +66,9 @@ class SellViewModel : ViewModel() {
 
     private val _imagesDisplay = MutableStateFlow<List<Bitmap>>(listOf())
     val imagesDisplay : StateFlow<List<Bitmap>> get() = _imagesDisplay.asStateFlow()
+
+    private val _imagesDisplay1 = MutableStateFlow<List<ProductImage>>(listOf())
+    val imagesDisplay1 : StateFlow<List<ProductImage>> get() = _imagesDisplay1.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -109,6 +116,14 @@ class SellViewModel : ViewModel() {
         newList.add(bitmap)
         Log.i("sellVM", "added one bitmap")
         _productImages.value = newList
+    }
+
+    fun updateProductImages1(image: Bitmap) {
+        val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
+        val newList = productImages1.value.toMutableList()
+        newList.add(productImage)
+        Log.i("sellVM", "added one bitmap")
+        _productImages1.value = newList
     }
 
     fun updateAskingImages(bitmap: Bitmap) {
@@ -174,10 +189,17 @@ class SellViewModel : ViewModel() {
     }
 
     fun prepareImagesDisplay() {
-        _imagesDisplay.value = productImages.value
+        _imagesDisplay1.value = productImages1.value
     }
 
     fun updateShouldPopImages(should: Boolean) {
         _shouldPopImages.value = should
+    }
+
+    fun deleteImage(image: ProductImage) {
+        Log.i("askingVM", "got image")
+        val newList = imagesDisplay1.value.toMutableList()
+        newList.remove(image)
+        _imagesDisplay1.value = newList
     }
 }
