@@ -5,13 +5,16 @@ class UserFirebase {
     var name: String = ""
     var email: String = ""
     var dataCreated: String = ""
+    var productsOffering = HashMap<String, ProductOfferingFirebase>()
 
     constructor()
 
-    constructor(userId: String, userName: String, userEmail: String, userDateCreated: String) {
+    constructor(userId: String, userName: String, userEmail: String, userDateCreated: String,
+        offering: HashMap<String, ProductOfferingFirebase>) {
         id = userId
         name = userName
         email = userEmail
         dataCreated = userDateCreated
+        productsOffering = offering
     }
 }

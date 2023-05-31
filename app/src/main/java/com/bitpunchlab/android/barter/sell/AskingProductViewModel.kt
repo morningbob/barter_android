@@ -26,11 +26,8 @@ class AskingProductViewModel : ViewModel() {
     private val _productCategory = MutableStateFlow(Category.NOT_SET)
     val productCategory : StateFlow<Category> get() = _productCategory.asStateFlow()
 
-    private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
-    val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
-
-    private val _askingProductImages1 = MutableStateFlow<List<ProductImage>>(mutableListOf())
-    val askingProductImages1 : StateFlow<List<ProductImage>> get() = _askingProductImages1.asStateFlow()
+    private val _askingProductImages = MutableStateFlow<List<ProductImage>>(mutableListOf())
+    val askingProductImages : StateFlow<List<ProductImage>> get() = _askingProductImages.asStateFlow()
 
     private val _status = MutableStateFlow(0)
     val status : StateFlow<Int> get() = _status.asStateFlow()
@@ -47,11 +44,8 @@ class AskingProductViewModel : ViewModel() {
     private val _update = MutableStateFlow(false)
     val update : StateFlow<Boolean> get() = _update.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<Bitmap>>(listOf())
-    val imagesDisplay : StateFlow<List<Bitmap>> get() = _imagesDisplay.asStateFlow()
-
-    private val _imagesDisplay1 = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay1 : StateFlow<List<ProductImage>> get() = _imagesDisplay1.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -71,18 +65,12 @@ class AskingProductViewModel : ViewModel() {
         _productName.value = name
     }
 
-    fun updateAskingImages(bitmap: Bitmap) {
-        val newList = askingProductImages.value.toMutableList()
-        newList.add(bitmap)
-        _askingProductImages.value = newList
-    }
-
-    fun updateAskingImages1(image: Bitmap) {
+    fun updateAskingImages(image: Bitmap) {
         val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
-        val newList = askingProductImages1.value.toMutableList()
+        val newList = askingProductImages.value.toMutableList()
         newList.add(productImage)
         Log.i("sellVM", "added one bitmap")
-        _askingProductImages1.value = newList
+        _askingProductImages.value = newList
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -134,9 +122,9 @@ class AskingProductViewModel : ViewModel() {
 
     fun deleteImage(image: ProductImage) {
         Log.i("askingVM", "got image")
-        val newList = imagesDisplay1.value.toMutableList()
+        val newList = imagesDisplay.value.toMutableList()
         newList.remove(image)
-        _imagesDisplay1.value = newList
+        _imagesDisplay.value = newList
     }
 
     private fun clearForm() {

@@ -36,6 +36,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val sellingDuration by sellViewModel.sellingDuration.collectAsState()
     val shouldSetAskingProduct by sellViewModel.shouldSetProduct.collectAsState()
     val shouldDisplayImages by sellViewModel.shouldDisplayImages.collectAsState()
+    val processSellingStatus by sellViewModel.processSellingStatus.collectAsState()
 
     var shouldCancel by remember { mutableStateOf(false) }
 
@@ -56,7 +57,6 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             Log.i("sell screen", "should display images false")
         }
     }
-
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -131,6 +131,12 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             }
             if (shouldDisplayImages) {
                 ImagesDisplayScreen(viewModel = sellViewModel)
+            }
+            if (processSellingStatus != 0) {
+                com.bitpunchlab.android.barter.sell.processSellingStatus(
+                    status = processSellingStatus,
+                    sellViewModel = sellViewModel
+                )
             }
         }
     }
@@ -266,8 +272,6 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 onClickItem =  {
                     viewModelUpdateCategory.call(viewModel, it)
                     viewModelUpdateShouldExpandCategory.call(viewModel, false)
-                    //sellViewModel.updateCategory(it)
-                    //sellViewModel.updateShouldExpandCategory(false)
                 },
                 onDismiss = {  },
                 items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
@@ -298,6 +302,38 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 .padding(top = 20.dp),
         )
     }
+}
+
+@Composable
+fun processSellingStatus(status: Int, sellViewModel: SellViewModel) {
+    when (status) {
+        2 -> {
+            processSellingSuccessDialog(sellViewModel)
+        }
+        1 -> {
+            processSellingFailureDialog(sellViewModel)
+        }
+    }
+}
+
+@Composable
+fun processSellingSuccessDialog(sellViewModel: SellViewModel) {
+    CustomDialog(
+        title = "Selling Confirmation",
+        message = "The product was successfully sent to the server.  It will be available to all the users who read the products offering list.",
+        positiveText = "OK",
+        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
+        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+}
+
+@Composable
+fun processSellingFailureDialog(sellViewModel: SellViewModel) {
+    CustomDialog(
+        title = "Selling Failed",
+        message = "There is error sending the product's information to the server.  Please make sure you have wifi and try again later.",
+        positiveText = "OK",
+        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
+        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
 }
 
 

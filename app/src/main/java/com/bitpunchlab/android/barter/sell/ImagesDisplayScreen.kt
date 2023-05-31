@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,11 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.ChoiceButton
+import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,16 +43,13 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
 
     val viewModelCollection = viewModel!!::class.members
 
-    var images: MutableStateFlow<List<Bitmap>?>
-    var images1: MutableStateFlow<List<ProductImage>?>
+    var images: MutableStateFlow<List<ProductImage>?>
 
     val field = viewModel.javaClass.getDeclaredField("_imagesDisplay")
     field.isAccessible = true
-    val field1 = viewModel.javaClass.getDeclaredField("_imagesDisplay1")
-    field1.isAccessible = true
     //Log.i("images display", "accessed field ${field.name}")
-    images = field.get(viewModel) as MutableStateFlow<List<Bitmap>?>//.collectAsState()
-    images1 = field1.get(viewModel) as MutableStateFlow<List<ProductImage>?>
+    //images = field.get(viewModel) as MutableStateFlow<List<Bitmap>?>//.collectAsState()
+    images = field.get(viewModel) as MutableStateFlow<List<ProductImage>?>
     //Log.i("images display", images.value?.size.toString())
 
     val viewModelShouldPopImages = viewModel.javaClass.getDeclaredField("_shouldPopImages")//.get(viewModel) as MutableStateFlow<Boolean>
@@ -61,6 +63,10 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
     val viewModelDeleteImages = viewModel.javaClass.declaredMethods.first { it.name == "deleteImage" }
     viewModelDeleteImages.isAccessible = true
 
+    var shouldDisplayFullImage by remember { mutableStateOf(false) }
+    var imageToShow : ProductImage? by remember { mutableStateOf(null) }
+
+    var shouldShowConfirmDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = shouldPopImages.value) {
         Log.i("images launched effect", "should pop images changed ${shouldPopImages.value}")
@@ -69,9 +75,78 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
             //navController.popBackStack()
         }
     }
+
+    @Composable
+    fun ConfirmDeleteDialog(image: ProductImage) {
+        CustomDialog(
+            title = "Remove Confirmation",
+            message = "Are you sure to remove the image?",
+            positiveText = "Delete",
+            negativeText = "Cancel",
+            onDismiss = { shouldShowConfirmDelete = false },
+            onPositive = { Log.i("confirm delete", "confirmed") },
+            onNegative = { Log.i("confirm delete", "cancelled") } )
+    }
+
+    @Composable
+    fun showImage(image: ProductImage) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            Alignment.Center
+        ) {
+            Image(
+                bitmap = image.image.asImageBitmap(),
+                contentDescription = "A product image",
+                modifier = Modifier
+                    .width(400.dp)
+            )
+            Card(
+                modifier = Modifier
+                    //.fillMaxWidth()
+                    .background(Color.Transparent),
+                //.padding(30.dp),
+                shape = RoundedCornerShape(20.dp),
+                elevation = 10.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(Color.Gray)
+                        .padding(15.dp)
+                        .clickable {
+                            shouldShowConfirmDelete = true
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.mipmap.remove),
+                        contentDescription = "remove icon",
+                        modifier = Modifier
+                            .width(25.dp)
+                            .background(Color.Gray)
+                    )
+                    Text(
+                        text = "Remove",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        modifier = Modifier
+                            .background(Color.Gray)
+                        ,
+                        color = BarterColor.lightGreen
+                    )
+                }
+                if (shouldShowConfirmDelete) {
+                    ConfirmDeleteDialog(image)
+                }
+            }
+        }
+
+    }
+
     Dialog(
         onDismissRequest = {  },
-        properties = DialogProperties(decorFitsSystemWindows = true)
+        //properties = DialogProperties(decorFitsSystemWindows = true),
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
 
         Surface(
@@ -100,21 +175,20 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                             },
                     )
                 }
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
-                    verticalArrangement = Arrangement.spacedBy(15.dp),
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                if (shouldDisplayFullImage && imageToShow != null) {
+                    showImage(image = imageToShow!!)
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
 
-                ) {
-                    //for (each in images.value!!) {
+                    ) {
 
-                    //items(count = images.value?.size ?: 0, key = { index -> images.value?.get(index) ?: 0 } , itemContent = ) {
-                        //items(images.value ?: listOf(), { }) {
-                    items(images1.value ?: listOf(), { image -> image.id }) {
-                            item ->
-                        //item {
+                        items(images.value ?: listOf(), { image -> image.id }) { item ->
+                            //item {
                             // remember updated state will renew whenever there is
                             // recomposition, so , if an item is deleted, another
                             // item's position changed, the remember will remember the
@@ -132,20 +206,46 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                                 contentDescription = "product image",
                                 modifier = Modifier
                                     .fillMaxWidth(0.8f)
-
+                                    .clickable {
+                                        //showImage(item)
+                                        imageToShow = item
+                                        shouldDisplayFullImage = true
+                                    },
                             )
+
+                        }
+
+                    }  // end of lazy column
+                }
+            } // end of column
+        } // end of surface
+    } // end of dialog
+
+
+}
+/*
+
+
+inline fun <reified T: Any> getValue(name: String): MutableStateFlow<Boolean> {
+    return T::class.java.getDeclaredField(name).get(null) as MutableStateFlow<Boolean>
+}
+/*
                             SwipeToDismiss(
                                 state = dismissState,
                                 background = {
-                                    val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
-                                    Box(modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color.Red))
+                                    val direction =
+                                        dismissState.dismissDirection ?: return@SwipeToDismiss
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.Red)
+                                    )
                                 },
                                 dismissThresholds = { direction ->
                                     FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
                                 },
-                                directions = setOf(DismissDirection.StartToEnd,
+                                directions = setOf(
+                                    DismissDirection.StartToEnd,
                                     DismissDirection.EndToStart
                                 ),
 
@@ -160,20 +260,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                                     }
                                 }
                             )
-                        }
-                    //}
 
-                }  // end of lazy column
-            } // end of column
-        } // end of surface
-    } // end of dialog
-
-}
-/*
-
-
-inline fun <reified T: Any> getValue(name: String): MutableStateFlow<Boolean> {
-    return T::class.java.getDeclaredField(name).get(null) as MutableStateFlow<Boolean>
-}
+                             */
 
  */

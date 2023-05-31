@@ -2,11 +2,15 @@ package com.bitpunchlab.android.barter.firebase
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.bitpunchlab.android.barter.database.BarterDatabase
+import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.ProductType
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
+import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
@@ -19,7 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
 import kotlin.collections.HashMap
 
-//class FirebaseClient(val application: Application) : AndroidViewModel(application) {
 object FirebaseClient {
 
     private val storageRef = Firebase.storage.reference
@@ -49,22 +52,13 @@ object FirebaseClient {
             Log.i("auth listener", "got user id ${userId.value}")
             if (createAccount) {
                 _finishedAuthSignup.value = true
-                /*
-                CoroutineScope(Dispatchers.IO).launch {
-                    if (processSignupUserObject(userName, userEmail)) {
-                        _createACStatus.value = 2
-                    } else {
-                        _createACStatus.value = 1
-                    }
-                }
-
-                 */
             } else {
                 // retrieve user from firestore
                 CoroutineScope(Dispatchers.IO).launch {
                     //_userId.value = auth.cu
                     Log.i("auth", "user id: ${auth.currentUser!!.uid}")
                     _currentUserFirebase.value = retrieveUserFirebase(auth.currentUser!!.uid)
+
                 }
             }
         } else {
@@ -172,11 +166,27 @@ object FirebaseClient {
                 }
     }
 
+    private fun prepareProductsOfferingForLocalDatabase(localDatabase: BarterDatabase,
+                                                userFirebase: UserFirebase) {
+        // retrieve the products offering and products bidding info
+        // create those objects and save in local database
+        // this includes removing the outdated products objects in the database
+        // here the productsOffering in the user firebase object
+        // has the full product offering object stored in it
+        val productsOffering = userFirebase.productsOffering.map { (key, value) ->
+            convertProductFirebaseToProduct(value)
+        }
+        BarterRepository.insertProductsOffering(localDatabase, productsOffering)
+
+    }
+
     // after we successfully created an user in FirebaseAuth,
     // we proceed to create the user object in both Firestore and local database
     private fun createUserFirebase(id: String, name: String, email: String) : UserFirebase {
         val user = UserFirebase(userId = id, userName = name,
-        userEmail = email, userDateCreated = Calendar.getInstance().time.toString() )
+        userEmail = email, userDateCreated = Calendar.getInstance().time.toString(),
+        offering = HashMap<String, ProductOfferingFirebase>()
+        )
         Log.i("created user", "time is ${Calendar.getInstance().time.toString()}")
         return user
     }
@@ -197,20 +207,10 @@ object FirebaseClient {
                     }
                 }
         }
-/*
-    suspend fun processSelling(productOffering: ProductOffering, askImages: List<Bitmap>)
-    : ProductOffering {
-        // convert product to firebase model
-        // save images in cloud store and local device, and get the url and store in the product
-        // store product id in user's object, both local and firebase
-        // save user's object in firebase
-        // save product in productsOffering collection in firebase
-        // trigger cloud function to
 
-    }
-*/
-    suspend fun processSelling(productOffering: ProductOffering, productImages: List<Bitmap>,
-        askingProducts: List<ProductOffering>, askingProductImages: List<List<Bitmap>>) : Boolean {
+    suspend fun processSelling(localDatabase: BarterDatabase, productOffering: ProductOffering,
+                               productImages: List<ProductImage>,
+        askingProducts: List<ProductOffering>, askingProductImages: List<List<ProductImage>>) : Boolean {
 
         val askingProductsList = mutableListOf<ProductOffering>()
         for (i in 0..askingProducts.size - 1) {
@@ -218,12 +218,10 @@ object FirebaseClient {
         }
 
         val semiUpdatedProductOffering = processEachProduct(productOffering, productImages)
-        //semiUpdatedProductOffering.askingProducts = askingProductsList
 
         val productFirebase = convertProductOfferingToFirebase(semiUpdatedProductOffering, askingProductsList)
         val resultProductDeferred = CoroutineScope(Dispatchers.IO).async {
             saveProductOfferingFirebase(productFirebase, ProductType.PRODUCT)
-
         }
         val resultAskingDeferred = CoroutineScope(Dispatchers.IO).async {
             askingProductsList.map { each ->
@@ -233,6 +231,10 @@ object FirebaseClient {
                 )
             }
         }
+
+        val resultUpdateUser = updateProductSellingInUserFirebase(currentUserFirebase.value!!,
+            productOffering)
+
         val resultAsking = resultAskingDeferred.await()
         var count = 0
         for (each in resultAsking) {
@@ -243,16 +245,18 @@ object FirebaseClient {
             }
         }
 
-        return resultProductDeferred.await() && (count == resultAsking.size)
+        return resultProductDeferred.await() && (count == resultAsking.size) && resultUpdateUser
     }
 
     private suspend fun processEachProduct(productOffering: ProductOffering,
-        productImages: List<Bitmap>) : ProductOffering {
+        productImages: List<ProductImage>) : ProductOffering {
         val downloadUrlList = mutableListOf<String>()
         val imageFilenames = mutableListOf<String>()
 
+        val images = productImages.map { it.image }
+
         val pairProductResult = uploadImages(productOffering = productOffering,
-            images = productImages)
+            images = images)
 
         downloadUrlList.addAll(pairProductResult.first)
         imageFilenames.addAll(pairProductResult.second)
@@ -279,7 +283,7 @@ object FirebaseClient {
                 Log.i("process selling", "creating filename $filename")
                 val pair = saveImageCloudStorage(images[i], filename)
                 synchronized(lock1) {
-                    //val newProductOffering = processSaveImage(askImages[i], productOffering, filename)
+
                     if (pair.second != null) {
                         Log.i("process selling", "editing downloadUrlList")
                         downloadUrlList.add(pair.second!!)
@@ -336,7 +340,8 @@ object FirebaseClient {
                 }
     }
 
-    private suspend fun saveProductOfferingFirebase(productOffering: ProductOfferingFirebase, type: ProductType) : Boolean =
+    private suspend fun saveProductOfferingFirebase(productOffering: ProductOfferingFirebase,
+                                                    type: ProductType) : Boolean =
 
         suspendCancellableCoroutine {cancellableContinuation ->
             var collection = if (type == ProductType.PRODUCT) "productsOffering" else "askingProducts"
@@ -354,5 +359,17 @@ object FirebaseClient {
                 }
     }
 
+    private suspend fun updateProductSellingInUserFirebase(
+        userFirebase: UserFirebase, productOffering: ProductOffering) : Boolean =
+        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+            val newUser = userFirebase
 
+            val newProductsMap = newUser.productsOffering.toMutableMap()
+            newProductsMap.put(productOffering.productId, convertProductOfferingToFirebase(productOffering))
+            //val updatedUser = newUser.productsOffering
+            newUser.productsOffering = newProductsMap as HashMap<String, ProductOfferingFirebase>
+            CoroutineScope(Dispatchers.IO).launch {
+                cancellableContinuation.resume(saveUserFirebase(newUser)) {}
+            }
+    }
 }

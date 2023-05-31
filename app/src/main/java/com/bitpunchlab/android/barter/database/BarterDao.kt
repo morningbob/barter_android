@@ -20,7 +20,7 @@ interface BarterDao {
     fun getUser(id: String) : Flow<List<User>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProductOffering(product: ProductOffering)
+    suspend fun insertProductsOffering(vararg product: ProductOffering)
 
     @Query("SELECT * FROM products_offering")
     fun getAllProductOffering() : Flow<List<ProductOffering>>
@@ -31,4 +31,8 @@ interface BarterDao {
     @Transaction
     @Query("SELECT * from users")
     suspend fun getUsersAndProductsOffering() : List<UserAndProductOffering>
+
+
+    @Query("SELECT * from users WHERE :id = id")
+    fun getUserAndProductsOffering(id: String) : List<UserAndProductOffering>
 }

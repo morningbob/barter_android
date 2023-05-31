@@ -13,11 +13,6 @@ import kotlinx.coroutines.launch
 
 object BarterRepository {
 
-    //var context : Context? = null
-
-    //val _productsOffering = MutableStateFlow<List<ProductOffering>>(listOf())
-    //val productsOffering : StateFlow<List<ProductOffering>> get() = _productsOffering.asStateFlow()
-
     fun insertCurrentUser(user: User, database: BarterDatabase) {
         CoroutineScope(Dispatchers.IO).launch {
             database.barterDao.insertUser(user)
@@ -36,4 +31,12 @@ object BarterRepository {
         return database.barterDao.getAllProductOffering()
 
     }
+
+    fun insertProductsOffering(database: BarterDatabase, products: List<ProductOffering>)  {
+        CoroutineScope(Dispatchers.IO).launch {
+            database.barterDao.insertProductsOffering(*products.toTypedArray())
+        }
+    }
+
+
 }

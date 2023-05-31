@@ -37,14 +37,8 @@ class SellViewModel : ViewModel() {
     private val _sellingDuration = MutableStateFlow(SellingDuration.NOT_SET)
     val sellingDuration : StateFlow<SellingDuration> get() = _sellingDuration.asStateFlow()
 
-    private val _productImage = MutableStateFlow<Bitmap?>(null)
-    val productImage : StateFlow<Bitmap?> get() = _productImage.asStateFlow()
-
-    private val _productImages = MutableStateFlow<List<Bitmap>>(listOf())
-    val productImages : StateFlow<List<Bitmap>> get() = _productImages.asStateFlow()
-
-    private val _productImages1 = MutableStateFlow<List<ProductImage>>(listOf())
-    val productImages1 : StateFlow<List<ProductImage>> get() = _productImages1.asStateFlow()
+    private val _productImages = MutableStateFlow<List<ProductImage>>(listOf())
+    val productImages : StateFlow<List<ProductImage>> get() = _productImages.asStateFlow()
 
     //private val _askingProducts = MutableStateFlow<List<ProductOffering>>(listOf())
     //val askingProducts : StateFlow<List<ProductOffering>> get() = _askingProducts.asStateFlow()
@@ -58,17 +52,8 @@ class SellViewModel : ViewModel() {
     private val _shouldSetProduct = MutableStateFlow(false)
     val shouldSetProduct : StateFlow<Boolean> get() = _shouldSetProduct.asStateFlow()
 
-    //private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
-    //val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
-
-    //private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
-    //val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
-
-    private val _imagesDisplay = MutableStateFlow<List<Bitmap>>(listOf())
-    val imagesDisplay : StateFlow<List<Bitmap>> get() = _imagesDisplay.asStateFlow()
-
-    private val _imagesDisplay1 = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay1 : StateFlow<List<ProductImage>> get() = _imagesDisplay1.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -78,7 +63,9 @@ class SellViewModel : ViewModel() {
 
     private val userId = MutableStateFlow("")
 
-    //private val onSendClicked
+    private val _processSellingStatus = MutableStateFlow(0)
+    val processSellingStatus : StateFlow<Int> get() = _processSellingStatus.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.userId.collect() {
@@ -108,22 +95,15 @@ class SellViewModel : ViewModel() {
     }
 
     fun updateProductImage(bitmap: Bitmap) {
-        _productImage.value = bitmap
-    }
-
-    fun updateProductImages(bitmap: Bitmap) {
-        val newList = productImages.value.toMutableList()
-        newList.add(bitmap)
-        Log.i("sellVM", "added one bitmap")
-        _productImages.value = newList
+       // _productImage.value = bitmap
     }
 
     fun updateProductImages1(image: Bitmap) {
         val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
-        val newList = productImages1.value.toMutableList()
+        val newList = productImages.value.toMutableList()
         newList.add(productImage)
         Log.i("sellVM", "added one bitmap")
-        _productImages1.value = newList
+        _productImages.value = newList
     }
 
     fun updateAskingImages(bitmap: Bitmap) {
@@ -182,14 +162,16 @@ class SellViewModel : ViewModel() {
             if (FirebaseClient.processSelling(productOffering, productImages.value,
                 updatedAskingProducts, AskingProductInfo.askingProductsImages)) {
                 Log.i("process selling, from sellVM", "succeeded")
+                _processSellingStatus.value = 2
             } else {
                 Log.i("process selling, from sellVM", "failed")
+                _processSellingStatus.value = 1
             }
         }
     }
 
     fun prepareImagesDisplay() {
-        _imagesDisplay1.value = productImages1.value
+        _imagesDisplay.value = productImages.value
     }
 
     fun updateShouldPopImages(should: Boolean) {
@@ -198,8 +180,12 @@ class SellViewModel : ViewModel() {
 
     fun deleteImage(image: ProductImage) {
         Log.i("askingVM", "got image")
-        val newList = imagesDisplay1.value.toMutableList()
+        val newList = imagesDisplay.value.toMutableList()
         newList.remove(image)
-        _imagesDisplay1.value = newList
+        _imagesDisplay.value = newList
+    }
+
+    fun updateProcessSellingStatus(status: Int) {
+        _processSellingStatus.value = status
     }
 }

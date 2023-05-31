@@ -20,6 +20,7 @@ import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
+import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
@@ -68,6 +69,9 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         composable(Main.route) {
             MainScreen(navController, mainViewModel)
         }
+        composable(ProductsOffering.route) {
+            ProductsOfferingListScreen(navController)
+        }
         composable(Sell.route) {
             SellScreen(navController, sellViewModel)
         }
@@ -81,7 +85,7 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
 
         }
         composable(ImagesDisplay.route) {
-            //ImagesDisplayScreen(navController)
+
         }
         composable(Logout.route) {
             LogoutScreen(navController = navController)

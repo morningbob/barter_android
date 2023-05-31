@@ -22,6 +22,7 @@ fun BottomBarNavigation(navController: NavHostController) {
         Main,
         Sell,
         Bid,
+        ProductsOffering,
         Report,
         Logout
     )

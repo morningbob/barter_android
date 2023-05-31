@@ -129,7 +129,9 @@ fun CustomDialog(
                          title = positiveText, onPositive)
                      if (negativeText != null && onNegative != null) {
                          DialogButton(
-                             title = negativeText, onNegative
+                             title = negativeText, onNegative,
+                             modifier = Modifier
+                                 .padding(start = 25.dp)
                          )
                      }
                  }
@@ -141,12 +143,13 @@ fun CustomDialog(
 
 @Composable
 fun DialogButton(title: String,
-                 onClick: () -> Unit) {
+                 onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = { onClick.invoke() },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = BarterColor.buttonBrown
-        )
+        ),
+        modifier = Modifier.then(modifier)
     ) {
         Text(
             text = title,

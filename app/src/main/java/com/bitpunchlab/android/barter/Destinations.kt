@@ -24,6 +24,12 @@ object Main : Destinations {
     override val icon: Int = R.mipmap.home2
 }
 
+object ProductsOffering : Destinations {
+    override val title: String = "Products Offering"
+    override val route: String = "ProductsOffering"
+    override val icon: Int = R.mipmap.productslist
+}
+
 object Sell : Destinations {
     override val title: String = "Sell"
     override val route: String = "Sell"

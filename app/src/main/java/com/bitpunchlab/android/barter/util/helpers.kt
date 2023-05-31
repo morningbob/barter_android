@@ -42,3 +42,8 @@ data class ProductImage(
     var id : String,
     var image: Bitmap
 )
+
+data class SortProduct(
+    var key : Int,
+    var value : String
+)

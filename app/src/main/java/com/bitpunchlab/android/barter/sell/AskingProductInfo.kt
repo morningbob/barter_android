@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.sell
 import android.graphics.Bitmap
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 
 object AskingProductInfo {
@@ -13,6 +14,6 @@ object AskingProductInfo {
     val sellingDuration = SellingDuration.NOT_SET
 
     val askingProducts = mutableListOf<ProductOffering>()
-    val askingProductsImages = mutableListOf<List<Bitmap>>()
+    val askingProductsImages = mutableListOf<List<ProductImage>>()
 
 }
