@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.bitpunchlab.android.barter.bid.BidScreen
+import com.bitpunchlab.android.barter.database.BarterDatabase
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
@@ -29,8 +31,10 @@ import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.LogoutScreen
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
+import kotlinx.coroutines.InternalCoroutinesApi
 
 class MainActivity : ComponentActivity() {
+    @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,6 +52,7 @@ class MainActivity : ComponentActivity() {
                         .get(MainViewModel::class.java)
                     val sellViewModel = ViewModelProvider(this)
                         .get(SellViewModel::class.java)
+                    FirebaseClient.localDatabase = BarterDatabase.getInstance(applicationContext)
                     BarterNavigation(mainViewModel, sellViewModel)
                 }
             }

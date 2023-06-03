@@ -10,22 +10,22 @@ fun convertUserFirebaseToUser(userFirebase: UserFirebase) : User {
 }
 
 fun convertUserToUserFirebase(user: User) : UserFirebase {
-
     return UserFirebase(user.id, user.name, user.email, user.dataCreated, HashMap<String, ProductOfferingFirebase>())
 }
 
 // I like to maintain the order of the images, that is better for the user
+// here, we set the order of the products and asking products according to the place they are in the list
 fun convertProductOfferingToFirebase(product: ProductOffering, asking: List<ProductOffering> = listOf()) : ProductOfferingFirebase {
 
     val imagesMap = HashMap<String, String>()
     for (i in 0..product.images.size - 1) {
         imagesMap.put(i.toString(), product.images[i])
     }
-    val askingMap = HashMap<String, String>()
+    val askingMap = HashMap<String, ProductOfferingFirebase>()
     // this is a product offering, not a asking product
     if (asking.isNotEmpty()) {
         for (i in 0..asking.size - 1) {
-            askingMap.put(asking[i].productId, asking[i].productId)
+            askingMap.put(i.toString(), convertProductOfferingToFirebase(asking[i]))
         }
     }
 
@@ -38,15 +38,14 @@ fun convertProductOfferingToFirebase(product: ProductOffering, asking: List<Prod
     )
 }
 
+// here we sort the key of the products in the product firebase before
+// we add to the list of the product offering object before saving to database
 fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : ProductOffering {
-    //var imagesList = mutableListOf<String>()
-    //val listOfKeys = mutableListOf<String>()
-    //val listOfValues = mutableListOf<String>()
+
     val listOfSortProduct = mutableListOf<SortProduct>()
     // convert the keys in the map to integers and rank
     for ((key, value) in productFirebase.images) {
-        //listOfKeys.add(key)
-        //listOfValues.add(value)
+
         listOfSortProduct.add(SortProduct(key.toInt(), value))
     }
 
@@ -54,7 +53,6 @@ fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : 
 
     val imagesList = listOfSortProduct.map { it.value }
 
-    //imagesList.addAll( listOfSortProduct.)
 
     return ProductOffering(
         productId = productFirebase.id, name = productFirebase.name,

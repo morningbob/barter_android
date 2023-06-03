@@ -28,6 +28,8 @@ object FirebaseClient {
     private val storageRef = Firebase.storage.reference
     // we need the id as soon as it is available from Auth
     private val _userId = MutableStateFlow<String>("")
+
+    var localDatabase : BarterDatabase? = null
     val userId : StateFlow<String> get() = _userId.asStateFlow()
 
     private val _currentUserFirebase = MutableStateFlow<UserFirebase?>(null)
@@ -57,8 +59,11 @@ object FirebaseClient {
                 CoroutineScope(Dispatchers.IO).launch {
                     //_userId.value = auth.cu
                     Log.i("auth", "user id: ${auth.currentUser!!.uid}")
-                    _currentUserFirebase.value = retrieveUserFirebase(auth.currentUser!!.uid)
-
+                    val currentUser = retrieveUserFirebase(auth.currentUser!!.uid)
+                    currentUser?.let {
+                        _currentUserFirebase.value = currentUser
+                        prepareProductsOfferingForLocalDatabase(currentUser)
+                    }
                 }
             }
         } else {
@@ -166,7 +171,7 @@ object FirebaseClient {
                 }
     }
 
-    private fun prepareProductsOfferingForLocalDatabase(localDatabase: BarterDatabase,
+    private fun prepareProductsOfferingForLocalDatabase(
                                                 userFirebase: UserFirebase) {
         // retrieve the products offering and products bidding info
         // create those objects and save in local database
@@ -176,7 +181,7 @@ object FirebaseClient {
         val productsOffering = userFirebase.productsOffering.map { (key, value) ->
             convertProductFirebaseToProduct(value)
         }
-        BarterRepository.insertProductsOffering(localDatabase, productsOffering)
+        BarterRepository.insertProductsOffering(localDatabase!!, productsOffering)
 
     }
 
@@ -208,45 +213,101 @@ object FirebaseClient {
                 }
         }
 
-    suspend fun processSelling(localDatabase: BarterDatabase, productOffering: ProductOffering,
+    suspend fun processSelling(productOffering: ProductOffering,
                                productImages: List<ProductImage>,
         askingProducts: List<ProductOffering>, askingProductImages: List<List<ProductImage>>) : Boolean {
 
-        val askingProductsList = mutableListOf<ProductOffering>()
-        for (i in 0..askingProducts.size - 1) {
-            askingProductsList.add(processEachProduct(askingProducts[i], askingProductImages[i]))
+        val pairResult = uploadImagesAndGetDownloadUrl(productOffering, askingProducts, askingProductImages, productImages)
+        val semiUpdatedProductOffering = pairResult.first
+        val askingProductsList = pairResult.second
+        // here, we need to wait for the processEachProduct to upload the images to cloud storage
+        // and get back download url, then record in the product offering and asking product
+        // so the product offering will be updated with both its own images and the asking products
+        // objects. They can then be saved in user object in firestore.
+        val productFirebase =
+            convertProductOfferingToFirebase(semiUpdatedProductOffering, askingProductsList)
+
+        val askingProductsFirebase = askingProductsList.map { each ->
+            convertProductOfferingToFirebase(each)
+        }
+        val resultAskingDeferred = CoroutineScope(Dispatchers.IO).async {
+            saveAllAskingProductOfferingFirebase(askingProductsFirebase)
         }
 
-        val semiUpdatedProductOffering = processEachProduct(productOffering, productImages)
+        //val productOfferingFirebase = convertProductOfferingToFirebase(productOffering)
+        val askingProductsFirebaseMap = HashMap<String, ProductOfferingFirebase>()
+        for (i in 0..askingProductsFirebase.size - 1) {
+            askingProductsFirebaseMap.put(i.toString(), askingProductsFirebase[i])
+        }
 
-        val productFirebase = convertProductOfferingToFirebase(semiUpdatedProductOffering, askingProductsList)
+        productFirebase.askingProducts = askingProductsFirebaseMap
+
         val resultProductDeferred = CoroutineScope(Dispatchers.IO).async {
             saveProductOfferingFirebase(productFirebase, ProductType.PRODUCT)
         }
-        val resultAskingDeferred = CoroutineScope(Dispatchers.IO).async {
-            askingProductsList.map { each ->
-                saveProductOfferingFirebase(
-                    convertProductOfferingToFirebase(each),
-                    ProductType.ASKING_PRODUCT
-                )
-            }
-        }
-
-        val resultUpdateUser = updateProductSellingInUserFirebase(currentUserFirebase.value!!,
-            productOffering)
 
         val resultAsking = resultAskingDeferred.await()
-        var count = 0
-        for (each in resultAsking) {
-            if (each) {
-                count += 1
-            } else {
-                break
-            }
-        }
 
-        return resultProductDeferred.await() && (count == resultAsking.size) && resultUpdateUser
+        val resultUpdateUser = updateProductSellingInUserFirebase(
+            currentUserFirebase.value!!,
+            productFirebase,
+        )
+
+        Log.i("process selling", "resultAsking and resultUpdateUser done")
+
+        val resultProduct = resultProductDeferred.await()
+
+        Log.i("process selling", "resultUpdateUser $resultUpdateUser")
+
+        Log.i("process selling", "resultAsking ${resultAsking}")
+        Log.i("process selling", "resultProduct $resultProduct")
+
+        return resultProduct && resultAsking && resultUpdateUser
     }
+
+    private suspend fun uploadImagesAndGetDownloadUrl(productOffering: ProductOffering,
+                                                      listOfAskingProducts: List<ProductOffering>,
+                                                      askingProductImages: List<List<ProductImage>>,
+                                                      productImages: List<ProductImage>) =
+        suspendCancellableCoroutine<Pair<ProductOffering, List<ProductOffering>>> { cancellableContinuation ->
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val askingProductsList = mutableListOf<ProductOffering>()
+                CoroutineScope(Dispatchers.IO).async {
+                    for (i in 0..listOfAskingProducts.size - 1) {
+                        askingProductsList.add(
+                            processEachProduct(
+                                listOfAskingProducts[i],
+                                askingProductImages[i]
+                            )
+                        )
+                    }
+                }.await()
+                val semiUpdatedProductOfferingDeferred = CoroutineScope(Dispatchers.IO).async {
+                        processEachProduct(productOffering, productImages)
+                }
+                val processedProductOffering = semiUpdatedProductOfferingDeferred.await()
+                cancellableContinuation.resume(Pair(processedProductOffering, askingProductsList)) {}
+            }
+    }
+
+    private suspend fun saveAllAskingProductOfferingFirebase(
+        askingProductsFirebase: List<ProductOfferingFirebase>) =
+        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+            //val results = mutableListOf<Boolean>()
+            for (i in 0..askingProductsFirebase.size - 1) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result = CoroutineScope(Dispatchers.IO).async {
+                        saveProductOfferingFirebase(askingProductsFirebase[i],
+                            ProductType.ASKING_PRODUCT)
+                    }.await()
+                    if (!result) {
+                        cancellableContinuation.resume(false) {}
+                    }
+                }
+            }
+            cancellableContinuation.resume(true) {}
+        }
 
     private suspend fun processEachProduct(productOffering: ProductOffering,
         productImages: List<ProductImage>) : ProductOffering {
@@ -294,25 +355,7 @@ object FirebaseClient {
         }
         return Pair(downloadUrlList, imageFilenames)
     }
-/*
-    private suspend fun processSaveImage(bitmap: Bitmap,
-                                         filename: String) : Pair<String, String?> =
-        suspendCancellableCoroutine<Pair<String, String?>> { cancellableContinuation ->
-            CoroutineScope(Dispatchers.IO).launch {
 
-                val downloadUrl = saveImageCloudStorage(bitmap, filename)
-                if (downloadUrl != null) {
-                    Log.i("process save image", "got downloadUrl $downloadUrl")
-                    cancellableContinuation.resume(Pair(filename, downloadUrl)) {}
-                } else {
-                    // not put that after if because need to wait for the result back
-                    Log.i("process save image", "failed to get downloadUrl")
-                    cancellableContinuation.resume(Pair(filename, null)) {}
-                }
-            }
-
-    }
-*/
     private suspend fun saveImageCloudStorage(image: Bitmap, filename: String) : Pair<String, String?> =
         suspendCancellableCoroutine { cancellableContinuation ->
 
@@ -353,23 +396,31 @@ object FirebaseClient {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.i("save product offering firebase", "success")
+                        cancellableContinuation.resume(true) {}
                     } else {
                         Log.i("save product offering firebase", "failed ${task.exception}")
+                        cancellableContinuation.resume(false) {}
                     }
                 }
     }
 
     private suspend fun updateProductSellingInUserFirebase(
-        userFirebase: UserFirebase, productOffering: ProductOffering) : Boolean =
+        userFirebase: UserFirebase, productOfferingFirebase: ProductOfferingFirebase) : Boolean =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
             val newUser = userFirebase
 
+            // I like to maintain the order of the product user asked for
+            // it is important to show the most favorable product in exchange
+            // the key is used to maintain the order of the asking products
+
             val newProductsMap = newUser.productsOffering.toMutableMap()
-            newProductsMap.put(productOffering.productId, convertProductOfferingToFirebase(productOffering))
+            newProductsMap.put(productOfferingFirebase.id, productOfferingFirebase)
             //val updatedUser = newUser.productsOffering
             newUser.productsOffering = newProductsMap as HashMap<String, ProductOfferingFirebase>
             CoroutineScope(Dispatchers.IO).launch {
-                cancellableContinuation.resume(saveUserFirebase(newUser)) {}
+                val result = saveUserFirebase(newUser)
+                Log.i("update user firebase", "result: $result")
+                cancellableContinuation.resume(result) {}
             }
     }
 }
