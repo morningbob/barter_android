@@ -47,8 +47,6 @@ fun AskingProductScreen(navController: NavHostController,
 
     val shouldDisplayImages by askingProductViewModel.shouldDisplayImages.collectAsState()
 
-    //var displayImages by remember { mutableStateOf(false) }
-
     LaunchedEffect(key1 = popCurrent) {
         if (popCurrent) {
             Log.i("asking product screen", "popping current")

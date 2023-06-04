@@ -10,5 +10,5 @@ data class UserAndProductOffering(
         parentColumn = "id",
         entityColumn = "userId"
     )
-    val productOffering: ProductOffering
+    val productsOffering: List<ProductOffering>
 )

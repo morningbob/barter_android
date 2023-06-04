@@ -40,9 +40,6 @@ class SellViewModel : ViewModel() {
     private val _productImages = MutableStateFlow<List<ProductImage>>(listOf())
     val productImages : StateFlow<List<ProductImage>> get() = _productImages.asStateFlow()
 
-    //private val _askingProducts = MutableStateFlow<List<ProductOffering>>(listOf())
-    //val askingProducts : StateFlow<List<ProductOffering>> get() = _askingProducts.asStateFlow()
-
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
 
@@ -94,15 +91,11 @@ class SellViewModel : ViewModel() {
         _sellingDuration.value = duration
     }
 
-    fun updateProductImage(bitmap: Bitmap) {
-       // _productImage.value = bitmap
-    }
-
-    fun updateProductImages1(image: Bitmap) {
+    fun updateProductImages(image: Bitmap) {
         val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
         val newList = productImages.value.toMutableList()
         newList.add(productImage)
-        Log.i("sellVM", "added one bitmap")
+        //Log.i("sellVM", "added one bitmap")
         _productImages.value = newList
     }
 
@@ -135,12 +128,14 @@ class SellViewModel : ViewModel() {
 
     fun onSendClicked() {
         // validate inputs
+        // here, I don't make images required
         if (productName.value != "" && productCategory.value != Category.NOT_SET &&
-                //askingProductImages.value.isNotEmpty() &&
-             sellingDuration.value != SellingDuration.NOT_SET //&&
-                    //askingProducts.value.isNotEmpty()
-                ) {
+                AskingProductInfo.askingProducts.isNotEmpty() &&
+             sellingDuration.value != SellingDuration.NOT_SET) {
             processSelling()
+        } else {
+            // invalid field
+            _processSellingStatus.value = 3
         }
     }
 
@@ -148,7 +143,8 @@ class SellViewModel : ViewModel() {
     fun processSelling() {
         val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
         name = productName.value, category = productCategory.value.name,
-            userId = userId.value, images = listOf(), currentBids = listOf()
+            userId = userId.value, images = listOf(), currentBids = listOf(),
+            duration = sellingDuration.value.value
         )
 
         val updatedAskingProducts = mutableListOf<ProductOffering>()
@@ -163,9 +159,11 @@ class SellViewModel : ViewModel() {
                 updatedAskingProducts, AskingProductInfo.askingProductsImages)) {
                 Log.i("process selling, from sellVM", "succeeded")
                 _processSellingStatus.value = 2
+                clearFields()
             } else {
                 Log.i("process selling, from sellVM", "failed")
                 _processSellingStatus.value = 1
+                clearFields()
             }
         }
     }
@@ -187,5 +185,15 @@ class SellViewModel : ViewModel() {
 
     fun updateProcessSellingStatus(status: Int) {
         _processSellingStatus.value = status
+    }
+
+    fun clearFields() {
+        _productName.value = ""
+        _productCategory.value = Category.NOT_SET
+        _sellingDuration.value = SellingDuration.NOT_SET
+        _productImages.value = listOf()
+        _askingProductImages.value = listOf()
+        AskingProductInfo.askingProducts = mutableListOf<ProductOffering>()
+        AskingProductInfo.askingProductsImages = mutableListOf()
     }
 }

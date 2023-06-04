@@ -33,6 +33,7 @@ fun convertProductOfferingToFirebase(product: ProductOffering, asking: List<Prod
         productId = product.productId, productName = product.name,
         productUserId = product.userId,
         productImages = imagesMap, productCategory = product.category,
+        duration = product.duration,
         productCurrentBids = HashMap<String, String>(),
         asking = askingMap
     )
@@ -57,6 +58,6 @@ fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : 
     return ProductOffering(
         productId = productFirebase.id, name = productFirebase.name,
         userId = productFirebase.userId, category = productFirebase.category,
-        images = imagesList
+        images = imagesList, duration = productFirebase.sellingDuration
     )
 }

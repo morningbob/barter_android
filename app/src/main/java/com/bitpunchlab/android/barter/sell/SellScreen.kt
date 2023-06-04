@@ -64,7 +64,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             val bitmap = RetrievePhotoHelper.getBitmap(uri, screenContext)
             bitmap?.let {
                 Log.i("launcher", "got bitmap")
-                sellViewModel.updateProductImages1(it)
+                sellViewModel.updateProductImages(it)
             }
         }
     }
@@ -133,7 +133,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 ImagesDisplayScreen(viewModel = sellViewModel)
             }
             if (processSellingStatus != 0) {
-                com.bitpunchlab.android.barter.sell.processSellingStatus(
+                com.bitpunchlab.android.barter.sell.ProcessSellingStatus(
                     status = processSellingStatus,
                     sellViewModel = sellViewModel
                 )
@@ -305,19 +305,22 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
 }
 
 @Composable
-fun processSellingStatus(status: Int, sellViewModel: SellViewModel) {
+fun ProcessSellingStatus(status: Int, sellViewModel: SellViewModel) {
     when (status) {
         2 -> {
-            processSellingSuccessDialog(sellViewModel)
+            ProcessSellingSuccessDialog(sellViewModel)
         }
         1 -> {
-            processSellingFailureDialog(sellViewModel)
+            ProcessSellingFailureDialog(sellViewModel)
+        }
+        3 -> {
+            ProcessSellingInvalidFieldDialog(sellViewModel)
         }
     }
 }
 
 @Composable
-fun processSellingSuccessDialog(sellViewModel: SellViewModel) {
+fun ProcessSellingSuccessDialog(sellViewModel: SellViewModel) {
     CustomDialog(
         title = "Selling Confirmation",
         message = "The product was successfully sent to the server.  It will be available to all the users who read the products offering list.",
@@ -327,10 +330,20 @@ fun processSellingSuccessDialog(sellViewModel: SellViewModel) {
 }
 
 @Composable
-fun processSellingFailureDialog(sellViewModel: SellViewModel) {
+fun ProcessSellingFailureDialog(sellViewModel: SellViewModel) {
     CustomDialog(
         title = "Selling Failed",
         message = "There is error sending the product's information to the server.  Please make sure you have wifi and try again later.",
+        positiveText = "OK",
+        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
+        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+}
+
+@Composable
+fun ProcessSellingInvalidFieldDialog(sellViewModel: SellViewModel) {
+    CustomDialog(
+        title = "Invalid Fields",
+        message = "Please make sure to fill in product name, category and duration information.",
         positiveText = "OK",
         onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
         onPositive = { sellViewModel.updateProcessSellingStatus(0) })

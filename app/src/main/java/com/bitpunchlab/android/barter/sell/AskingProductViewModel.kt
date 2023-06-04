@@ -9,6 +9,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.util.SellingDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -93,12 +94,12 @@ class AskingProductViewModel : ViewModel() {
             val newProduct = ProductOffering(productId = UUID.randomUUID().toString(),
             category = productCategory.value.name,
             userId = FirebaseClient.currentUserFirebase.value!!.id,
-            name = productName.value)
+            name = productName.value,
+            duration = SellingDuration.NOT_SET.value )
 
             AskingProductInfo.askingProducts.add(newProduct)
             AskingProductInfo.askingProductsImages.add(askingProductImages.value)
-            //updateAskingProductsList(newProduct)
-            //updateAskingProductsImages(askingProductImages.value)
+
             // clean up
             clearForm()
             _status.value = 2

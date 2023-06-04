@@ -7,10 +7,10 @@ enum class Category(var label: String, var number: Int) {
     OTHERS(label = "Others", number = 3)
 }
 
-enum class SellingDuration(val label: String) {
-    NOT_SET(label = "not set"),
-    ONE_DAY(label = "One"),
-    TWO_DAYS(label = "Two"),
+enum class SellingDuration(val label: String, val value: Int) {
+    NOT_SET(label = "not set", value = 0),
+    ONE_DAY(label = "One", value = 1),
+    TWO_DAYS(label = "Two", value = 2),
 }
 
 enum class ImageType {

@@ -7,11 +7,13 @@ import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.ProductType
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
+import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -62,6 +64,7 @@ object FirebaseClient {
                     val currentUser = retrieveUserFirebase(auth.currentUser!!.uid)
                     currentUser?.let {
                         _currentUserFirebase.value = currentUser
+                        saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
                         prepareProductsOfferingForLocalDatabase(currentUser)
                     }
                 }
@@ -169,6 +172,10 @@ object FirebaseClient {
                     Log.i("retrieve user firebase", "failed $e" )
                     cancellableContinuation.resume(null) {}
                 }
+    }
+
+    private fun saveUserLocalDatabase(user: User) {
+        BarterRepository.insertCurrentUser(user, localDatabase!!)
     }
 
     private fun prepareProductsOfferingForLocalDatabase(

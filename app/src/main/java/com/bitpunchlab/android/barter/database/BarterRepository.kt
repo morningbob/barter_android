@@ -3,13 +3,17 @@ package com.bitpunchlab.android.barter.database
 import android.content.Context
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object BarterRepository {
 
@@ -38,5 +42,13 @@ object BarterRepository {
         }
     }
 
+    suspend fun getUserProductsOffering(database: BarterDatabase, id: String) : List<UserAndProductOffering> {
+        return CoroutineScope(Dispatchers.IO).async {
+            database.barterDao.getUserAndProductsOffering(id)
+        }.await()
+    }
 
+    suspend fun getAskingProducts(database: BarterDatabase, id: String) : Flow<List<ProductOffering>> {
+        return database.barterDao.getAskingProducts(id)
+    }
 }

@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.base
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -15,9 +17,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.SellingDuration
 import kotlin.reflect.KClass
-//import kotlin.reflect.full.memberProperties
 
 @Composable
 fun CustomTextField(label: String, textValue: String, onChange: (String) -> Unit,
@@ -217,4 +222,63 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
             color = Color.White,
         )
     }
+}
+
+@Composable
+fun ProductRowDisplay(product: ProductOffering,
+            modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .then(modifier),
+        horizontalAlignment = Alignment.Start
+    ) {
+        if (product.images.isNotEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(product.images[0]),
+                contentDescription = "product's image",
+                modifier = Modifier
+                    .width(120.dp)
+            )
+        }
+        Text(
+            text = product.name,
+            color = BarterColor.textGreen,
+            //modifier = Modifier.then(modifier)
+        )
+        Row() {
+            Text(
+                text = "Category: ",
+                color = BarterColor.textGreen,
+                //modifier = Modifier.then(modifier)
+            )
+            Text(
+                text = product.category,
+                color = BarterColor.textGreen,
+            )
+        }
+        Row() {
+            Text(
+                text = "Selling Duration: ",
+                color = BarterColor.textGreen,
+                //modifier = Modifier.then(modifier)
+            )
+            Text(
+                text = "${product.duration} days",
+                color = BarterColor.textGreen,
+            )
+        }
+        Row() {
+            Text(
+                text = "Asking Products: ",
+                color = BarterColor.textGreen,
+                //modifier = Modifier.then(modifier)
+            )
+
+            Text(
+                text = "${product}",
+                color = BarterColor.textGreen,
+            )
+        }
+    }
+
 }

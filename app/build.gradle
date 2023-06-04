@@ -88,4 +88,6 @@ dependencies {
     // firebase storage
     implementation 'com.google.firebase:firebase-storage-ktx'
 
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 }

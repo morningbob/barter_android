@@ -15,8 +15,8 @@ data class ProductOffering(
     var userId: String,
     var name: String,
     var category: String,
+    var duration: Int,
     var images : List<String> = listOf(),
     var currentBids : List<String> = listOf(),
     var productOfferingId : String = ""
-    //@Embedded var askingProducts : List<ProductOffering> = listOf()
 ) : Parcelable
