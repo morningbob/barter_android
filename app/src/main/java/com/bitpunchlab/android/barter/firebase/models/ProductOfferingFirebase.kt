@@ -11,7 +11,7 @@ class ProductOfferingFirebase {
     var sellingDuration : Int = 0
     var images = HashMap<String, String>()
     var currentBids = HashMap<String, String>()
-    var askingProducts = HashMap<String, ProductOfferingFirebase>()
+    var askingProducts = HashMap<String, ProductAskingFirebase>()
 
     constructor()
 
@@ -20,7 +20,7 @@ class ProductOfferingFirebase {
                 duration: Int,
                 productImages: HashMap<String, String> = HashMap<String, String>(),
                 productCurrentBids: HashMap<String, String> = HashMap<String, String>(),
-                asking: HashMap<String, ProductOfferingFirebase> = HashMap())
+                asking: HashMap<String, ProductAskingFirebase> = HashMap())
     {
         id = productId
         userId = productUserId

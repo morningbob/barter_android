@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -91,11 +92,12 @@ class AskingProductViewModel : ViewModel() {
     fun processAskingProduct() {
         // validate inputs
         if (validateInputs()) {
-            val newProduct = ProductOffering(productId = UUID.randomUUID().toString(),
-            category = productCategory.value.name,
-            userId = FirebaseClient.currentUserFirebase.value!!.id,
-            name = productName.value,
-            duration = SellingDuration.NOT_SET.value )
+            val newProduct = ProductAsking(
+                productId = UUID.randomUUID().toString(),
+                category = productCategory.value.name,
+                userId = FirebaseClient.currentUserFirebase.value!!.id,
+                name = productName.value,
+            )
 
             AskingProductInfo.askingProducts.add(newProduct)
             AskingProductInfo.askingProductsImages.add(askingProductImages.value)
@@ -110,8 +112,6 @@ class AskingProductViewModel : ViewModel() {
     fun cancelUpdate() {
         _update.value = false
     }
-
-
 
     fun updateStatus(status: Int) {
         _status.value = status

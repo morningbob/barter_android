@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
@@ -147,7 +148,7 @@ class SellViewModel : ViewModel() {
             duration = sellingDuration.value.value
         )
 
-        val updatedAskingProducts = mutableListOf<ProductOffering>()
+        val updatedAskingProducts = mutableListOf<ProductAsking>()
         for (each in AskingProductInfo.askingProducts) {
             val newProduct = each.copy(productOfferingId = productOffering.productId)
             updatedAskingProducts.add(newProduct)
@@ -193,7 +194,7 @@ class SellViewModel : ViewModel() {
         _sellingDuration.value = SellingDuration.NOT_SET
         _productImages.value = listOf()
         _askingProductImages.value = listOf()
-        AskingProductInfo.askingProducts = mutableListOf<ProductOffering>()
+        AskingProductInfo.askingProducts = mutableListOf<ProductAsking>()
         AskingProductInfo.askingProductsImages = mutableListOf()
     }
 }

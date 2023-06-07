@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.util
 
 import android.graphics.Bitmap
+import com.bitpunchlab.android.barter.models.ProductOffering
 import java.io.ByteArrayOutputStream
 
 fun validateEmail(email: String) : String {
@@ -43,7 +44,7 @@ data class ProductImage(
     var image: Bitmap
 )
 
-data class SortProduct(
+data class SortProduct<T>(
     var key : Int,
-    var value : String
+    var value : T
 )

@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.productsOfferingList
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
@@ -24,7 +25,9 @@ class ProductsOfferingListViewModel : ViewModel() {
 
     suspend fun getCorrespondingAskingProducts(database: BarterDatabase) {
         productsOffering.value.map { each ->
+            Log.i("get asking products", "got product's id ${each.productId}")
             BarterRepository.getAskingProducts(database, each.productId).collect() { askingProducts ->
+                Log.i("get asking products", "got list ${askingProducts.size}")
                 _productsAskingMap.value.put(each.productId, askingProducts)
             }
         }

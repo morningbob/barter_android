@@ -15,7 +15,6 @@ class Converters {
 
     @TypeConverter
     fun productsOfferingToString(productsOffering: List<ProductOffering>) : String {
-
         return Gson().toJson(productsOffering)
     }
 
@@ -30,4 +29,6 @@ class Converters {
     fun imagesToString(images: List<String>) : String {
         return Gson().toJson(images)
     }
+
+
 }

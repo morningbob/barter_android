@@ -1,14 +1,24 @@
 package com.bitpunchlab.android.barter.base
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -18,10 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.SellingDuration
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import kotlin.reflect.KClass
 
 @Composable
@@ -124,7 +139,6 @@ fun CustomDialog(
                      modifier = Modifier
                          .fillMaxWidth()
                          .padding(top = 30.dp),
-
                  )
                  Row(
                      modifier = Modifier
@@ -225,60 +239,121 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
 }
 
 @Composable
-fun ProductRowDisplay(product: ProductOffering,
+fun ProductRowDisplay(product: ProductOffering, askingProduct: ProductOffering?,
             modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .then(modifier),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         if (product.images.isNotEmpty()) {
+            val imageState = loadImage(url = product.images.first())
+            if (imageState.value != null) {
+            //Log.i("product row", "images is not empty")
+            //Log.i("product row", "images 0 ${product.images[0]}")
             Image(
-                painter = rememberAsyncImagePainter(product.images[0]),
-                contentDescription = "product's image",
+                bitmap = imageState.value!!.asImageBitmap(),
+                contentDescription = null,
                 modifier = Modifier
-                    .width(120.dp)
+                    .width(280.dp)
+                    .padding(top = 30.dp)
             )
+            }
+
+        } else {
+            Log.i("product row", "images is empty")
         }
         Text(
             text = product.name,
             color = BarterColor.textGreen,
-            //modifier = Modifier.then(modifier)
+            modifier = Modifier
+                .padding(top = 20.dp)
         )
-        Row() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+        ) {
             Text(
                 text = "Category: ",
                 color = BarterColor.textGreen,
-                //modifier = Modifier.then(modifier)
+                textAlign = TextAlign.Start
             )
             Text(
                 text = product.category,
                 color = BarterColor.textGreen,
             )
         }
-        Row() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+        ) {
             Text(
                 text = "Selling Duration: ",
                 color = BarterColor.textGreen,
                 //modifier = Modifier.then(modifier)
+
+                textAlign = TextAlign.Start
             )
             Text(
                 text = "${product.duration} days",
                 color = BarterColor.textGreen,
             )
         }
-        Row() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+        ) {
             Text(
                 text = "Asking Products: ",
                 color = BarterColor.textGreen,
                 //modifier = Modifier.then(modifier)
+
+                textAlign = TextAlign.Start
             )
 
             Text(
-                text = "${product}",
+                text = "${askingProduct?.name}",
                 color = BarterColor.textGreen,
             )
         }
     }
-
 }
+
+@Composable
+fun loadImage(url: String): MutableState<Bitmap?> {
+    val bitmapState: MutableState<Bitmap?> = remember {
+        mutableStateOf(null)
+    }
+
+    Glide.with(LocalContext.current)
+        .asBitmap()
+        .placeholder(R.mipmap.imageplaceholder)
+        .load(url)
+        .into(object : CustomTarget<Bitmap>() {
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                bitmapState.value = resource
+            }
+
+            override fun onLoadCleared(placeholder: Drawable?) {
+            }
+
+        })
+    return bitmapState
+}
+/*
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F86f01956-2baf-4e9d-9c3f-b08b0a127bb6_0.jpg?alt=media&token=db25a9f0-e674-4be5-b952-73863b9c891c")
+                        .setHeader("User-Agent", "Mozilla/5.0")
+                        .build()),
+                contentDescription = "product's image",
+                modifier = Modifier
+                    .width(200.dp)
+            )
+
+             */
