@@ -22,6 +22,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
+import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
@@ -76,6 +77,9 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
         composable(ProductsOffering.route) {
             ProductsOfferingListScreen(navController)
+        }
+        composable(ProductOfferingDetails.route) {
+            ProductOfferingDetailsScreen(navController)
         }
         composable(Sell.route) {
             SellScreen(navController, sellViewModel)

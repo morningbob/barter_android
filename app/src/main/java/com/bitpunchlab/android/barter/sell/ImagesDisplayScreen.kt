@@ -43,16 +43,16 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
 
     val viewModelCollection = viewModel!!::class.members
 
+    // we focus on the list of images, instead of the product offering object or the asking
+    // product object, so, it can display images of both objects.
+
     var images: MutableStateFlow<List<ProductImage>?>
 
     val field = viewModel.javaClass.getDeclaredField("_imagesDisplay")
     field.isAccessible = true
-    //Log.i("images display", "accessed field ${field.name}")
-    //images = field.get(viewModel) as MutableStateFlow<List<Bitmap>?>//.collectAsState()
     images = field.get(viewModel) as MutableStateFlow<List<ProductImage>?>
-    //Log.i("images display", images.value?.size.toString())
 
-    val viewModelShouldPopImages = viewModel.javaClass.getDeclaredField("_shouldPopImages")//.get(viewModel) as MutableStateFlow<Boolean>
+    val viewModelShouldPopImages = viewModel.javaClass.getDeclaredField("_shouldPopImages")
     viewModelShouldPopImages.isAccessible = true
     val shouldPopImages = (viewModelShouldPopImages.get(viewModel) as MutableStateFlow<Boolean>).collectAsState()
 
@@ -72,7 +72,6 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
         Log.i("images launched effect", "should pop images changed ${shouldPopImages.value}")
         if (shouldPopImages.value) {
             viewModelUpdateShouldPopImages.invoke(viewModel, false)
-            //navController.popBackStack()
         }
     }
 

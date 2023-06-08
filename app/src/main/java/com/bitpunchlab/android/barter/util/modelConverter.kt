@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.util
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
+import com.bitpunchlab.android.barter.models.AskingProductsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
@@ -26,9 +27,9 @@ fun convertProductOfferingToFirebase(product: ProductOffering) : ProductOffering
     val askingMap = HashMap<String, ProductAskingFirebase>()
     // this is a product offering, not a asking product
 
-    if (product.askingProducts.isNotEmpty()) {
-        for (i in 0..product.askingProducts.size - 1) {
-            askingMap.put(i.toString(), convertProductAskingToFirebase(product.askingProducts[i], product.productId))
+    if (product.askingProducts.askingList.isNotEmpty()) {
+        for (i in 0..product.askingProducts.askingList.size - 1) {
+            askingMap.put(i.toString(), convertProductAskingToFirebase(product.askingProducts.askingList[i], product.productId))
         }
     }
 
@@ -82,7 +83,7 @@ fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : 
         productId = productFirebase.id, name = productFirebase.name,
         userId = productFirebase.userId, category = productFirebase.category,
         images = imagesList, duration = productFirebase.sellingDuration,
-        askingProducts = askingProducts
+        askingProducts = AskingProductsHolder(askingProducts)
     )
 }
 

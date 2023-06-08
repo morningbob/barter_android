@@ -18,6 +18,18 @@ class ProductsOfferingListViewModel : ViewModel() {
     private var _productsOffering = MutableStateFlow<List<ProductOffering>>(listOf())
     val productsOffering : StateFlow<List<ProductOffering>> get() = _productsOffering.asStateFlow()
 
+    private var _productChosen = MutableStateFlow<ProductOffering?>(null)
+    val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
+
+    suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {
+        val userList = BarterRepository.getUserProductsOffering(database, id)
+        if (userList.isNotEmpty()) {
+            _productsOffering.value = userList[0].productsOffering
+        }
+    }
+}
+
+/*
     private var _productsAskingMap =
         MutableStateFlow<HashMap<String, List<ProductOffering>>>(HashMap<String, List<ProductOffering>>())
     val productsAskingMap : StateFlow<HashMap<String, List<ProductOffering>>> get() =
@@ -32,12 +44,4 @@ class ProductsOfferingListViewModel : ViewModel() {
             }
         }
     }
-
-    suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {
-        //_productsOffering.value =
-        val userList = BarterRepository.getUserProductsOffering(database, id)
-        if (userList.isNotEmpty()) {
-            _productsOffering.value = userList[0].productsOffering
-        }
-    }
-}
+*/

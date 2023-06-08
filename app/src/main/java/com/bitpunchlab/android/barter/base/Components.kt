@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -239,11 +240,12 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
 }
 
 @Composable
-fun ProductRowDisplay(product: ProductOffering, askingProduct: ProductOffering?,
+fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Unit,
             modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
-            .then(modifier),
+            .then(modifier)
+            .clickable { onClick.invoke(product) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -316,7 +318,7 @@ fun ProductRowDisplay(product: ProductOffering, askingProduct: ProductOffering?,
             )
 
             Text(
-                text = "${askingProduct?.name}",
+                text = "${product.askingProducts.askingList[0].name}",
                 color = BarterColor.textGreen,
             )
         }
@@ -344,6 +346,10 @@ fun loadImage(url: String): MutableState<Bitmap?> {
         })
     return bitmapState
 }
+
+
+
+
 /*
             Image(
                 painter = rememberAsyncImagePainter(

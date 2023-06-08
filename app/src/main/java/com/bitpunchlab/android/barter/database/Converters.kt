@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.database
 
 import androidx.room.TypeConverter
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -16,6 +17,17 @@ class Converters {
     @TypeConverter
     fun productsOfferingToString(productsOffering: List<ProductOffering>) : String {
         return Gson().toJson(productsOffering)
+    }
+
+    @TypeConverter
+    fun askingProductsFromString(productsString: String) : List<ProductAsking> {
+        val objectType = object : TypeToken<List<ProductAsking>>() {}.type
+        return Gson().fromJson<List<ProductAsking>>(productsString, objectType)
+    }
+
+    @TypeConverter
+    fun askingProductsToString(productsAsking: List<ProductAsking>) : String {
+        return Gson().toJson(productsAsking)
     }
 
     @TypeConverter

@@ -33,12 +33,14 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.BarterNavigation
+import com.bitpunchlab.android.barter.ProductOfferingDetails
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ProductRowDisplay
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -53,18 +55,20 @@ fun ProductsOfferingListScreen(navController: NavHostController,
 
     val productsOffering by productsOfferingListViewModel.productsOffering.collectAsState()
     val userId by FirebaseClient.userId.collectAsState()
-    val productAskingMap by productsOfferingListViewModel.productsAskingMap.collectAsState()
+    val productChosen by ProductInfo.productChosen.collectAsState()
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.IO).launch {
-            CoroutineScope(Dispatchers.IO).async {
-                productsOfferingListViewModel.getAllProductsOffering(
-                    FirebaseClient.localDatabase!!,
-                    userId
-                )
-            }.await()
-            // we need to wait for the products offering retrieval finished
-            productsOfferingListViewModel.getCorrespondingAskingProducts(FirebaseClient.localDatabase!!)
+            productsOfferingListViewModel.getAllProductsOffering(
+                FirebaseClient.localDatabase!!,
+                userId
+            )
+        }
+        // we need to wait for the products offering retrieval finished
+    }
+    LaunchedEffect(key1 = productChosen) {
+        if (productChosen != null) {
+            navController.navigate(ProductOfferingDetails.route)
         }
     }
 
@@ -78,7 +82,6 @@ fun ProductsOfferingListScreen(navController: NavHostController,
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
-                    //.verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -90,23 +93,16 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                 )
 
                 LazyColumn(
+                    // the bottom navigation bar has 80dp height
                     modifier = Modifier
-                        .padding(top = 30.dp)
+                        .padding(top = 30.dp, bottom = 110.dp)
                         .fillMaxWidth(0.75f),
                     contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
                 ) {
                     items(productsOffering) { each ->
-                        val askingProductList by remember { mutableStateOf(productAskingMap[each.productId]) }
-                        var firstAskingProduct : ProductOffering? = null
-                        askingProductList?.let {
-                            if (it.isNotEmpty()) {
-                                it[0]
-                                Log.i("products screen", "first asking product: ${it[0].name}")
-                            }
-                        }
                         ProductRowDisplay(
                             product = each,
-                            askingProduct =  null,//productAskingMap[each.productId]!![0],
+                            onClick = { ProductInfo.updateProductChosen(it) },
                             modifier = Modifier,
                         )
                     }

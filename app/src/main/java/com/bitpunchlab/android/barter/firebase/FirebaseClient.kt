@@ -7,6 +7,7 @@ import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
+import com.bitpunchlab.android.barter.models.AskingProductsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
@@ -233,7 +234,7 @@ object FirebaseClient {
         val pairResult = uploadImagesAndGetDownloadUrl(productOffering, askingProducts, askingProductImages, productImages)
         val semiUpdatedProductOffering = pairResult.first
         val askingProductsList = pairResult.second
-        semiUpdatedProductOffering.askingProducts = askingProductsList
+        semiUpdatedProductOffering.askingProducts = AskingProductsHolder(askingProductsList)
         // here, we need to wait for the processEachProduct to upload the images to cloud storage
         // and get back download url, then record in the product offering and asking product
         // so the product offering will be updated with both its own images and the asking products

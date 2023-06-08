@@ -20,5 +20,10 @@ data class ProductOffering(
     var currentBids : List<String> = listOf(),
     var productOfferingId : String = "",
     @Embedded
-    var askingProducts : List<ProductAsking> = listOf()
+    var askingProducts : AskingProductsHolder = AskingProductsHolder(listOf())
+) : Parcelable
+
+@Parcelize
+data class AskingProductsHolder(
+    val askingList : List<ProductAsking>
 ) : Parcelable
