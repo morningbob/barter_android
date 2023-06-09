@@ -21,11 +21,25 @@ class ProductsOfferingListViewModel : ViewModel() {
     private var _productChosen = MutableStateFlow<ProductOffering?>(null)
     val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
 
+    private var _shouldDisplayDetails = MutableStateFlow<Boolean>(false)
+    val shouldDisplayDetails : StateFlow<Boolean> get() = _shouldDisplayDetails.asStateFlow()
+
+    // everytime we trigger this page, for example, from navigation bar,
+    // we clear the productChosen in ProductInfo, so, the product details page wont' be shown
+    //ProductInfo.updateProductChosen(null)
+    init {
+        ProductInfo.updateProductChosen(null)
+    }
+
     suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {
         val userList = BarterRepository.getUserProductsOffering(database, id)
         if (userList.isNotEmpty()) {
             _productsOffering.value = userList[0].productsOffering
         }
+    }
+
+    fun updateShouldDisplayProductDetails(should: Boolean) {
+        _shouldDisplayDetails.value = should
     }
 }
 

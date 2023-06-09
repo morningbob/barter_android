@@ -56,6 +56,7 @@ fun ProductsOfferingListScreen(navController: NavHostController,
     val productsOffering by productsOfferingListViewModel.productsOffering.collectAsState()
     val userId by FirebaseClient.userId.collectAsState()
     val productChosen by ProductInfo.productChosen.collectAsState()
+    val shouldDisplayDetails by productsOfferingListViewModel.shouldDisplayDetails.collectAsState()
 
     LaunchedEffect(key1 = userId) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -66,12 +67,18 @@ fun ProductsOfferingListScreen(navController: NavHostController,
         }
         // we need to wait for the products offering retrieval finished
     }
+    LaunchedEffect(key1 = shouldDisplayDetails) {
+        if (shouldDisplayDetails) {
+            navController.navigate(ProductOfferingDetails.route)
+        }
+    }
+    /*
     LaunchedEffect(key1 = productChosen) {
         if (productChosen != null) {
             navController.navigate(ProductOfferingDetails.route)
         }
     }
-
+*/
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -102,7 +109,9 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                     items(productsOffering) { each ->
                         ProductRowDisplay(
                             product = each,
-                            onClick = { ProductInfo.updateProductChosen(it) },
+                            onClick = {
+                                ProductInfo.updateProductChosen(it)
+                                productsOfferingListViewModel.updateShouldDisplayProductDetails(true)},
                             modifier = Modifier,
                         )
                     }

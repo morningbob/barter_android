@@ -1,6 +1,9 @@
 package com.bitpunchlab.android.barter.util
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.ProductOffering
 import java.io.ByteArrayOutputStream
 
@@ -37,6 +40,10 @@ fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
     val baos = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
     return baos.toByteArray()
+}
+
+fun createPlaceholderImage(context: Context) : Bitmap {
+    return BitmapFactory.decodeResource(context.resources, R.mipmap.imageplaceholder)
 }
 
 data class ProductImage(

@@ -4,8 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,18 +73,23 @@ fun CustomButton(label: String, onClick: () -> Unit, enable: Boolean = true,
                  modifier: Modifier = Modifier) {
     OutlinedButton(
         onClick = { onClick.invoke() },
-        modifier = Modifier.then(modifier),
+        modifier = Modifier
+            //.border(BorderStroke(2.dp, BarterColor.green), RoundedCornerShape(15.dp))
+            .then(modifier),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = BarterColor.buttonBrown,
+            backgroundColor = BarterColor.lightGreen,
             disabledContentColor = BarterColor.orange,
             disabledBackgroundColor = BarterColor.orange,
+            contentColor = BarterColor.green
             ),
-        enabled = enable
+        enabled = enable,
+        shape = RoundedCornerShape(10.dp),
+
     ) {
         Text(
             text = label,
             fontSize = 18.sp,
-            color = Color.White
+            color = BarterColor.green
         )
     }
 }
@@ -250,7 +257,7 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
     ) {
 
         if (product.images.isNotEmpty()) {
-            val imageState = loadImage(url = product.images.first())
+            val imageState = LoadImage(url = product.images.first())
             if (imageState.value != null) {
             //Log.i("product row", "images is not empty")
             //Log.i("product row", "images 0 ${product.images[0]}")
@@ -326,7 +333,7 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
 }
 
 @Composable
-fun loadImage(url: String): MutableState<Bitmap?> {
+fun LoadImage(url: String): MutableState<Bitmap?> {
     val bitmapState: MutableState<Bitmap?> = remember {
         mutableStateOf(null)
     }
