@@ -1,24 +1,32 @@
 package com.bitpunchlab.android.barter.firebase.models
 
+
+
 class ProductBiddingFirebase {
     var id: String = ""
+    var productOfferingId : String = ""
     var name: String = ""
-    var ownerId : String = ""
     var category: String = ""
+    var dateCreated : String = ""
+    var durationLeft: Int = 0
     var images = HashMap<String, String>()
-    //var currentBids = HashMap<String, String>()
+    var bids = HashMap<String, BidFirebase>()
 
     constructor()
 
-    constructor(productId: String, productName: String, productOwnerId: String,
-                productCategory: String,
+    constructor(productId: String, offeringId: String, productName: String,
+                productCategory: String, date: String, duration: Int,
                 productImages: HashMap<String, String> = HashMap<String, String>(),
+                bid: HashMap<String, BidFirebase>
                 ) {
         id = productId
+        productOfferingId = offeringId
         name = productName
-        ownerId = productOwnerId
+        productOfferingId = productId
         category = productCategory
+        dateCreated = date
+        durationLeft = duration
         images = productImages
-        //currentBids = productCurrentBids
+        bids = bid
     }
 }

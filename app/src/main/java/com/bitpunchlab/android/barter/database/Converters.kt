@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.database
 
 import androidx.room.TypeConverter
+import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.google.gson.Gson
@@ -30,11 +31,11 @@ class Converters {
         return Gson().toJson(productsAsking)
     }
 
+
     @TypeConverter
     fun imagesFromString(imagesString: String) : List<String> {
         val objectType = object : TypeToken<List<String>>() {}.type
         return Gson().fromJson<List<String>>(imagesString, objectType)
-        //return listOf()
     }
 
     @TypeConverter
@@ -42,5 +43,30 @@ class Converters {
         return Gson().toJson(images)
     }
 
+    @TypeConverter
+    fun bidToString(bid: List<Bid>) : String {
+        return Gson().toJson(bid)
+    }
 
+    @TypeConverter
+    fun bidFromString(bidString: String) : List<Bid> {
+        val objectType = object : TypeToken<List<Bid>>() {}.type
+        return Gson().fromJson<List<Bid>>(bidString, objectType)
+    }
 }
+/*
+    fun askingProductFromString(askingString: String) : ProductAsking {
+        return Gson().fromJson(askingString, ProductAsking::class.java)
+    }
+
+    fun askingProductToString(asking: ProductAsking) : String {
+        return Gson().toJson(asking)
+    }
+
+    @TypeConverter
+    fun askingProductFromString(askingString: String) : ProductAsking {
+        val objectType = object : TypeToken<ProductAsking>() {}.type
+        return Gson().fromJson<ProductAsking>(askingString, objectType)
+    }
+
+     */
