@@ -19,10 +19,12 @@ import androidx.navigation.compose.rememberNavController
 import com.bitpunchlab.android.barter.askingProducts.AskingProductsListScreen
 import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.database.BarterDatabase
+import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
+import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
@@ -46,15 +48,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    //val firebaseClient = ViewModelProvider(this,
-                        //FirebaseClientViewModelFactory(this.application))
-                        //.get(FirebaseClient::class.java)
+
                     val mainViewModel = ViewModelProvider(this,
                         MainViewModelFactory(application))
                         .get(MainViewModel::class.java)
                     val sellViewModel = ViewModelProvider(this)
                         .get(SellViewModel::class.java)
                     FirebaseClient.localDatabase = BarterDatabase.getInstance(applicationContext)
+                    BarterRepository.database = BarterDatabase.getInstance(applicationContext)
                     BarterNavigation(mainViewModel, sellViewModel)
                 }
             }
@@ -91,6 +92,9 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         composable(AskProduct.route) {
             AskingProductScreen(navController, sellViewModel)
         }
+        composable(ProductsBiddingList.route) {
+            ProductBiddingListScreen(navController)
+        }
         composable(Bid.route) {
             BidScreen(navController)
         }
@@ -105,4 +109,3 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
     }
 }
-

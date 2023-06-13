@@ -5,21 +5,25 @@ import android.util.Log
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
+import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.AskingProductsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.ProductType
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
+import com.bitpunchlab.android.barter.util.convertProductBiddingFirebaseToProductBidding
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.*
@@ -70,6 +74,7 @@ object FirebaseClient {
                         _currentUserFirebase.value = currentUser
                         saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
                         prepareProductsOfferingForLocalDatabase(currentUser)
+                        prepareProductsBiddingForLocalDatabase()
                     }
                 }
             }
@@ -179,11 +184,10 @@ object FirebaseClient {
     }
 
     private fun saveUserLocalDatabase(user: User) {
-        BarterRepository.insertCurrentUser(user, localDatabase!!)
+        BarterRepository.insertCurrentUser(user)
     }
 
-    private fun prepareProductsOfferingForLocalDatabase(
-                                                userFirebase: UserFirebase) {
+    private fun prepareProductsOfferingForLocalDatabase(userFirebase: UserFirebase) {
         // retrieve the products offering and products bidding info
         // create those objects and save in local database
         // this includes removing the outdated products objects in the database
@@ -192,11 +196,23 @@ object FirebaseClient {
         val productsOffering = userFirebase.productsOffering.map { (key, value) ->
             convertProductFirebaseToProduct(value)
         }
-        //val askingProducts = mutableListOf<ProductOffering>()
 
-        //for (product in productsOffering.as)
-        BarterRepository.insertProductsOffering(localDatabase!!, productsOffering)
+        BarterRepository.insertProductsOffering(productsOffering)
 
+    }
+
+    private fun prepareProductsBiddingForLocalDatabase() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val productsBiddingFirebaseDeferred = CoroutineScope(Dispatchers.IO).async {
+                retrieveProductsBidding()
+            }
+            val productsBiddingFirebase = productsBiddingFirebaseDeferred.await()
+            Log.i("prepare products bidding", "got from firestore ${productsBiddingFirebase.size}")
+            val productsBidding = productsBiddingFirebase.map { product ->
+                convertProductBiddingFirebaseToProductBidding(product)
+            }
+            BarterRepository.insertProductsBidding(productsBidding)
+        }
     }
 
     // after we successfully created an user in FirebaseAuth,
@@ -226,6 +242,33 @@ object FirebaseClient {
                     }
                 }
         }
+
+    private suspend fun retrieveProductsBidding() =
+        suspendCancellableCoroutine<List<ProductBiddingFirebase>> {
+            cancellableContinuation ->
+
+            Firebase.firestore
+                .collection("productsBidding")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    Log.i("retrieve products bidding", "success")
+                    if (snapshot.documents.isNotEmpty()) {
+                        val productsBidding = mutableListOf<ProductBiddingFirebase>()
+                        for (productDoc in snapshot.documents) {
+                            productDoc.toObject<ProductBiddingFirebase>()?.let {
+                                productsBidding.add(it)
+                            }
+                        }
+                        cancellableContinuation.resume(productsBidding) {}
+
+                    } else {
+                        Log.i("retrieve products bidding", "is empty")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.i("retrieve products bidding", "failed ${e}")
+                }
+    }
 
     suspend fun processSelling(productOffering: ProductOffering,
                                productImages: List<ProductImage>,
@@ -427,7 +470,7 @@ object FirebaseClient {
     private suspend fun <T : Any> saveProductOfferingFirebase(product: T, productId: String,
                                                               type: ProductType) : Boolean =
 
-        suspendCancellableCoroutine {cancellableContinuation ->
+        suspendCancellableCoroutine { cancellableContinuation ->
             var collection = if (type == ProductType.PRODUCT) "productsOffering" else "askingProducts"
 
             Firebase.firestore

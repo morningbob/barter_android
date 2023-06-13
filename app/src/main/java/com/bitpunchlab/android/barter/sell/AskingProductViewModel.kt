@@ -135,17 +135,3 @@ class AskingProductViewModel : ViewModel() {
         _shouldExpandCategory.value = false
     }
 }
-
-/*
-fun updateAskingProductsList(product: ProductOffering) {
-        val newList = askingProductsList.value.toMutableList()
-        newList.add(product)
-        _askingProductsList.value = newList
-    }
-
-    fun updateAskingProductsImages(images: List<Bitmap>) {
-        val newList = askingProductsImages.value.toMutableList()
-        newList.add(images)
-        _askingProductsImages.value = newList
-    }
- */

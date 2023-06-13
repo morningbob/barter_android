@@ -1,10 +1,15 @@
 package com.bitpunchlab.android.barter.util
 
+import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
+import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.AskingProductsHolder
+import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 
@@ -42,39 +47,13 @@ fun convertProductOfferingToFirebase(product: ProductOffering) : ProductOffering
         asking = askingMap
     )
 }
-/*
-fun convertProductOfferingToFirebase(product: ProductOffering, asking: List<ProductOffering> = listOf()) : ProductOfferingFirebase {
-
-    val imagesMap = HashMap<String, String>()
-    for (i in 0..product.images.size - 1) {
-        imagesMap.put(i.toString(), product.images[i])
-    }
-    val askingMap = HashMap<String, ProductOfferingFirebase>()
-    // this is a product offering, not a asking product
-    if (asking.isNotEmpty()) {
-        for (i in 0..asking.size - 1) {
-            askingMap.put(i.toString(), convertProductOfferingToFirebase(asking[i]))
-        }
-    }
-
-    return ProductOfferingFirebase(
-        productId = product.productId, productName = product.name,
-        productUserId = product.userId,
-        productImages = imagesMap, productCategory = product.category,
-        duration = product.duration,
-        productCurrentBids = HashMap<String, String>(),
-        asking = askingMap
-    )
-}
-
- */
 
 // here we sort the key of the products in the product firebase before
 // we add to the list of the product offering object before saving to database
 fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : ProductOffering {
 
-    val imagesList = sortProductsOffering(productFirebase.images)
-    val askingProductsFirebase = sortProductsOffering(productFirebase.askingProducts)
+    val imagesList = sortElements(productFirebase.images)
+    val askingProductsFirebase = sortElements(productFirebase.askingProducts)
     val askingProducts = askingProductsFirebase.map { each ->
         convertProductFirebaseToProductAsking(each)
     }
@@ -89,7 +68,7 @@ fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : 
 
 fun convertProductFirebaseToProductAsking(productFirebase: ProductAskingFirebase) : ProductAsking {
 
-    val imagesList = sortProductsOffering(productFirebase.images)
+    val imagesList = sortElements(productFirebase.images)
     //val askingProductsFirebase = sortProductsOffering(productFirebase.images)
     //val askingProducts = askingProductsFirebase.map { each ->
     //    convertProductFirebaseToProduct(each)
@@ -119,10 +98,61 @@ fun convertProductAskingToFirebase(productAsking: ProductAsking, productOffering
     )
 }
 
-fun <T> sortProductsOffering(productsMap: HashMap<String, T>) : List<T>{
-    val listOfSortProduct = mutableListOf<SortProduct<T>>()
+fun convertProductAskingFirebaseToProductAsking(productAskingFirebase: ProductAskingFirebase) : ProductAsking {
+
+    val imagesList = sortElements(productAskingFirebase.images)
+
+    return ProductAsking(
+        productId = productAskingFirebase.id,
+        userId = productAskingFirebase.userId,
+        name = productAskingFirebase.name,
+        category = productAskingFirebase.category,
+        images = imagesList,
+        productOfferingId = productAskingFirebase.productOfferingId
+    )
+}
+
+fun convertProductBiddingFirebaseToProductBidding(productFirebase: ProductBiddingFirebase) : ProductBidding {
+
+    val imagesList = sortElements(productFirebase.images)
+    val bidsFirebaseList = sortElements(productFirebase.bids)
+    val bidsList = bidsFirebaseList.map { bidFirebase ->
+        convertBidFirebaseToBid(bidFirebase)
+    }
+
+    return ProductBidding(
+        productId = productFirebase.id,
+        productOfferingId = productFirebase.productOfferingId,
+        name = productFirebase.name,
+        ownerName = productFirebase.ownerName,
+        category = productFirebase.category,
+        dateCreated = productFirebase.dateCreated,
+        durationLeft = productFirebase.durationLeft,
+        images = imagesList,
+        bids = BidsHolder(bidsList)
+    )
+}
+
+fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
+
+    var askingProduct : ProductAsking? = null
+    bidFirebase.askingProduct?.let {
+        askingProduct = convertProductAskingFirebaseToProductAsking(it)
+    }
+
+    return Bid(
+        id = bidFirebase.id,
+        userName = bidFirebase.userName,
+        bidTime = bidFirebase.bidTime,
+        askingProduct = askingProduct
+    )
+}
+
+
+fun <T> sortElements(productsMap: HashMap<String, T>) : List<T>{
+    val listOfSortProduct = mutableListOf<SortHelpObject<T>>()
     for ((key, value) in productsMap) {
-        listOfSortProduct.add(SortProduct(key.toInt(), value))
+        listOfSortProduct.add(SortHelpObject(key.toInt(), value))
     }
 
     listOfSortProduct.sortBy { it.key }

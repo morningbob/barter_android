@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.database
 
 import android.content.Context
+import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
@@ -17,38 +18,52 @@ import kotlinx.coroutines.withContext
 
 object BarterRepository {
 
-    fun insertCurrentUser(user: User, database: BarterDatabase) {
+    var database : BarterDatabase? = null
+
+    fun insertCurrentUser(user: User) {
         CoroutineScope(Dispatchers.IO).launch {
-            database.barterDao.insertUser(user)
+            database?.barterDao?.insertUser(user)
         }
     }
 
-    fun getAllUsers(database: BarterDatabase) : Flow<List<User>> {
-        return database.barterDao.getAllUsers()
+    fun getAllUsers() : Flow<List<User>>? {
+        return database?.barterDao?.getAllUsers()
     }
 
-    fun getCurrentUser(id: String, database: BarterDatabase) : Flow<List<User>> {
-        return database.barterDao.getUser(id)
+    fun getCurrentUser(id: String) : Flow<List<User>>? {
+        return database?.barterDao?.getUser(id)
     }
 
-    fun getAllProductOffering(database: BarterDatabase) : Flow<List<ProductOffering>> {
-        return database.barterDao.getAllProductOffering()
+    fun getAllProductOffering() : Flow<List<ProductOffering>>? {
+        return database?.barterDao?.getAllProductOffering()
 
     }
 
-    fun insertProductsOffering(database: BarterDatabase, products: List<ProductOffering>)  {
+    fun insertProductsOffering(products: List<ProductOffering>)  {
         CoroutineScope(Dispatchers.IO).launch {
-            database.barterDao.insertProductsOffering(*products.toTypedArray())
+            database?.barterDao?.insertProductsOffering(*products.toTypedArray())
         }
     }
 
-    suspend fun getUserProductsOffering(database: BarterDatabase, id: String) : List<UserAndProductOffering> {
+    suspend fun getUserProductsOffering(id: String) : List<UserAndProductOffering>? {
         return CoroutineScope(Dispatchers.IO).async {
-            database.barterDao.getUserAndProductsOffering(id)
+            database?.barterDao?.getUserAndProductsOffering(id)
         }.await()
     }
 
-    suspend fun getAskingProducts(database: BarterDatabase, id: String) : Flow<List<ProductOffering>> {
-        return database.barterDao.getAskingProducts(id)
+    suspend fun getAskingProducts(id: String) : Flow<List<ProductOffering>>? {
+        return database?.barterDao?.getAskingProducts(id)
+    }
+
+    fun insertProductsBidding(productsBidding: List<ProductBidding>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.insertProductsBidding(*productsBidding.toTypedArray())
+        }
+    }
+
+    suspend fun getAllProductsBidding() : Flow<List<ProductBidding>>? {
+        return CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getAllProductsBidding()
+        }.await()
     }
 }

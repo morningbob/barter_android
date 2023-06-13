@@ -151,7 +151,7 @@ fun AskingProductScreen(navController: NavHostController,
             }
             // show success dialog
             if (status != 0) {
-                showStatus(status = status, askingProductViewModel = askingProductViewModel)
+                ShowStatus(status = status, askingProductViewModel = askingProductViewModel)
             }
             if (shouldDisplayImages) {
                 ImagesDisplayScreen(viewModel = askingProductViewModel)
@@ -161,16 +161,16 @@ fun AskingProductScreen(navController: NavHostController,
 }
 
 @Composable
-fun showStatus(status: Int, askingProductViewModel: AskingProductViewModel) {
+fun ShowStatus(status: Int, askingProductViewModel: AskingProductViewModel) {
     when (status) {
         2 -> {
-            successDialog(askingProductViewModel)
+            SuccessDialog(askingProductViewModel)
         }
     }
 }
 
 @Composable
-fun successDialog(askingProductViewModel: AskingProductViewModel) {
+fun SuccessDialog(askingProductViewModel: AskingProductViewModel) {
     CustomDialog(
         title = "Product recorded",
         message = "The asking product was saved.  It will be shown to the user who bid your product.",

@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.productBiddingList
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -28,8 +30,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.LoadImage
+import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -40,7 +44,15 @@ fun ProductBiddingListScreen(navController: NavHostController,
     }
                              ) {
 
-    val productsBidding by ProductBiddingInfo.productBidding.collectAsState()
+    val productsBidding by productBiddingViewModel.productsBidding.collectAsState()
+    val shouldShowProduct by productBiddingViewModel.shouldShowProduct.collectAsState()
+
+
+    LaunchedEffect(key1 = shouldShowProduct) {
+        if (shouldShowProduct) {
+            navController.navigate(Bid.route)
+        }
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
@@ -55,27 +67,33 @@ fun ProductBiddingListScreen(navController: NavHostController,
                     .padding(top = 40.dp)
             )
 
+            // the bottom bar is 80 height, so, we set a bit more
             LazyColumn(
                 modifier = Modifier
-                    .padding(top = 30.dp),
-                contentPadding = PaddingValues(horizontal = 50.dp, vertical = 20.dp),
+                    .padding(top = 30.dp, bottom = 120.dp),
+                contentPadding = PaddingValues(horizontal = 50.dp, vertical = 40.dp),
             ) {
                 items(productsBidding,
                     { product -> product.productId }) { product ->
                     
-                    ProductBiddingRow(product = product)
+                    ProductBiddingRow(
+                        product = product,
+                        onClick = { productBiddingViewModel.prepareForProduct(it) }
+                    )
                 }
             }
+
         }
     }
 }
 
 @Composable
-fun ProductBiddingRow(product: ProductBidding) {
+fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit) {
     Card(
 
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 8.dp),
         elevation = 10.dp,
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(3.dp, BarterColor.textGreen)
@@ -85,8 +103,13 @@ fun ProductBiddingRow(product: ProductBidding) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Yellow)
+                .padding(start = 20.dp, end = 20.dp)
+                .clickable { onClick.invoke(product) }
         ) {
-            Column() {
+            Column(
+                modifier = Modifier
+
+            ) {
                 if (product.images.isNotEmpty()) {
                     val bitmap = LoadImage(url = product.images[0])
                     bitmap.value?.let {
@@ -100,7 +123,9 @@ fun ProductBiddingRow(product: ProductBidding) {
                 } else {
                     Image(
                         painter = painterResource(id = R.mipmap.imageplaceholder),
-                        contentDescription = "image palceholder"
+                        contentDescription = "image placeholder",
+                        modifier = Modifier
+                            .width(80.dp)
                     )
                 }
             }
@@ -108,16 +133,16 @@ fun ProductBiddingRow(product: ProductBidding) {
                 Text(
                     text = product.name,
                     color = BarterColor.textGreen,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     modifier = Modifier
-                        .padding(top = 10.dp)
+                        .padding(top = 10.dp, start = 20.dp)
                 )
                 Text(
                     text = product.category,
                     color = BarterColor.textGreen,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     modifier = Modifier
-                        .padding(top = 10.dp)
+                        .padding(top = 10.dp, start = 20.dp)
                 )
             }
         }

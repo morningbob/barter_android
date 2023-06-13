@@ -55,7 +55,7 @@ fun ProductsOfferingListScreen(navController: NavHostController,
 
     val productsOffering by productsOfferingListViewModel.productsOffering.collectAsState()
     val userId by FirebaseClient.userId.collectAsState()
-    val productChosen by ProductInfo.productChosen.collectAsState()
+    //val productChosen by ProductInfo.productChosen.collectAsState()
     val shouldDisplayDetails by productsOfferingListViewModel.shouldDisplayDetails.collectAsState()
 
     LaunchedEffect(key1 = userId) {
@@ -72,13 +72,7 @@ fun ProductsOfferingListScreen(navController: NavHostController,
             navController.navigate(ProductOfferingDetails.route)
         }
     }
-    /*
-    LaunchedEffect(key1 = productChosen) {
-        if (productChosen != null) {
-            navController.navigate(ProductOfferingDetails.route)
-        }
-    }
-*/
+
     Surface(
         modifier = Modifier
             .fillMaxSize()

@@ -16,6 +16,7 @@ import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
+import com.bitpunchlab.android.barter.util.loadImage
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -98,11 +99,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 }
             }
         }
-        // create Product Images and store in view model
-        if (type == ImageType.PRODUCT_IMAGE) {
-
-        }
-        // put Product Images in imagesDisplay
 
     }
 
@@ -116,28 +112,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     }
 
     // show images as soon as it is loaded
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun loadImage(url: String, context: Context) =
-        suspendCancellableCoroutine<Bitmap?> { cancellableContinuation ->
-            Glide.with(context)
-                .asBitmap()
-                .placeholder(R.mipmap.imageplaceholder)
-                .load(url)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        cancellableContinuation.resume(resource) {}
-                    }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {
-                    }
-
-                    override fun onLoadFailed(erroryDrawable: Drawable?) {
-                        //super.onLoadFailed(errorDrawable)
-                        //val bitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.imageplaceholder)
-                        cancellableContinuation.resume(createPlaceholderImage(context)) {}
-                    }
-                })
-    }
 
     fun prepareAskingProducts() {
         ProductInfo.productChosen.value?.let {

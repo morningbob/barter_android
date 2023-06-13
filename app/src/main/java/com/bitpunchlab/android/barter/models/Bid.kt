@@ -12,6 +12,7 @@ data class Bid(
     @PrimaryKey
     val id : String,
     val userName : String,
+    // the asking product that the bidder offers
     @Embedded
     val askingProduct : ProductAsking? = null,
     val bidTime : String

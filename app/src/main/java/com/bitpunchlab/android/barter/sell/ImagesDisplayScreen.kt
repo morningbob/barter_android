@@ -69,7 +69,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
     var shouldShowConfirmDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = shouldPopImages.value) {
-        Log.i("images launched effect", "should pop images changed ${shouldPopImages.value}")
+        //Log.i("images launched effect", "should pop images changed ${shouldPopImages.value}")
         if (shouldPopImages.value) {
             viewModelUpdateShouldPopImages.invoke(viewModel, false)
         }
@@ -219,8 +219,6 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
             } // end of column
         } // end of surface
     } // end of dialog
-
-
 }
 /*
 

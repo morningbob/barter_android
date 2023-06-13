@@ -21,7 +21,7 @@ fun BottomBarNavigation(navController: NavHostController) {
     val items = listOf(
         Main,
         Sell,
-        Bid,
+        ProductsBiddingList,
         ProductsOffering,
         Report,
         Logout

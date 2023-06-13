@@ -16,6 +16,7 @@ data class ProductBidding(
     val productId : String,
     val productOfferingId : String,
     val name : String,
+    val ownerName : String,
     val category: String,
     val dateCreated : String,
     val durationLeft: Int,

@@ -32,7 +32,7 @@ class ProductsOfferingListViewModel : ViewModel() {
     }
 
     suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {
-        val userList = BarterRepository.getUserProductsOffering(database, id)
+        val userList = BarterRepository.getUserProductsOffering(id) ?: listOf()
         if (userList.isNotEmpty()) {
             _productsOffering.value = userList[0].productsOffering
         }

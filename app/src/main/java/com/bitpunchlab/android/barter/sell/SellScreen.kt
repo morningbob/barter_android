@@ -130,7 +130,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 }
             }
             if (shouldDisplayImages) {
-                ImagesDisplayScreen(viewModel = sellViewModel)
+                ImagesDisplayScreen(sellViewModel)
             }
             if (processSellingStatus != 0) {
                 com.bitpunchlab.android.barter.sell.ProcessSellingStatus(
@@ -218,7 +218,6 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                 )
 
             }
-        //} // end of if
         
     }
 }

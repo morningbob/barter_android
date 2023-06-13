@@ -3,8 +3,14 @@ package com.bitpunchlab.android.barter.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
 
 fun validateEmail(email: String) : String {
@@ -46,12 +52,35 @@ fun createPlaceholderImage(context: Context) : Bitmap {
     return BitmapFactory.decodeResource(context.resources, R.mipmap.imageplaceholder)
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
+suspend fun loadImage(url: String, context: Context) =
+    suspendCancellableCoroutine<Bitmap?> { cancellableContinuation ->
+        Glide.with(context)
+            .asBitmap()
+            .placeholder(R.mipmap.imageplaceholder)
+            .load(url)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    cancellableContinuation.resume(resource) {}
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                }
+
+                override fun onLoadFailed(erroryDrawable: Drawable?) {
+                    //super.onLoadFailed(errorDrawable)
+                    //val bitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.imageplaceholder)
+                    cancellableContinuation.resume(createPlaceholderImage(context)) {}
+                }
+            })
+    }
+
 data class ProductImage(
     var id : String,
     var image: Bitmap
 )
 
-data class SortProduct<T>(
+data class SortHelpObject<T>(
     var key : Int,
     var value : T
 )

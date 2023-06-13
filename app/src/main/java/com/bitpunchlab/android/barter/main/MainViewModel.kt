@@ -49,7 +49,7 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
             //_userId.value = it
                 if (it != "") {
                     Log.i("mainVM", "userid: $it")
-                    BarterRepository.getCurrentUser(it, database).collect() { currentUserList ->
+                    BarterRepository.getCurrentUser(it)?.collect() { currentUserList ->
                         if (currentUserList.isNotEmpty()) {
                             Log.i("barter repo", "got current user ${currentUserList[0].name}")
                             _currentUser.value = currentUserList[0]
@@ -67,13 +67,13 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
             FirebaseClient.currentUserFirebase.collect() {
                 it?.let {
                     Log.i("barter repo", "saving current user")
-                    BarterRepository.insertCurrentUser(convertUserFirebaseToUser(it), database)
+                    BarterRepository.insertCurrentUser(convertUserFirebaseToUser(it))
                 }
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
             //database.barterDao.getAllUsers().collect() {
-            BarterRepository.getAllUsers(database).collect() {
+            BarterRepository.getAllUsers()?.collect() {
                 Log.i("mainVM", "all users")
                 it.map { user ->
                     Log.i("mainVM", "user ${user.name} ${user.id}")
@@ -83,7 +83,7 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
     }
     // new relation, to get products
     suspend fun retrieveProductsOffering()   {
-        BarterRepository.getAllProductOffering(database).collect() {
+        BarterRepository.getAllProductOffering()?.collect() {
             _productOfferingList.value = it
         }
     }

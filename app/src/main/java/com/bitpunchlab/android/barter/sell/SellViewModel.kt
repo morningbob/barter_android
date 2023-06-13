@@ -113,19 +113,9 @@ class SellViewModel : ViewModel() {
     fun updateShouldSetProduct(set: Boolean) {
         _shouldSetProduct.value = set
     }
-
-    fun updateAskingProductsList(productsList: List<ProductOffering>) {
-        //_askingProductsList.value = productsList
-    }
-
-    fun updateAskingProductsImages(listOfImages: List<List<Bitmap>>) {
-        //_askingProductsImages.value = listOfImages
-    }
-
     fun updateShouldDisplayImages(should: Boolean) {
         _shouldDisplayImages.value = should
     }
-
 
     fun onSendClicked() {
         // validate inputs
