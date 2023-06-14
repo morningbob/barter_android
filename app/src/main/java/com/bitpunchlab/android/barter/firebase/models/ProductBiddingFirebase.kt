@@ -23,7 +23,6 @@ class ProductBiddingFirebase {
         productOfferingId = offeringId
         name = productName
         ownerName = ownerN
-        productOfferingId = productId
         category = productCategory
         dateCreated = date
         durationLeft = duration

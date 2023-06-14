@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
+import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.DialogButton
 import com.bitpunchlab.android.barter.models.Bid
@@ -46,6 +47,7 @@ fun BidScreen(navController: NavHostController,
     val shouldDisplayImage by bidViewModel.shouldDisplayImages.collectAsState()
     val shouldPopBid by bidViewModel.shouldPopBid.collectAsState()
     val shouldStartBiding by bidViewModel.shouldStartBid.collectAsState()
+    val bid by bidViewModel.bid.collectAsState()
     //val shouldCancel by bidViewModel.shouldCancel.collectAsState()
 
     val currentContext = LocalContext.current
@@ -59,8 +61,16 @@ fun BidScreen(navController: NavHostController,
     LaunchedEffect(key1 = shouldPopBid) {
         Log.i("bid screen, ", "detect should pop bid ${shouldPopBid}")
         if (shouldPopBid) {
-
             navController.popBackStack()
+        }
+    }
+
+    // we check if bid is not null, then we process the bid in bidVM
+    LaunchedEffect(key1 = bid) {
+        if (bid != null && product != null) {
+            bidViewModel.processBidding(product!!, bid!!)
+        } else {
+            Log.i("bid screen", "null product or bid0")
         }
     }
 
@@ -120,9 +130,12 @@ fun BidScreen(navController: NavHostController,
                         .padding(top = 25.dp)
                 )
 
-                DialogButton(
+                ChoiceButton(
                     title = "Bid",
-                    onClick = { bidViewModel.updateShouldStartBid(true) })
+                    onClick = { bidViewModel.updateShouldStartBid(true) },
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                )
 
                 CustomButton(
                     label = "Cancel",
@@ -133,14 +146,14 @@ fun BidScreen(navController: NavHostController,
                     modifier = Modifier
                         .padding(top = 25.dp)
                 )
-
+  
                 // we don't navigate to the screen, instead we display it on the top on current screen
                 //
                 if (shouldDisplayImage) {
                     ImagesDisplayScreen(bidViewModel)
                 }
                 if (shouldStartBiding) {
-                    var bidFormViewModel: BidFormViewModel = BidFormViewModel()
+                    var bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() }
                     BidFormScreen(navController, bidFormViewModel ,bidViewModel)
                 }
             }

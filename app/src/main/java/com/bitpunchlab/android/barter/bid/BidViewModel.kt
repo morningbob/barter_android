@@ -3,7 +3,11 @@ package com.bitpunchlab.android.barter.bid
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
+import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingListScreen
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
@@ -17,6 +21,9 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class BidViewModel : ViewModel() {
+
+    private val _bid = MutableStateFlow<Bid?>(null)
+    val bid : StateFlow<Bid?> get() = _bid.asStateFlow()
 
     private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
@@ -76,11 +83,23 @@ class BidViewModel : ViewModel() {
         _shouldCancel.value = should
     }
 
+    fun updateBid(newBid: Bid) {
+        _bid.value = newBid
+    }
+
     fun deleteImage(image: ProductImage) {
         //Log.i("askingVM", "got image")
         //val newList = imagesDisplay.value.toMutableList()
         //newList.remove(image)
         //_imagesDisplay.value = newList
+    }
+
+    fun processBidding(product: ProductBidding, bid: Bid) {
+        CoroutineScope(Dispatchers.IO).launch {
+            //if (ProductBiddingInfo.product.value != null) {
+            Log.i("bidVM", "process bidding")
+            FirebaseClient.processBidding(product, bid)
+        }
     }
 
 }

@@ -27,9 +27,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDropDown
 import com.bitpunchlab.android.barter.base.CustomTextField
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.ProductBidding
+import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
@@ -77,7 +81,7 @@ fun BidFormScreen(navController: NavHostController,
 
             ) {
                 Image(
-                    painter = painterResource(id = R.mipmap.bidding),
+                    painter = painterResource(id = R.mipmap.hammer),
                     contentDescription = "Bid Product icon",
                     modifier = Modifier
                         .padding(top = 40.dp)
@@ -97,14 +101,15 @@ fun BidFormScreen(navController: NavHostController,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 20.dp),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     CustomTextField(
                         label = "Product Category",
                         textValue = bidProductCategory.label,
                         onChange = {  },
                         modifier = Modifier
-                            .fillMaxWidth(0.45f)
+                            .fillMaxWidth(0.5f)
                     )
                     CustomDropDown(
                         title = "Category",
@@ -131,6 +136,20 @@ fun BidFormScreen(navController: NavHostController,
                     modifier = Modifier
                         .padding(top = 20.dp)
                 )
+
+                ChoiceButton(
+                    title = "Send",
+                    onClick = {
+                        //bidFormViewModel.createBid(FirebaseClient.userId.value)?.let {
+                        //    bidViewModel.updateBid(it)
+                        //}
+                        val bid = bidFormViewModel.createBid(FirebaseClient.userId.value)
+                        if (ProductBiddingInfo.product.value != null && bid != null) {
+                            bidViewModel.processBidding(ProductBiddingInfo.product.value!!, bid)
+                        } else {
+                            Log.i("bid screen", "null product or bid")
+                        }
+                    })
 
                 CustomButton(
                     label = "Cancel",

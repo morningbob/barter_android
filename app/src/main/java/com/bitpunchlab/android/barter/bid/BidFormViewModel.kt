@@ -3,35 +3,40 @@ package com.bitpunchlab.android.barter.bid
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.Date
 import java.util.UUID
 
 class BidFormViewModel : ViewModel() {
 
-    val _bidTime = MutableStateFlow("")
+
+
+    private val _bidTime = MutableStateFlow("")
     val bidTime : StateFlow<String> get() = _bidTime.asStateFlow()
 
-    val _bidProductName = MutableStateFlow("")
+    private val _bidProductName = MutableStateFlow("")
     val bidProductName : StateFlow<String> get() = _bidProductName.asStateFlow()
 
-    val _bidProductCategory = MutableStateFlow(Category.NOT_SET)
+    private val _bidProductCategory = MutableStateFlow(Category.NOT_SET)
     val bidProductCategory : StateFlow<Category> get() = _bidProductCategory.asStateFlow()
 
-    val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
-    val _shouldExpandCategoryDropdown = MutableStateFlow<Boolean>(false)
+    private val _shouldExpandCategoryDropdown = MutableStateFlow<Boolean>(false)
     val shouldExpandCategoryDropdown : StateFlow<Boolean>
         get() = _shouldExpandCategoryDropdown.asStateFlow()
 
-    val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
+    private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
 
-    val _shouldPopImages = MutableStateFlow<Boolean>(false)
+    private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
     fun updateBidProductName(name: String) {
@@ -57,6 +62,23 @@ class BidFormViewModel : ViewModel() {
 
     fun updateShouldPopImages(should: Boolean) {
         _shouldPopImages.value = should
+    }
+
+    // check if all fields are valid
+    // create the bid
+    fun createBid(userId: String) : Bid? {
+        if (bidProductName.value != "" && bidProductCategory.value != Category.NOT_SET) {
+            val askingProduct = ProductAsking(
+                productId = UUID.randomUUID().toString(),
+                name = bidProductName.value,
+                category = bidProductCategory.value.label,
+                userId = userId
+            )
+            Log.i("bid formVM", "created bid")
+            return Bid(id = UUID.randomUUID().toString(),
+                userName = "", askingProduct = askingProduct, bidTime = Date().toString())
+        }
+        return null
     }
 
     fun deleteImage(image: ProductImage) {

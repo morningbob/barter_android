@@ -133,12 +133,16 @@ class SellViewModel : ViewModel() {
     // I put empty images list, we will populate it in FirebaseClient
     fun processSelling() {
         val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
-        name = productName.value, category = productCategory.value.name,
+            name = productName.value, category = productCategory.value.name,
             userId = userId.value, images = listOf(), currentBids = listOf(),
             duration = sellingDuration.value.value
         )
 
         val updatedAskingProducts = mutableListOf<ProductAsking>()
+        // we update the product offering id in all the asking products
+        // since when we created them in asking product screen,
+        // we don't have this id yet
+        // for the images' url, we will update them in firebase client
         for (each in AskingProductInfo.askingProducts) {
             val newProduct = each.copy(productOfferingId = productOffering.productId)
             updatedAskingProducts.add(newProduct)

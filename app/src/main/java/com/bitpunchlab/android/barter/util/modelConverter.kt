@@ -34,7 +34,7 @@ fun convertProductOfferingToFirebase(product: ProductOffering) : ProductOffering
 
     if (product.askingProducts.askingList.isNotEmpty()) {
         for (i in 0..product.askingProducts.askingList.size - 1) {
-            askingMap.put(i.toString(), convertProductAskingToFirebase(product.askingProducts.askingList[i], product.productId))
+            askingMap.put(i.toString(), convertProductAskingToFirebase(product.askingProducts.askingList[i]))
         }
     }
 
@@ -81,7 +81,7 @@ fun convertProductFirebaseToProductAsking(productFirebase: ProductAskingFirebase
     )
 }
 
-fun convertProductAskingToFirebase(productAsking: ProductAsking, productOfferingId: String) : ProductAskingFirebase {
+fun convertProductAskingToFirebase(productAsking: ProductAsking) : ProductAskingFirebase {
     val imagesMap = HashMap<String, String>()
 
     for (i in 0..productAsking.images.size - 1) {
@@ -94,7 +94,7 @@ fun convertProductAskingToFirebase(productAsking: ProductAsking, productOffering
         productCategory = productAsking.category,
         productImages = imagesMap,
         productUserId = productAsking.userId,
-        productOffering = productOfferingId
+        productOffering = productAsking.productOfferingId
     )
 }
 
@@ -129,7 +129,35 @@ fun convertProductBiddingFirebaseToProductBidding(productFirebase: ProductBiddin
         dateCreated = productFirebase.dateCreated,
         durationLeft = productFirebase.durationLeft,
         images = imagesList,
-        bids = BidsHolder(bidsList)
+        bidsHolder = BidsHolder(bidsList)
+    )
+}
+
+fun convertProductBiddingToProductBiddingFirebase(productBidding: ProductBidding)
+    : ProductBiddingFirebase {
+
+    val imagesMap = HashMap<String, String>()
+    for (i in 0..productBidding.images.size - 1) {
+        imagesMap.put(i.toString(), productBidding.images[i])
+    }
+
+    val bidsMap = HashMap<String, BidFirebase>()
+    for (i in 0..productBidding.bidsHolder.bids.size - 1) {
+        bidsMap.put(i.toString(), convertBidToBidFirebase(productBidding.bidsHolder.bids[i], ))
+    }
+    productBidding.bidsHolder.bids
+
+    return ProductBiddingFirebase(
+        productId = productBidding.productId,
+        offeringId = productBidding.productOfferingId,
+        productName = productBidding.name,
+        ownerN = productBidding.ownerName,
+        productCategory = productBidding.category,
+        date = productBidding.dateCreated,
+        duration = productBidding.durationLeft,
+        productImages = imagesMap,
+        bid = bidsMap
+
     )
 }
 
@@ -145,6 +173,16 @@ fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
         userName = bidFirebase.userName,
         bidTime = bidFirebase.bidTime,
         askingProduct = askingProduct
+    )
+}
+
+fun convertBidToBidFirebase(bid: Bid) : BidFirebase {
+
+    return BidFirebase(
+        bidId = bid.id,
+        name = bid.userName,
+        askingFirebase = convertProductAskingToFirebase(bid.askingProduct!!),
+        time = bid.bidTime
     )
 }
 

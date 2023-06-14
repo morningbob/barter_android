@@ -4,20 +4,25 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
+import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.AskingProductsHolder
+import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.ProductType
+import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
 import com.bitpunchlab.android.barter.util.convertProductBiddingFirebaseToProductBidding
+import com.bitpunchlab.android.barter.util.convertProductBiddingToProductBiddingFirebase
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
@@ -142,7 +147,6 @@ object FirebaseClient {
                             _createACStatus.value = 2
                         } else {
                             _createACStatus.value = 1
-
                         }
                     }
                 }
@@ -282,13 +286,11 @@ object FirebaseClient {
         // and get back download url, then record in the product offering and asking product
         // so the product offering will be updated with both its own images and the asking products
         // objects. They can then be saved in user object in firestore.
-        //val productFirebase =
-        //    convertProductOfferingToFirebase(semiUpdatedProductOffering, askingProductsList)
         val productFirebase =
             convertProductOfferingToFirebase(semiUpdatedProductOffering)
 
         val askingProductsFirebase = askingProductsList.map { each ->
-            convertProductAskingToFirebase(each, productFirebase.id)
+            convertProductAskingToFirebase(each)
         }
         val resultAskingDeferred = CoroutineScope(Dispatchers.IO).async {
             saveAllAskingProductFirebase(askingProductsFirebase)
@@ -313,14 +315,7 @@ object FirebaseClient {
             productFirebase,
         )
 
-        //Log.i("process selling", "resultAsking and resultUpdateUser done")
-
         val resultProduct = resultProductDeferred.await()
-
-        //Log.i("process selling", "resultUpdateUser $resultUpdateUser")
-
-        //Log.i("process selling", "resultAsking ${resultAsking}")
-        //Log.i("process selling", "resultProduct $resultProduct")
 
         return resultProduct && resultAsking && resultUpdateUser
     }
@@ -384,9 +379,6 @@ object FirebaseClient {
 
         val images = productImages.map { it.image }
 
-        //val productMembers = product!!::class.members
-        //val field = product.javaClass.getDeclaredField("")
-
         val pairProductResult = uploadImages(product = product,
             productId = productId,
             images = images)
@@ -394,25 +386,11 @@ object FirebaseClient {
         downloadUrlList.addAll(pairProductResult.first)
         imageFilenames.addAll(pairProductResult.second)
 
-        //val productMembers = product!!::class.members
-        //val productImages = productMembers.first { it.name == "images" }
-        //val field = product.javaClass.getDeclaredField("_images")
-        //field.isAccessible = true
-        //val productImages = field.get(product) as List<String>
-
-        // create a new object, copy all field
-
-
-        //val newList = mutableListOf<String>()
-        //val newList = productImages.toMutableList()
-        //newList.addAll(downloadUrlList)
         Log.i(
             "process selling",
             "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
         )
 
-        //productImages.set(product, newList)
-        //product.images = newList
         return Pair(downloadUrlList, imageFilenames)
     }
 
@@ -507,4 +485,41 @@ object FirebaseClient {
                 cancellableContinuation.resume(result) {}
             }
     }
+
+    // we modify the product bidding's bids field.  add the bid to it.
+    suspend fun processBidding(productBidding: ProductBidding, bid: Bid) : Boolean {
+
+        val newBids = productBidding.bidsHolder.bids.toMutableList()
+        newBids.add(bid)
+        val newProduct = productBidding.copy(bidsHolder = BidsHolder(newBids))
+
+        //productBidding.bidsHolder = BidsHolder(newBids)
+
+        return CoroutineScope(Dispatchers.IO).async {
+            return@async saveProductBiddingFirebase(convertProductBiddingToProductBiddingFirebase(newProduct))
+        }.await()
+    }
+    private suspend fun saveProductBiddingFirebase(productBiddingFirebase: ProductBiddingFirebase) =
+        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+            Firebase.firestore
+                .collection("productsBidding")
+                .document(productBiddingFirebase.id)
+                .set(productBiddingFirebase)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("update product bidding for bids", "success")
+                    } else {
+                        Log.i("update product bidding for bids", "failed ${task.exception}")
+                    }
+                }
+
+            cancellableContinuation.resume(false) {}
+        }
+/*
+    private suspend fun saveProductBiddingFirebase(bidFirebase: BidFirebase) : Boolean =
+        suspendCancellableCoroutine { cancellableContinuation ->
+            cancellableContinuation.resume(false) {}
+        }
+
+*/
 }

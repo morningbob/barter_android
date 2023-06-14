@@ -22,6 +22,6 @@ data class ProductBidding(
     val durationLeft: Int,
     var images : List<String>,
     @Embedded
-    var bids : BidsHolder,
+    var bidsHolder : BidsHolder,
 
 )

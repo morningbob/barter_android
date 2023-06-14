@@ -97,6 +97,7 @@ class AskingProductViewModel : ViewModel() {
                 category = productCategory.value.name,
                 userId = FirebaseClient.currentUserFirebase.value!!.id,
                 name = productName.value,
+                productOfferingId = ""
             )
 
             AskingProductInfo.askingProducts.add(newProduct)
