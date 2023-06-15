@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -37,6 +38,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val shouldSetAskingProduct by sellViewModel.shouldSetProduct.collectAsState()
     val shouldDisplayImages by sellViewModel.shouldDisplayImages.collectAsState()
     val processSellingStatus by sellViewModel.processSellingStatus.collectAsState()
+    val loadingAlpha by sellViewModel.loadingAlpha.collectAsState()
 
     var shouldCancel by remember { mutableStateOf(false) }
 
@@ -137,6 +139,14 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                     status = processSellingStatus,
                     sellViewModel = sellViewModel
                 )
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(loadingAlpha)
+            ) {
+                CustomCircularProgressBar()
             }
         }
     }

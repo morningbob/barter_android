@@ -87,4 +87,9 @@ class BidFormViewModel : ViewModel() {
         //newList.remove(image)
         //_imagesDisplay.value = newList
     }
+
+    fun clearForm() {
+        _bidProductName.value = ""
+        _bidProductCategory.value = Category.NOT_SET
+    }
 }

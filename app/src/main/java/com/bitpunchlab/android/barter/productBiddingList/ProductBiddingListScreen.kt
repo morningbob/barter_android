@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.productBiddingList
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,17 +34,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProductBiddingListScreen(navController: NavHostController,
     productBiddingViewModel: ProductBiddingListViewModel = remember {
         ProductBiddingListViewModel()
-    }
-                             ) {
+    }) {
 
     val productsBidding by productBiddingViewModel.productsBidding.collectAsState()
     val shouldShowProduct by productBiddingViewModel.shouldShowProduct.collectAsState()
@@ -55,34 +58,45 @@ fun ProductBiddingListScreen(navController: NavHostController,
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .background(BarterColor.lightGreen),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = painterResource(id = R.mipmap.bidding),
-                contentDescription = "products available for bidding icon",
-                modifier = Modifier
-                    .width(120.dp)
-                    .padding(top = 40.dp)
-            )
+        Scaffold(
+            // bottom bar is 80dp height
+            modifier = Modifier
+                .fillMaxSize(),
+            bottomBar = { BottomBarNavigation(navController) }
 
-            // the bottom bar is 80 height, so, we set a bit more
-            LazyColumn(
+        ) {
+            Column(
                 modifier = Modifier
-                    .padding(top = 30.dp, bottom = 120.dp),
-                contentPadding = PaddingValues(horizontal = 50.dp, vertical = 40.dp),
+                    .fillMaxSize()
+                    .background(BarterColor.lightGreen),
+                    //.padding(bottom = 120.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(productsBidding,
-                    { product -> product.productId }) { product ->
-                    
-                    ProductBiddingRow(
-                        product = product,
-                        onClick = { productBiddingViewModel.prepareForProduct(it) }
-                    )
-                }
-            }
+                Image(
+                    painter = painterResource(id = R.mipmap.bidding),
+                    contentDescription = "products available for bidding icon",
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(top = 40.dp)
+                )
 
+                // the bottom bar is 80 height, so, we set a bit more
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 30.dp, bottom = 100.dp),
+                    contentPadding = PaddingValues(horizontal = 50.dp, vertical = 40.dp),
+                ) {
+                    items(productsBidding,
+                        { product -> product.productId }) { product ->
+
+                        ProductBiddingRow(
+                            product = product,
+                            onClick = { productBiddingViewModel.prepareForProduct(it) }
+                        )
+                    }
+                }
+
+            }
         }
     }
 }
@@ -102,7 +116,7 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Yellow)
+                .background(BarterColor.lightYellow)
                 .padding(start = 20.dp, end = 20.dp)
                 .clickable { onClick.invoke(product) }
         ) {
@@ -118,6 +132,7 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
                             contentDescription = "product's image",
                             modifier = Modifier
                                 .width(80.dp)
+                                .padding(top = 20.dp, bottom = 20.dp)
                         )
                     }
                 } else {

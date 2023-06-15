@@ -14,6 +14,7 @@ import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,6 +64,9 @@ class SellViewModel : ViewModel() {
 
     private val _processSellingStatus = MutableStateFlow(0)
     val processSellingStatus : StateFlow<Int> get() = _processSellingStatus.asStateFlow()
+
+    private val _loadingAlpha = MutableStateFlow(0f)
+    val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -123,7 +127,25 @@ class SellViewModel : ViewModel() {
         if (productName.value != "" && productCategory.value != Category.NOT_SET &&
                 AskingProductInfo.askingProducts.isNotEmpty() &&
              sellingDuration.value != SellingDuration.NOT_SET) {
-            processSelling()
+            _loadingAlpha.value = 100f
+            CoroutineScope(Dispatchers.IO).launch {
+                if (processSelling()) {
+                    Log.i("process selling, from sellVM", "succeeded")
+                    _processSellingStatus.value = 2
+                    // I clear the fields and stop loading spinner as such in 2 places
+                    // because the timing of each are different.
+                    // Can't put it after if clause
+                    // need to wait for the processing finished
+                    clearFields()
+                    _loadingAlpha.value = 0f
+                } else {
+                    Log.i("process selling, from sellVM", "failed")
+                    _processSellingStatus.value = 1
+                    clearFields()
+                    _loadingAlpha.value = 0f
+                }
+            }
+
         } else {
             // invalid field
             _processSellingStatus.value = 3
@@ -131,7 +153,7 @@ class SellViewModel : ViewModel() {
     }
 
     // I put empty images list, we will populate it in FirebaseClient
-    fun processSelling() {
+    private suspend fun processSelling() : Boolean {
         val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
             name = productName.value, category = productCategory.value.name,
             userId = userId.value, images = listOf(), currentBids = listOf(),
@@ -148,19 +170,11 @@ class SellViewModel : ViewModel() {
             updatedAskingProducts.add(newProduct)
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        return CoroutineScope(Dispatchers.IO).async {
             Log.i("process selling", "got images size: ${productImages.value.size}")
-            if (FirebaseClient.processSelling(productOffering, productImages.value,
-                updatedAskingProducts, AskingProductInfo.askingProductsImages)) {
-                Log.i("process selling, from sellVM", "succeeded")
-                _processSellingStatus.value = 2
-                clearFields()
-            } else {
-                Log.i("process selling, from sellVM", "failed")
-                _processSellingStatus.value = 1
-                clearFields()
-            }
-        }
+            FirebaseClient.processSelling(productOffering, productImages.value,
+                updatedAskingProducts, AskingProductInfo.askingProductsImages)
+        }.await()
     }
 
     fun prepareImagesDisplay() {

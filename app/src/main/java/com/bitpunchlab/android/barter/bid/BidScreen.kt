@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -47,7 +49,7 @@ fun BidScreen(navController: NavHostController,
     val shouldDisplayImage by bidViewModel.shouldDisplayImages.collectAsState()
     val shouldPopBid by bidViewModel.shouldPopBid.collectAsState()
     val shouldStartBiding by bidViewModel.shouldStartBid.collectAsState()
-    val bid by bidViewModel.bid.collectAsState()
+    //val bid by bidViewModel.bid.collectAsState()
     //val shouldCancel by bidViewModel.shouldCancel.collectAsState()
 
     val currentContext = LocalContext.current
@@ -65,25 +67,21 @@ fun BidScreen(navController: NavHostController,
         }
     }
 
-    // we check if bid is not null, then we process the bid in bidVM
-    LaunchedEffect(key1 = bid) {
-        if (bid != null && product != null) {
-            bidViewModel.processBidding(product!!, bid!!)
-        } else {
-            Log.i("bid screen", "null product or bid0")
-        }
-    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            bottomBar = { BottomBarNavigation(navController) }
+            //bottomBar = { BottomBarNavigation(navController) }
         ) {
             Column(
+                // bottom navigation bar is 80 height
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(BarterColor.lightGreen),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(BarterColor.lightGreen)
+                    .verticalScroll(rememberScrollState()),
+                    //.padding(bottom = 120.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+
             ) {
                 Image(
                     painter = painterResource(id = R.mipmap.hammer),

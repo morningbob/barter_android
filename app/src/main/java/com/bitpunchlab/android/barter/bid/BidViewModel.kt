@@ -14,6 +14,7 @@ import com.bitpunchlab.android.barter.util.createPlaceholderImage
 import com.bitpunchlab.android.barter.util.loadImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,10 @@ class BidViewModel : ViewModel() {
 
     private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+
+    // 1 is failed, 2 is succeeded, 3 is invalid info
+    private val _biddingStatus = MutableStateFlow<Int>(0)
+    val biddingStatus : StateFlow<Int> get() = _biddingStatus.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -42,6 +47,10 @@ class BidViewModel : ViewModel() {
 
     private val _shouldCancel = MutableStateFlow(false)
     val shouldCancel : StateFlow<Boolean> get() = _shouldCancel.asStateFlow()
+
+    private val _loadingAlpha = MutableStateFlow(0f)
+    val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
+
     fun prepareImages(type: ImageType, imagesUrl: List<String>, context: Context) {
         // retrieve images from cloud storage and store in view model
         // we need to do like this because Images Display Screen's setup
@@ -87,6 +96,10 @@ class BidViewModel : ViewModel() {
         _bid.value = newBid
     }
 
+    fun updateBiddingStatus(status: Int) {
+        _biddingStatus.value = status
+    }
+
     fun deleteImage(image: ProductImage) {
         //Log.i("askingVM", "got image")
         //val newList = imagesDisplay.value.toMutableList()
@@ -94,12 +107,28 @@ class BidViewModel : ViewModel() {
         //_imagesDisplay.value = newList
     }
 
-    fun processBidding(product: ProductBidding, bid: Bid) {
-        CoroutineScope(Dispatchers.IO).launch {
+
+
+    fun processBidding(product: ProductBidding, bid: Bid, images: List<ProductImage>)  {
+        _loadingAlpha.value = 100f
+
+        val imagesBitmap = images.map { image ->
+            image.image
+        }
+
+        //return CoroutineScope(Dispatchers.IO).launch {
+         CoroutineScope(Dispatchers.IO).launch {
             //if (ProductBiddingInfo.product.value != null) {
             Log.i("bidVM", "process bidding")
-            FirebaseClient.processBidding(product, bid)
-        }
+            if (FirebaseClient.processBidding(product, bid, imagesBitmap)) {
+                _biddingStatus.value = 2
+                _loadingAlpha.value = 0f
+            } else {
+                _biddingStatus.value = 1
+                _loadingAlpha.value = 0f
+            }
+         }
+        //}
     }
 
 }

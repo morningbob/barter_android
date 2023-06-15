@@ -157,7 +157,6 @@ fun convertProductBiddingToProductBiddingFirebase(productBidding: ProductBidding
         duration = productBidding.durationLeft,
         productImages = imagesMap,
         bid = bidsMap
-
     )
 }
 
