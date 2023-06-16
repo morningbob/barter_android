@@ -104,7 +104,6 @@ fun ProductBiddingListScreen(navController: NavHostController,
 @Composable
 fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit) {
     Card(
-
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, bottom = 8.dp),

@@ -226,9 +226,7 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                     modifier = Modifier
                         .fillMaxWidth()
                 )
-
             }
-        
     }
 }
 

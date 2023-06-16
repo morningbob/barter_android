@@ -10,10 +10,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,13 +37,17 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.reflect.KClass
 
 @Composable
@@ -249,85 +257,93 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
 @Composable
 fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Unit,
             modifier: Modifier = Modifier) {
-    Column(
+    Card(
         modifier = Modifier
-            .then(modifier)
-            .clickable { onClick.invoke(product) },
-        horizontalAlignment = Alignment.CenterHorizontally
+            .then(modifier),
+            //.clickable { onClick.invoke(product) },
+            //.background(BarterColor.lightBlue),
+        elevation = 10.dp,
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(3.dp, BarterColor.textGreen)
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(BarterColor.lightBlue)
+                .padding(start = 20.dp, end = 20.dp)
+                .clickable { onClick.invoke(product) }
+        ) {
+            if (product.images.isNotEmpty()) {
+                val imageState = LoadImage(url = product.images.first())
+                if (imageState.value != null) {
+                    //Log.i("product row", "images is not empty")
+                    //Log.i("product row", "images 0 ${product.images[0]}")
+                    Image(
+                        bitmap = imageState.value!!.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .width(280.dp)
+                            .padding(top = 30.dp)
+                    )
+                }
 
-        if (product.images.isNotEmpty()) {
-            val imageState = LoadImage(url = product.images.first())
-            if (imageState.value != null) {
-            //Log.i("product row", "images is not empty")
-            //Log.i("product row", "images 0 ${product.images[0]}")
-            Image(
-                bitmap = imageState.value!!.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(280.dp)
-                    .padding(top = 30.dp)
-            )
+            } else {
+                Log.i("product row", "images is empty")
             }
+            Text(
+                text = product.name,
+                color = BarterColor.textGreen,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, start = 20.dp, end = 20.dp),
+            ) {
+                Text(
+                    text = "Category: ",
+                    color = BarterColor.textGreen,
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = product.category,
+                    color = BarterColor.textGreen,
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, start = 20.dp, end = 20.dp),
+            ) {
+                Text(
+                    text = "Selling Duration: ",
+                    color = BarterColor.textGreen,
+                    //modifier = Modifier.then(modifier)
 
-        } else {
-            Log.i("product row", "images is empty")
-        }
-        Text(
-            text = product.name,
-            color = BarterColor.textGreen,
-            modifier = Modifier
-                .padding(top = 20.dp)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-        ) {
-            Text(
-                text = "Category: ",
-                color = BarterColor.textGreen,
-                textAlign = TextAlign.Start
-            )
-            Text(
-                text = product.category,
-                color = BarterColor.textGreen,
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-        ) {
-            Text(
-                text = "Selling Duration: ",
-                color = BarterColor.textGreen,
-                //modifier = Modifier.then(modifier)
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = "${product.duration} days",
+                    color = BarterColor.textGreen,
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 10.dp),
+            ) {
+                Text(
+                    text = "Asking Products: ",
+                    color = BarterColor.textGreen,
+                    textAlign = TextAlign.Start
+                )
 
-                textAlign = TextAlign.Start
-            )
-            Text(
-                text = "${product.duration} days",
-                color = BarterColor.textGreen,
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-        ) {
-            Text(
-                text = "Asking Products: ",
-                color = BarterColor.textGreen,
-                //modifier = Modifier.then(modifier)
-
-                textAlign = TextAlign.Start
-            )
-
-            Text(
-                text = "${product.askingProducts.askingList[0].name}",
-                color = BarterColor.textGreen,
-            )
+                Text(
+                    text = "${product.askingProducts.askingList[0].name}",
+                    color = BarterColor.textGreen,
+                )
+            }
         }
     }
 }
@@ -354,7 +370,61 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
     return bitmapState
 }
 
+@Composable
+fun <T : Any> BasicBidScreen(product: ProductBidding?, images: List<ProductImage>, viewModel: T) {
+    //val product by ProductBiddingInfo.product.collectAsState()
+    //val images by viewModel.imagesDisplay.collectAsState()
 
+    val viewModelMembers = viewModel::class.members
+    val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
+
+
+            Image(
+                painter = painterResource(id = R.mipmap.hammer),
+                contentDescription = "Bid's icon",
+                modifier = Modifier
+                    .padding(top = 40.dp)
+                    .width(120.dp)
+            )
+            if (images.isNotEmpty()) {
+                Image(
+                    bitmap = images[0].image.asImageBitmap(),
+                    contentDescription = "product's image",
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .width(200.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.mipmap.imageplaceholder),
+                    contentDescription = "image placeholder",
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .width(200.dp)
+                )
+            }
+            Text(
+                text = product?.name ?: "Not Available",
+                fontSize = 20.sp,
+                color = BarterColor.textGreen,
+                modifier = Modifier
+                    .padding(top = 30.dp)
+            )
+            Text(
+                text = product?.category ?: "Not Available",
+                fontSize = 20.sp,
+                color = BarterColor.textGreen,
+                modifier = Modifier
+                    .padding(top = 30.dp)
+            )
+            CustomButton(
+                label = "Show All Images",
+                onClick = { viewModelUpdateShouldDisplayImages.call(viewModel, true) },
+                modifier = Modifier
+                    .padding(top = 25.dp)
+            )
+
+}
 
 
 /*

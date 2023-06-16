@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.BasicBidScreen
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomButton
@@ -83,50 +84,7 @@ fun BidScreen(navController: NavHostController,
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.hammer),
-                    contentDescription = "Bid's icon",
-                    modifier = Modifier
-                        .padding(top = 40.dp)
-                        .width(120.dp)
-                )
-                if (images.isNotEmpty()) {
-                    Image(
-                        bitmap = images[0].image.asImageBitmap(),
-                        contentDescription = "product's image",
-                        modifier = Modifier
-                            .padding(top = 30.dp)
-                            .width(200.dp)
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.mipmap.imageplaceholder),
-                        contentDescription = "image placeholder",
-                        modifier = Modifier
-                            .padding(top = 30.dp)
-                            .width(200.dp)
-                    )
-                }
-                Text(
-                    text = product?.name ?: "Not Available",
-                    fontSize = 20.sp,
-                    color = BarterColor.textGreen,
-                    modifier = Modifier
-                        .padding(top = 30.dp)
-                )
-                Text(
-                    text = product?.category ?: "Not Available",
-                    fontSize = 20.sp,
-                    color = BarterColor.textGreen,
-                    modifier = Modifier
-                        .padding(top = 30.dp)
-                )
-                CustomButton(
-                    label = "Show All Images",
-                    onClick = { bidViewModel.updateShouldDisplayImages(true) },
-                    modifier = Modifier
-                        .padding(top = 25.dp)
-                )
+                BasicBidScreen(product = product, images = images, viewModel = bidViewModel)
 
                 ChoiceButton(
                     title = "Bid",
@@ -158,3 +116,50 @@ fun BidScreen(navController: NavHostController,
         }
     }
 }
+/*
+               Image(
+                   painter = painterResource(id = R.mipmap.hammer),
+                   contentDescription = "Bid's icon",
+                   modifier = Modifier
+                       .padding(top = 40.dp)
+                       .width(120.dp)
+               )
+               if (images.isNotEmpty()) {
+                   Image(
+                       bitmap = images[0].image.asImageBitmap(),
+                       contentDescription = "product's image",
+                       modifier = Modifier
+                           .padding(top = 30.dp)
+                           .width(200.dp)
+                   )
+               } else {
+                   Image(
+                       painter = painterResource(id = R.mipmap.imageplaceholder),
+                       contentDescription = "image placeholder",
+                       modifier = Modifier
+                           .padding(top = 30.dp)
+                           .width(200.dp)
+                   )
+               }
+               Text(
+                   text = product?.name ?: "Not Available",
+                   fontSize = 20.sp,
+                   color = BarterColor.textGreen,
+                   modifier = Modifier
+                       .padding(top = 30.dp)
+               )
+               Text(
+                   text = product?.category ?: "Not Available",
+                   fontSize = 20.sp,
+                   color = BarterColor.textGreen,
+                   modifier = Modifier
+                       .padding(top = 30.dp)
+               )
+               CustomButton(
+                   label = "Show All Images",
+                   onClick = { bidViewModel.updateShouldDisplayImages(true) },
+                   modifier = Modifier
+                       .padding(top = 25.dp)
+               )
+
+                */

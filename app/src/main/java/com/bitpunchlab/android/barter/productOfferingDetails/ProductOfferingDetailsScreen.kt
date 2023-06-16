@@ -152,6 +152,16 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         modifier = Modifier
                             .padding(top = 20.dp)
                     )
+
+                    CustomButton(
+                        label = "View Bids",
+                        onClick = {  }
+                    )
+
+                    CustomButton(
+                        label = "Back",
+                        onClick = {  }
+                    )
                 }
 
                 if (shouldDisplayImages) {

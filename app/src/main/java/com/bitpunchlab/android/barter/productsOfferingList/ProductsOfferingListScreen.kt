@@ -105,8 +105,11 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                             product = each,
                             onClick = {
                                 ProductInfo.updateProductChosen(it)
-                                productsOfferingListViewModel.updateShouldDisplayProductDetails(true)},
-                            modifier = Modifier,
+                                productsOfferingListViewModel.updateShouldDisplayProductDetails(true)
+                                      },
+                            modifier = Modifier
+                                .padding(top = 8.dp, bottom = 8.dp)
+
                         )
                     }
                 }

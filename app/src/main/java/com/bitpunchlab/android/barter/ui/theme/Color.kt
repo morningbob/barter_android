@@ -16,6 +16,6 @@ object BarterColor {
     val buttonBrown = Color(0xFF804d1d)
     val orange = Color(0xFFebc281)
     val lightYellow = Color(0xFFf2f1a2)
-    val lightBlue = Color(0xFF8ebbe8)
+    val lightBlue = Color(0xFFbbebf0)
 
 }
