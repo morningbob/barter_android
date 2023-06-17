@@ -162,16 +162,16 @@ fun convertProductBiddingToProductBiddingFirebase(productBidding: ProductBidding
 
 fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
 
-    var askingProduct : ProductAsking? = null
-    bidFirebase.askingProduct?.let {
-        askingProduct = convertProductAskingFirebaseToProductAsking(it)
+    var bidProduct : ProductBidding? = null
+    bidFirebase.bidProduct?.let {
+        bidProduct = convertProductBiddingFirebaseToProductBidding(it)
     }
 
     return Bid(
         id = bidFirebase.id,
         userName = bidFirebase.userName,
         bidTime = bidFirebase.bidTime,
-        askingProduct = askingProduct
+        bidProduct = bidProduct
     )
 }
 
@@ -180,7 +180,7 @@ fun convertBidToBidFirebase(bid: Bid) : BidFirebase {
     return BidFirebase(
         bidId = bid.id,
         name = bid.userName,
-        askingFirebase = convertProductAskingToFirebase(bid.askingProduct!!),
+        biddingFirebase = convertProductBiddingToProductBiddingFirebase(bid.bidProduct!!),
         time = bid.bidTime
     )
 }

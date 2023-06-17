@@ -51,6 +51,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val product by ProductInfo.productChosen.collectAsState()
     val shouldDisplayImages by productDetailsViewModel.shouldDisplayImages.collectAsState()
     val shouldDisplayProductAsking by productDetailsViewModel.shouldDisplayAskingProducts.collectAsState()
+    val shouldShowBidsList by productDetailsViewModel.shouldShowBidsList.collectAsState()
 
     val currentContext = LocalContext.current
 
@@ -155,7 +156,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
                     CustomButton(
                         label = "View Bids",
-                        onClick = {  }
+                        onClick = { productDetailsViewModel.updateShouldShowBidsList(true) }
                     )
 
                     CustomButton(

@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.R
@@ -50,6 +52,10 @@ fun ProductBiddingListScreen(navController: NavHostController,
     val productsBidding by productBiddingViewModel.productsBidding.collectAsState()
     val shouldShowProduct by productBiddingViewModel.shouldShowProduct.collectAsState()
 
+    //val viewModelMembers = viewModel::class.members
+    //val viewModelProductsBidding = viewModelMembers.first { it.name == "productsBidding" }
+    //val viewModelPrepareForProduct = viewModelMembers.first { it.name == "prepareForProduct" }
+    //val viewModelUpdateShouldShowProduct = viewModelMembers.first { it.name == "updateShouldShowProduct" }
 
     LaunchedEffect(key1 = shouldShowProduct) {
         if (shouldShowProduct) {
@@ -91,7 +97,10 @@ fun ProductBiddingListScreen(navController: NavHostController,
 
                         ProductBiddingRow(
                             product = product,
-                            onClick = { productBiddingViewModel.prepareForProduct(it) }
+                            onClick = {
+                                productBiddingViewModel.prepareForProduct(it)
+                                //viewModelPrepareForProduct.call(viewModel, it)
+                            }
                         )
                     }
                 }

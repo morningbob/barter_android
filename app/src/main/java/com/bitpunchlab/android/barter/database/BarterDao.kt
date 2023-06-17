@@ -34,6 +34,7 @@ interface BarterDao {
     suspend fun getUsersAndProductsOffering() : List<UserAndProductOffering>
 
 
+    @Transaction
     @Query("SELECT * from users WHERE :id = id")
     fun getUserAndProductsOffering(id: String) : List<UserAndProductOffering>
 

@@ -494,7 +494,7 @@ object FirebaseClient {
 
         val newBids = productBidding.bidsHolder.bids.toMutableList()
         // we update the url we got after uploading the images
-        bid.askingProduct?.images = downloadUrls
+        bid.bidProduct?.images = downloadUrls
         newBids.add(bid)
         val newProduct = productBidding.copy(bidsHolder = BidsHolder(newBids))
 

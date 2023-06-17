@@ -15,7 +15,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @Database(entities = [User::class, ProductOffering::class, ProductBidding::class,
                      ProductAsking::class, Bid::class]
-, version = 12, exportSchema = false)
+, version = 15, exportSchema = false)
 
 @TypeConverters(Converters::class)
 abstract class BarterDatabase : RoomDatabase() {

@@ -45,6 +45,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _shouldDisplayAskingProducts = MutableStateFlow<Boolean>(false)
     val shouldDisplayAskingProducts : StateFlow<Boolean> get() = _shouldDisplayAskingProducts.asStateFlow()
 
+    private val _shouldShowBidsList = MutableStateFlow<Boolean>(false)
+    val shouldShowBidsList : StateFlow<Boolean> get() = _shouldShowBidsList.asStateFlow()
+
     //private val _shouldDisplayProductImages = MutableStateFlow<Boolean>(false)
     //val shouldDisplayProductImages : StateFlow<Boolean> get() = _shouldDisplayProductImages.asStateFlow()
 
@@ -53,13 +56,13 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     // so the images display screen can retrieve it here
     // that way, we can display both product images and asking product images
     // both in one images display screen
-    val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
-    val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    private val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val productImages : StateFlow<MutableList<ProductImage>> get() = _productImages.asStateFlow()
 
-    val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -76,6 +79,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     fun updateShouldDisplayAskingProducts(should: Boolean) {
         _shouldDisplayAskingProducts.value = should
+    }
+
+    fun updateShouldShowBidsList(should: Boolean) {
+        _shouldShowBidsList.value = should
     }
 
     // let me think how and when to retrieve the images from cloud storage
@@ -101,8 +108,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         }
 
     }
-
-
 
     fun deleteImage(image: ProductImage) {
         Log.i("askingVM", "got image")

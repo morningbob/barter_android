@@ -14,11 +14,12 @@ data class Bid(
     val userName : String,
     // the asking product that the bidder offers
     @Embedded
-    val askingProduct : ProductAsking? = null,
+    val bidProduct : ProductBidding? = null,
     val bidTime : String
 
 ) : Parcelable
 
+@Parcelize
 data class BidsHolder(
     val bids : List<Bid>
-)
+) : Parcelable
