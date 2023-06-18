@@ -58,15 +58,6 @@ fun ProductsOfferingListScreen(navController: NavHostController,
     //val productChosen by ProductInfo.productChosen.collectAsState()
     val shouldDisplayDetails by productsOfferingListViewModel.shouldDisplayDetails.collectAsState()
 
-    LaunchedEffect(key1 = userId) {
-        CoroutineScope(Dispatchers.IO).launch {
-            productsOfferingListViewModel.getAllProductsOffering(
-                FirebaseClient.localDatabase!!,
-                userId
-            )
-        }
-        // we need to wait for the products offering retrieval finished
-    }
     LaunchedEffect(key1 = shouldDisplayDetails) {
         if (shouldDisplayDetails) {
             navController.navigate(ProductOfferingDetails.route)
@@ -139,3 +130,15 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                         .width(120.dp)
                 )
 */
+/*
+    LaunchedEffect(key1 = userId) {
+        CoroutineScope(Dispatchers.IO).launch {
+            productsOfferingListViewModel.getAllProductsOffering(
+                FirebaseClient.localDatabase!!,
+                userId
+            )
+        }
+        // we need to wait for the products offering retrieval finished
+    }
+
+ */

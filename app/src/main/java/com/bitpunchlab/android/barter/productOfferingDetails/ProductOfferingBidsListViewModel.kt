@@ -18,8 +18,6 @@ import java.util.UUID
 
 class ProductOfferingBidsListViewModel : ViewModel() {
 
-
-
     private val _bid = MutableStateFlow<Bid?>(null)
     val bid : StateFlow<Bid?> get() = _bid.asStateFlow()
 

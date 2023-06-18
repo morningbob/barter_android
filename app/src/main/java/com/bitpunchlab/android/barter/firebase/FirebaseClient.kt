@@ -274,6 +274,29 @@ object FirebaseClient {
                 }
     }
 
+    suspend fun retrieveProductBidding(productOfferingId: String) : ProductBiddingFirebase? =
+        suspendCancellableCoroutine { cancellableContinuation ->
+            Firebase.firestore
+                .collection("productsBidding")
+                .whereEqualTo("productOfferingId", productOfferingId)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.documents.isNotEmpty()) {
+                        Log.i("retrieve product bidding", "success")
+                        val productBidding = snapshot.documents[0].toObject<ProductBiddingFirebase>()
+                        cancellableContinuation.resume(productBidding) {}
+                    } else {
+                        Log.i("retrieve product bidding", "product doesn't exist")
+                        cancellableContinuation.resume(null) {}
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.i("retrieve product bidding", "failure $e")
+                    cancellableContinuation.resume(null) {}
+                }
+
+        }
+
     suspend fun processSelling(productOffering: ProductOffering,
                                productImages: List<ProductImage>,
         askingProducts: List<ProductAsking>, askingProductImages: List<List<ProductImage>>) : Boolean {

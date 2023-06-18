@@ -11,10 +11,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
 import com.bitpunchlab.android.barter.util.loadImage
 import com.bumptech.glide.Glide
@@ -23,6 +26,7 @@ import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.UUID
 
-
+// here we prepare the bids list by querying firestore, the corresponding product bidding
+// we prepare it even before users click on view bids
 class ProductOfferingDetailsViewModel() : ViewModel() {
 
     private val _product = MutableStateFlow<ProductOffering?>(null)
@@ -65,6 +70,29 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
 
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            ProductInfo.productChosen.collect() { productOffering ->
+                productOffering?.let {
+                    //val bids = mutableListOf<Bid>()
+                    CoroutineScope(Dispatchers.IO).async {
+                        FirebaseClient.retrieveProductBidding(productOffering.productId)?.bids?.map { (key, bidFirebase) ->
+                                convertBidFirebaseToBid(bidFirebase)
+                            //Log.i("vm get updated bids", "got updated bids")
+                        }
+                    }.await()?.let { bids ->
+                        BidInfo.updateBids(bids)
+                        Log.i("get product bidding ", "updated bids")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun prepareBids() {
+
+    }
+
     fun updateShouldDisplayImages(should: Boolean) {
         _shouldDisplayImages.value = should
     }
@@ -81,6 +109,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _shouldDisplayAskingProducts.value = should
     }
 
+    // before showing the bids list, we need to retrieve the product bidding from firestore
     fun updateShouldShowBidsList(should: Boolean) {
         _shouldShowBidsList.value = should
     }

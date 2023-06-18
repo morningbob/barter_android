@@ -44,7 +44,7 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
           ProductOfferingBidsListViewModel()
     ) {
 
-    val bids = productOfferingBidsListViewModel.bids.collectAsState()
+    val bids = BidInfo.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
     val bidProductImages by productOfferingBidsListViewModel.bidProductImages.collectAsState()
@@ -59,7 +59,13 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn() {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BarterColor.lightGreen)
+                .padding(start = 40.dp, end = 40.dp, top = 30.dp)
+
+        ) {
             items(bids.value, { bid -> bid.id }) {bid ->
                 BidRow(
                     bid = bid,
@@ -82,6 +88,7 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit, productOfferingBidsListViewModel: P
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(BarterColor.lightGreen)
                 .padding(top = 8.dp, bottom = 8.dp),
             elevation = 10.dp,
             shape = RoundedCornerShape(15.dp),
@@ -90,7 +97,7 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit, productOfferingBidsListViewModel: P
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BarterColor.lightYellow)
+                    .background(BarterColor.lightBrown)
                     .padding(start = 20.dp, end = 20.dp)
                     .clickable { onClick.invoke(bid) }
             ) {

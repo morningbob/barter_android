@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +19,8 @@ class ProductsOfferingListViewModel : ViewModel() {
     private var _productsOffering = MutableStateFlow<List<ProductOffering>>(listOf())
     val productsOffering : StateFlow<List<ProductOffering>> get() = _productsOffering.asStateFlow()
 
-    private var _productChosen = MutableStateFlow<ProductOffering?>(null)
-    val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
+    //private var _productChosen = MutableStateFlow<ProductOffering?>(null)
+    //val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
 
     private var _shouldDisplayDetails = MutableStateFlow<Boolean>(false)
     val shouldDisplayDetails : StateFlow<Boolean> get() = _shouldDisplayDetails.asStateFlow()
@@ -29,6 +30,11 @@ class ProductsOfferingListViewModel : ViewModel() {
     //ProductInfo.updateProductChosen(null)
     init {
         ProductInfo.updateProductChosen(null)
+        CoroutineScope(Dispatchers.IO).launch {
+            FirebaseClient.userId.collect() { id ->
+                getAllProductsOffering(FirebaseClient.localDatabase!!, id)
+            }
+        }
     }
 
     suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {

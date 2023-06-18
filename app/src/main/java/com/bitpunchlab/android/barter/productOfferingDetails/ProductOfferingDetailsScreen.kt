@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskingProductsList
 import com.bitpunchlab.android.barter.Login
+import com.bitpunchlab.android.barter.ProductOfferingBidsList
 import com.bitpunchlab.android.barter.ProductsOffering
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
@@ -44,9 +45,7 @@ import com.bitpunchlab.android.barter.util.ImageType
 fun ProductOfferingDetailsScreen(navController: NavHostController,
      productDetailsViewModel: ProductOfferingDetailsViewModel = remember {
          ProductOfferingDetailsViewModel()
-     }
-
-    ) {
+     }) {
 
     val product by ProductInfo.productChosen.collectAsState()
     val shouldDisplayImages by productDetailsViewModel.shouldDisplayImages.collectAsState()
@@ -59,7 +58,6 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
         if (product == null) {
             // we may not come from products offering
             navController.popBackStack()
-
         }
     }
 
@@ -67,6 +65,12 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
         if (shouldDisplayProductAsking) {
             Log.i("product details", "should navigate asking products true")
             navController.navigate(AskingProductsList.route)
+        }
+    }
+
+    LaunchedEffect(key1 = shouldShowBidsList) {
+        if (shouldShowBidsList) {
+            navController.navigate(ProductOfferingBidsList.route)
         }
     }
 
@@ -156,7 +160,10 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
                     CustomButton(
                         label = "View Bids",
-                        onClick = { productDetailsViewModel.updateShouldShowBidsList(true) }
+                        onClick = {
+                            //BidInfo.updateBids(product.currentBids)
+                            productDetailsViewModel.updateShouldShowBidsList(true)
+                        }
                     )
 
                     CustomButton(
