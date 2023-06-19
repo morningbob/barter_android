@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -41,13 +42,14 @@ import java.util.UUID
 @Composable
 fun ProductOfferingBidsListScreen(navController: NavHostController,
       productOfferingBidsListViewModel: ProductOfferingBidsListViewModel =
-          ProductOfferingBidsListViewModel()
+          remember { ProductOfferingBidsListViewModel() }
     ) {
 
     val bids = BidInfo.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
-    val bidProductImages by productOfferingBidsListViewModel.bidProductImages.collectAsState()
+    //val bidProductImages by productOfferingBidsListViewModel.bidProductImages.collectAsState()
+    //val shouldDismissDetails by productOfferingBidsListViewModel.shouldDismissDetails.collectAsState()
 
     val currentContext = LocalContext.current
 
@@ -78,7 +80,9 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
         }
         if (shouldShowBid && chosenBid != null && chosenBid!!.bidProduct != null) {
             ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
-        }
+        } //else if (shouldDismissDetails) {
+          //  productOfferingBidsListViewModel.updateShouldDismissDetails(false)
+        //}
     }
 }
 

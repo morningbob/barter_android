@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.productOfferingDetails
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +34,7 @@ import com.bitpunchlab.android.barter.ProductsOffering
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.CustomButton
+import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
@@ -50,7 +53,8 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val product by ProductInfo.productChosen.collectAsState()
     val shouldDisplayImages by productDetailsViewModel.shouldDisplayImages.collectAsState()
     val shouldDisplayProductAsking by productDetailsViewModel.shouldDisplayAskingProducts.collectAsState()
-    val shouldShowBidsList by productDetailsViewModel.shouldShowBidsList.collectAsState()
+    val shouldShowBidsListStatus by productDetailsViewModel.shouldShowBidsListStatus.collectAsState()
+    val loadingAlpha by productDetailsViewModel.loadingAlpha.collectAsState()
 
     val currentContext = LocalContext.current
 
@@ -68,8 +72,8 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
         }
     }
 
-    LaunchedEffect(key1 = shouldShowBidsList) {
-        if (shouldShowBidsList) {
+    LaunchedEffect(key1 = shouldShowBidsListStatus) {
+        if (shouldShowBidsListStatus == 2) {
             navController.navigate(ProductOfferingBidsList.route)
         }
     }
@@ -162,7 +166,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         label = "View Bids",
                         onClick = {
                             //BidInfo.updateBids(product.currentBids)
-                            productDetailsViewModel.updateShouldShowBidsList(true)
+                            productDetailsViewModel.updateShouldShowBidsListStatus(1)
                         }
                     )
 
@@ -174,6 +178,14 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
                 if (shouldDisplayImages) {
                     ImagesDisplayScreen(productDetailsViewModel)
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(loadingAlpha)
+                ) {
+                    CustomCircularProgressBar()
                 }
             }
         }

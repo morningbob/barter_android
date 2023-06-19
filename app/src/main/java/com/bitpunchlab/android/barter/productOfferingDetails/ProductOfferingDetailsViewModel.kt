@@ -30,6 +30,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.UUID
@@ -50,8 +51,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _shouldDisplayAskingProducts = MutableStateFlow<Boolean>(false)
     val shouldDisplayAskingProducts : StateFlow<Boolean> get() = _shouldDisplayAskingProducts.asStateFlow()
 
-    private val _shouldShowBidsList = MutableStateFlow<Boolean>(false)
-    val shouldShowBidsList : StateFlow<Boolean> get() = _shouldShowBidsList.asStateFlow()
+    private val _shouldShowBidsListStatus = MutableStateFlow<Int>(0)
+    val shouldShowBidsListStatus : StateFlow<Int> get() = _shouldShowBidsListStatus.asStateFlow()
 
     //private val _shouldDisplayProductImages = MutableStateFlow<Boolean>(false)
     //val shouldDisplayProductImages : StateFlow<Boolean> get() = _shouldDisplayProductImages.asStateFlow()
@@ -70,6 +71,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
 
+    private val _loadingAlpha = MutableStateFlow<Float>(0f)
+    val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             ProductInfo.productChosen.collect() { productOffering ->
@@ -87,10 +91,17 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 }
             }
         }
-    }
-
-    private fun prepareBids() {
-
+        CoroutineScope(Dispatchers.IO).launch {
+            combine(shouldShowBidsListStatus, BidInfo.bids) {
+                status, bids ->
+                if (status == 1 && bids.isNotEmpty()) {
+                    updateShouldShowBidsListStatus(2)
+                }
+16
+            }.collect() {
+                Log.i("product offering details VM", "ready navigate")
+            }
+        }
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -110,8 +121,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     }
 
     // before showing the bids list, we need to retrieve the product bidding from firestore
-    fun updateShouldShowBidsList(should: Boolean) {
-        _shouldShowBidsList.value = should
+    fun updateShouldShowBidsListStatus(status: Int) {
+        _shouldShowBidsListStatus.value = status
     }
 
     // let me think how and when to retrieve the images from cloud storage
