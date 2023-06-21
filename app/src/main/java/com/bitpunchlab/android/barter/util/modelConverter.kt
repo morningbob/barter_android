@@ -1,10 +1,12 @@
 package com.bitpunchlab.android.barter.util
 
+import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
+import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AskingProductsHolder
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidsHolder
@@ -121,14 +123,14 @@ fun convertProductBiddingFirebaseToProductBidding(productFirebase: ProductBiddin
     }
 
     return ProductBidding(
-        productId = productFirebase.id,
-        productOfferingId = productFirebase.productOfferingId,
-        name = productFirebase.name,
+        productBidId = productFirebase.id,
+        productOfferingForBid = productFirebase.productOfferingId,
+        productName = productFirebase.name,
         ownerName = productFirebase.ownerName,
-        category = productFirebase.category,
+        productCategory = productFirebase.category,
         dateCreated = productFirebase.dateCreated,
         durationLeft = productFirebase.durationLeft,
-        images = imagesList,
+        productImages = imagesList,
         bidsHolder = BidsHolder(bidsList)
     )
 }
@@ -137,8 +139,8 @@ fun convertProductBiddingToProductBiddingFirebase(productBidding: ProductBidding
     : ProductBiddingFirebase {
 
     val imagesMap = HashMap<String, String>()
-    for (i in 0..productBidding.images.size - 1) {
-        imagesMap.put(i.toString(), productBidding.images[i])
+    for (i in 0..productBidding.productImages.size - 1) {
+        imagesMap.put(i.toString(), productBidding.productImages[i])
     }
 
     val bidsMap = HashMap<String, BidFirebase>()
@@ -148,11 +150,11 @@ fun convertProductBiddingToProductBiddingFirebase(productBidding: ProductBidding
     productBidding.bidsHolder.bids
 
     return ProductBiddingFirebase(
-        productId = productBidding.productId,
-        offeringId = productBidding.productOfferingId,
-        productName = productBidding.name,
+        productId = productBidding.productBidId,
+        offeringId = productBidding.productOfferingForBid,
+        productName = productBidding.productName,
         ownerN = productBidding.ownerName,
-        productCategory = productBidding.category,
+        productCategory = productBidding.productCategory,
         date = productBidding.dateCreated,
         duration = productBidding.durationLeft,
         productImages = imagesMap,
@@ -168,8 +170,9 @@ fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
     }
 
     return Bid(
-        id = bidFirebase.id,
-        userName = bidFirebase.userName,
+        bidId = bidFirebase.id,
+        bidUserName = bidFirebase.userName,
+        bidUserId = bidFirebase.userId,
         bidTime = bidFirebase.bidTime,
         bidProduct = bidProduct
     )
@@ -178,13 +181,21 @@ fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
 fun convertBidToBidFirebase(bid: Bid) : BidFirebase {
 
     return BidFirebase(
-        bidId = bid.id,
-        name = bid.userName,
+        bidId = bid.bidId,
+        name = bid.bidUserName,
+        bidUserId = bid.bidUserId,
         biddingFirebase = convertProductBiddingToProductBiddingFirebase(bid.bidProduct!!),
         time = bid.bidTime
     )
 }
 
+fun convertAcceptBidFirebaseToAcceptBid(acceptBidFirebase: AcceptBidFirebase) : AcceptBid {
+    return AcceptBid(
+        acceptBid = convertBidFirebaseToBid(acceptBidFirebase.bid!!),
+        acceptProductInConcern = convertProductFirebaseToProduct(acceptBidFirebase.productOffering!!),
+        acceptId = acceptBidFirebase.id
+    )
+}
 
 fun <T> sortElements(productsMap: HashMap<String, T>) : List<T>{
     val listOfSortProduct = mutableListOf<SortHelpObject<T>>()

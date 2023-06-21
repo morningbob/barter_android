@@ -6,15 +6,25 @@ class UserFirebase {
     var email: String = ""
     var dataCreated: String = ""
     var productsOffering = HashMap<String, ProductOfferingFirebase>()
+    // The bids that user accepted
+    var userAcceptedBids = HashMap<String, AcceptBidFirebase>()
+    // The bids that user offered and got accepted
+    var userBidsAccepted = HashMap<String, AcceptBidFirebase>()
 
     constructor()
 
     constructor(userId: String, userName: String, userEmail: String, userDateCreated: String,
-        offering: HashMap<String, ProductOfferingFirebase>) {
+        offering: HashMap<String, ProductOfferingFirebase>,
+        acceptedBids: HashMap<String, AcceptBidFirebase> =
+                    HashMap(),
+        bidsAccepted: HashMap<String, AcceptBidFirebase> =
+                    HashMap()) {
         id = userId
         name = userName
         email = userEmail
         dataCreated = userDateCreated
         productsOffering = offering
+        userAcceptedBids = acceptedBids
+        userBidsAccepted = bidsAccepted
     }
 }

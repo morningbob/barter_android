@@ -93,7 +93,7 @@ fun ProductBiddingListScreen(navController: NavHostController,
                     contentPadding = PaddingValues(horizontal = 50.dp, vertical = 40.dp),
                 ) {
                     items(productsBidding,
-                        { product -> product.productId }) { product ->
+                        { product -> product.productBidId }) { product ->
 
                         ProductBiddingRow(
                             product = product,
@@ -132,8 +132,8 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
                 modifier = Modifier
 
             ) {
-                if (product.images.isNotEmpty()) {
-                    val bitmap = LoadImage(url = product.images[0])
+                if (product.productImages.isNotEmpty()) {
+                    val bitmap = LoadImage(url = product.productImages[0])
                     bitmap.value?.let {
                         Image(
                             bitmap = bitmap.value!!.asImageBitmap(),
@@ -154,14 +154,14 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
             }
             Column() {
                 Text(
-                    text = product.name,
+                    text = product.productName,
                     color = BarterColor.textGreen,
                     fontSize = 18.sp,
                     modifier = Modifier
                         .padding(top = 10.dp, start = 20.dp)
                 )
                 Text(
-                    text = product.category,
+                    text = product.productCategory,
                     color = BarterColor.textGreen,
                     fontSize = 18.sp,
                     modifier = Modifier

@@ -404,14 +404,14 @@ fun <T : Any> BasicBidScreen(product: ProductBidding?, images: List<ProductImage
                 )
             }
             Text(
-                text = product?.name ?: "Not Available",
+                text = product?.productName ?: "Not Available",
                 fontSize = 20.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier
                     .padding(top = 30.dp)
             )
             Text(
-                text = product?.category ?: "Not Available",
+                text = product?.productCategory ?: "Not Available",
                 fontSize = 20.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier

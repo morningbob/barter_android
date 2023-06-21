@@ -167,7 +167,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                         painter = painterResource(id = R.mipmap.cross),
                         contentDescription = "cancel icon",
                         modifier = Modifier
-                            .width(50.dp)
+                            .width(40.dp)
                             .clickable {
                                 viewModelUpdateShouldPopImages.invoke(viewModel, true)
                                 viewModelUpdateShouldDisplayImages.invoke(viewModel, false)

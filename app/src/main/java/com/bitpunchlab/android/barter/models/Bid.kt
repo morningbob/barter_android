@@ -10,13 +10,13 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Bid(
     @PrimaryKey
-    val id : String,
-    val userName : String,
+    val bidId : String,
+    val bidUserName : String,
+    val bidUserId : String,
     // the asking product that the bidder offers
     @Embedded
     val bidProduct : ProductBidding? = null,
     val bidTime : String
-
 ) : Parcelable
 
 @Parcelize

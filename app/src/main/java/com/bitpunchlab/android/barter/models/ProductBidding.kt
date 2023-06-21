@@ -16,14 +16,14 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class ProductBidding(
     @PrimaryKey
-    val productId : String,
-    val productOfferingId : String,
-    val name : String,
+    val productBidId : String,
+    val productOfferingForBid : String,
+    val productName : String,
     val ownerName : String,
-    val category: String,
+    val productCategory: String,
     val dateCreated : String,
     val durationLeft: Int,
-    var images : List<String>,
+    var productImages : List<String>,
     @Embedded
     var bidsHolder : BidsHolder,
 

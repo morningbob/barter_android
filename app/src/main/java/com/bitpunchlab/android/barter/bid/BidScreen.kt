@@ -57,7 +57,7 @@ fun BidScreen(navController: NavHostController,
 
     LaunchedEffect(key1 = product) {
         if (product != null) {
-            bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.images, currentContext)
+            bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.productImages, currentContext)
         }
     }
 

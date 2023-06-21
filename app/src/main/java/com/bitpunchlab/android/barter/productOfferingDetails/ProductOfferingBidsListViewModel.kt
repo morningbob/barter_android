@@ -4,7 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.database.BarterRepository
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
@@ -21,6 +24,9 @@ class ProductOfferingBidsListViewModel : ViewModel() {
 
     private val _bid = MutableStateFlow<Bid?>(null)
     val bid : StateFlow<Bid?> get() = _bid.asStateFlow()
+
+    private val _product = MutableStateFlow<ProductOffering?>(null)
+    val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
 
     private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
@@ -39,6 +45,21 @@ class ProductOfferingBidsListViewModel : ViewModel() {
 
     private val _shouldDismissDetails = MutableStateFlow<Boolean>(false)
     val shouldDismissDetails : StateFlow<Boolean> get() = _shouldDismissDetails.asStateFlow()
+
+    // this variable is used to pop off the current screen as cross cancelled
+    private val _shouldPopBids = MutableStateFlow<Boolean>(false)
+    val shouldPopBids : StateFlow<Boolean> get() = _shouldPopBids.asStateFlow()
+
+    private val _acceptBidStatus = MutableStateFlow<Int>(0)
+    val acceptBidStatus : StateFlow<Int> get() = _acceptBidStatus.asStateFlow()
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            ProductInfo.productChosen.collect() { productChosen ->
+                _product.value = productChosen
+            }
+        }
+    }
 
     fun updateBid(bid: Bid) {
         _bid.value = bid
@@ -59,6 +80,15 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     fun updateShouldDismissDetails(should: Boolean) {
         _shouldDismissDetails.value = should
     }
+
+    fun updateShouldPopBids(should: Boolean) {
+        _shouldPopBids.value = should
+    }
+
+    fun updateAcceptBidStatus(status: Int) {
+        _acceptBidStatus.value = status
+    }
+
 
     fun deleteImage(image: ProductImage) {
         Log.i("askingVM", "got image")
@@ -81,8 +111,22 @@ class ProductOfferingBidsListViewModel : ViewModel() {
                 }
             }
         }
-        //updateShouldShowBid(true)
 
+    }
+
+    fun acceptBid() {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (product.value != null && bid.value != null) {
+                if (FirebaseClient.processAcceptBid(product.value!!, bid.value!!)) {
+                    updateAcceptBidStatus(3)
+                } else {
+                    updateAcceptBidStatus(4)
+                }
+            } else {
+                Log.i("accept bid", "product info not available")
+                updateAcceptBidStatus(5)
+            }
+        }
     }
 }
 /*

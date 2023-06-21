@@ -1,9 +1,11 @@
 package com.bitpunchlab.android.barter.productOfferingDetails
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -48,46 +51,76 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
     val bids = BidInfo.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
+    val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
+
     //val bidProductImages by productOfferingBidsListViewModel.bidProductImages.collectAsState()
     //val shouldDismissDetails by productOfferingBidsListViewModel.shouldDismissDetails.collectAsState()
 
     val currentContext = LocalContext.current
 
+    LaunchedEffect(key1 = shouldPopBids) {
+        if (shouldPopBids) {
+            productOfferingBidsListViewModel.updateShouldPopBids(false)
+            navController.popBackStack()
+        }
+    }
 
     LaunchedEffect(key1 = chosenBid) {
         if (chosenBid != null && chosenBid!!.bidProduct != null) {
-            productOfferingBidsListViewModel.prepareImages(chosenBid!!.bidProduct!!.images, currentContext)
+            productOfferingBidsListViewModel.prepareImages(chosenBid!!.bidProduct!!.productImages, currentContext)
         }
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BarterColor.lightGreen)
-                .padding(start = 40.dp, end = 40.dp, top = 30.dp)
 
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(bids.value, { bid -> bid.id }) {bid ->
-                BidRow(
-                    bid = bid,
-                    onClick = {
-                        productOfferingBidsListViewModel.updateBid(it)
-                        productOfferingBidsListViewModel.updateShouldShowBid(true)
-                    },
-                    productOfferingBidsListViewModel = productOfferingBidsListViewModel)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BarterColor.lightGreen)
+                    .padding(top = 20.dp, end = 20.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Image(
+                    painter = painterResource(id = R.mipmap.cross),
+                    contentDescription = "Cancel button",
+                    modifier = Modifier
+                        .width(40.dp)
+                        .clickable { productOfferingBidsListViewModel.updateShouldPopBids(true) }
+                        //.align(Alignment.End),
+                    //Alignment.TopEnd
+                )
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BarterColor.lightGreen)
+                    .padding(start = 40.dp, end = 40.dp, top = 30.dp)
+
+            ) {
+                items(bids.value, { bid -> bid.bidId }) { bid ->
+                    BidRow(
+                        bid = bid,
+                        onClick = {
+                            productOfferingBidsListViewModel.updateBid(it)
+                            productOfferingBidsListViewModel.updateShouldShowBid(true)
+                        },
+                        //productOfferingBidsListViewModel = productOfferingBidsListViewModel
+                    )
+                }
+            }
+            if (shouldShowBid && chosenBid != null && chosenBid!!.bidProduct != null) {
+                Log.i("bids list", "navigate to bid details")
+                ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
             }
         }
-        if (shouldShowBid && chosenBid != null && chosenBid!!.bidProduct != null) {
-            ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
-        } //else if (shouldDismissDetails) {
-          //  productOfferingBidsListViewModel.updateShouldDismissDetails(false)
-        //}
     }
 }
 
 @Composable
-fun BidRow(bid: Bid, onClick: (Bid) -> Unit, productOfferingBidsListViewModel: ProductOfferingBidsListViewModel) {
+fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
     Surface() {
         Card(
             modifier = Modifier
@@ -109,8 +142,8 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit, productOfferingBidsListViewModel: P
                     modifier = Modifier
 
                 ) {
-                    if (bid.bidProduct != null && bid.bidProduct.images.isNotEmpty()) {
-                        val bitmap = LoadImage(url = bid.bidProduct.images[0])
+                    if (bid.bidProduct != null && bid.bidProduct.productImages.isNotEmpty()) {
+                        val bitmap = LoadImage(url = bid.bidProduct.productImages[0])
                         bitmap.value?.let {
                             Image(
                                 bitmap = bitmap.value!!.asImageBitmap(),
@@ -131,14 +164,14 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit, productOfferingBidsListViewModel: P
                 }
                 Column() {
                     Text(
-                        text = bid.bidProduct?.name ?: "Not Available",
+                        text = bid.bidProduct?.productName ?: "Not Available",
                         color = BarterColor.textGreen,
                         fontSize = 18.sp,
                         modifier = Modifier
                             .padding(top = 10.dp, start = 20.dp)
                     )
                     Text(
-                        text = bid.bidProduct?.category ?: "Not Available",
+                        text = bid.bidProduct?.productCategory ?: "Not Available",
                         color = BarterColor.textGreen,
                         fontSize = 18.sp,
                         modifier = Modifier

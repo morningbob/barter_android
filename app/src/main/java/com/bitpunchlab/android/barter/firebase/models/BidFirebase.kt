@@ -4,15 +4,18 @@ class BidFirebase {
 
     var id = ""
     var userName = ""
+    var userId = ""
     var bidProduct : ProductBiddingFirebase? = null
     var bidTime = ""
 
     constructor()
 
-    constructor(bidId: String, name: String, biddingFirebase: ProductBiddingFirebase?,
+    constructor(bidId: String, bidUserId: String,
+                name: String, biddingFirebase: ProductBiddingFirebase?,
         time: String) {
         id = bidId
         userName = name
+        userId = bidUserId
         bidProduct = biddingFirebase
         bidTime = time
     }

@@ -3,11 +3,18 @@ package com.bitpunchlab.android.barter.productOfferingDetails
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -55,12 +62,13 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val shouldDisplayProductAsking by productDetailsViewModel.shouldDisplayAskingProducts.collectAsState()
     val shouldShowBidsListStatus by productDetailsViewModel.shouldShowBidsListStatus.collectAsState()
     val loadingAlpha by productDetailsViewModel.loadingAlpha.collectAsState()
+    val shouldPopDetails by productDetailsViewModel.shouldPopDetails.collectAsState()
 
     val currentContext = LocalContext.current
 
-    LaunchedEffect(key1 = product) {
-        if (product == null) {
-            // we may not come from products offering
+    LaunchedEffect(key1 = shouldPopDetails) {
+        if (shouldPopDetails) {
+            productDetailsViewModel.updateShouldPopDetails(false)
             navController.popBackStack()
         }
     }
@@ -80,15 +88,32 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            bottomBar = { BottomBarNavigation(navController = navController) }
+            //bottomBar = { BottomBarNavigation(navController = navController) }
         ) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(BarterColor.lightGreen)
+                            .padding(top = 20.dp, end = 20.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.mipmap.cross),
+                            contentDescription = "Cancel button",
+                            modifier = Modifier
+                                .width(40.dp)
+                                .clickable { productDetailsViewModel.updateShouldPopDetails(true) }
+                        )
+                    }
                     if (product != null && product!!.images.isNotEmpty()) {
                         val bitmap = LoadImage(url = product!!.images[0])
                         if (bitmap.value != null) {
@@ -168,11 +193,6 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             //BidInfo.updateBids(product.currentBids)
                             productDetailsViewModel.updateShouldShowBidsListStatus(1)
                         }
-                    )
-
-                    CustomButton(
-                        label = "Back",
-                        onClick = {  }
                     )
                 }
 

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
+import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
@@ -511,17 +512,15 @@ object FirebaseClient {
     // we modify the product bidding's bids field.  add the bid to it.
     suspend fun processBidding(productBidding: ProductBidding, bid: Bid, images: List<Bitmap>) : Boolean {
 
-        val downloadUrlResult = uploadImages(productBidding.productId, images)
+        val downloadUrlResult = uploadImages(productBidding.productBidId, images)
         val downloadUrls = downloadUrlResult.first
-        val filenames = downloadUrlResult.second
+        //val filenames = downloadUrlResult.second
 
         val newBids = productBidding.bidsHolder.bids.toMutableList()
         // we update the url we got after uploading the images
-        bid.bidProduct?.images = downloadUrls
+        bid.bidProduct?.productImages = downloadUrls
         newBids.add(bid)
         val newProduct = productBidding.copy(bidsHolder = BidsHolder(newBids))
-
-        //newProduct.images = downloadUrls
 
         return CoroutineScope(Dispatchers.IO).async {
             return@async saveProductBiddingFirebase(convertProductBiddingToProductBiddingFirebase(newProduct))
@@ -543,6 +542,36 @@ object FirebaseClient {
                     }
                 }
         }
+
+    suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
+        val productFirebase = convertProductOfferingToFirebase(product)
+        val bidFirebase = convertBidToBidFirebase(bid)
+
+        val acceptBidFirebase = AcceptBidFirebase(acceptId = UUID.randomUUID().toString(),
+            product = productFirebase, theBid = bidFirebase)
+        return CoroutineScope(Dispatchers.IO).async {
+            uploadAcceptBid(acceptBidFirebase)
+        }.await()
+    }
+
+    private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase) =
+        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+
+            Firebase.firestore
+                .collection("acceptBids")
+                .document()
+                .set(acceptBidFirebase)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("upload accept bid", "success")
+                        cancellableContinuation.resume(true) {}
+                    } else {
+                        Log.i("upload accept bid", "failed ${task.exception}")
+                        cancellableContinuation.resume(false) {}
+                    }
+                }
+        }
+
 /*
     private suspend fun saveProductBiddingFirebase(bidFirebase: BidFirebase) : Boolean =
         suspendCancellableCoroutine { cancellableContinuation ->
