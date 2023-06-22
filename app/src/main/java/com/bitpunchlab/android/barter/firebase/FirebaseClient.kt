@@ -19,6 +19,7 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.ProductType
+import com.bitpunchlab.android.barter.util.convertAcceptBidFirebaseToAcceptBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
@@ -70,7 +71,7 @@ object FirebaseClient {
             Log.i("auth listener", "got user id ${userId.value}")
             if (createAccount) {
                 _finishedAuthSignup.value = true
-            } else {
+            } //else {
                 // retrieve user from firestore
                 CoroutineScope(Dispatchers.IO).launch {
                     //_userId.value = auth.cu
@@ -81,8 +82,9 @@ object FirebaseClient {
                         saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
                         prepareProductsOfferingForLocalDatabase(currentUser)
                         prepareProductsBiddingForLocalDatabase()
+                        prepareTransactionRecords(currentUser)
                     }
-                }
+               // }
             }
         } else {
             Log.i("fire auth", "auth is null")
@@ -297,6 +299,15 @@ object FirebaseClient {
                 }
 
         }
+
+    private suspend fun prepareTransactionRecords(currentUser: UserFirebase) {
+        val acceptedBids =
+            currentUser.userAcceptedBids.map { (key, value) ->
+                convertAcceptBidFirebaseToAcceptBid(value)
+            }
+
+        localDatabase!!.barterDao.insertAcceptedBids(*acceptedBids.toTypedArray())
+    }
 
     suspend fun processSelling(productOffering: ProductOffering,
                                productImages: List<ProductImage>,
@@ -571,6 +582,8 @@ object FirebaseClient {
                     }
                 }
         }
+
+
 
 /*
     private suspend fun saveProductBiddingFirebase(bidFirebase: BidFirebase) : Boolean =

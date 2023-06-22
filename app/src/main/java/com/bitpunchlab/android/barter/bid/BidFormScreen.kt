@@ -152,7 +152,7 @@ fun BidFormScreen(navController: NavHostController,
                 ChoiceButton(
                     title = "Send",
                     onClick = {
-                        val bid = bidFormViewModel.createBid(FirebaseClient.userId.value)
+                        val bid = bidFormViewModel.createBid()
                         if (ProductBiddingInfo.product.value != null && bid != null) {
                             CoroutineScope(Dispatchers.IO).launch {
                                 bidViewModel.processBidding(ProductBiddingInfo.product.value!!, bid, imagesDisplay)

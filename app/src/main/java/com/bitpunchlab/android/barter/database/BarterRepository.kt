@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.database
 
 import android.content.Context
+import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
@@ -64,6 +65,12 @@ object BarterRepository {
     suspend fun getAllProductsBidding() : Flow<List<ProductBidding>>? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getAllProductsBidding()
+        }.await()
+    }
+
+    suspend fun retrieveAcceptedBids() : Flow<List<AcceptBid>>? {
+        return CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getAllAcceptedBids()
         }.await()
     }
 }
