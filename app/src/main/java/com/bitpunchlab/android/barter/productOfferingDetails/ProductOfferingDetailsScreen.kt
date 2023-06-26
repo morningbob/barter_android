@@ -43,6 +43,7 @@ import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.LoadImage
+import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
@@ -114,6 +115,14 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 .clickable { productDetailsViewModel.updateShouldPopDetails(true) }
                         )
                     }
+                    LoadedImageOrPlaceholder(
+                        imageUrls = product!!.images,
+                        contentDes = "product's image",
+                        modifier = Modifier
+                            .padding(top = 40.dp)
+                            .width(200.dp)
+                        )
+                    /*
                     if (product != null && product!!.images.isNotEmpty()) {
                         val bitmap = LoadImage(url = product!!.images[0])
                         if (bitmap.value != null) {
@@ -141,6 +150,8 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 .width(200.dp)
                         )
                     }
+
+                     */
 
                     Text(
                         text = product?.name ?: "Not Available",

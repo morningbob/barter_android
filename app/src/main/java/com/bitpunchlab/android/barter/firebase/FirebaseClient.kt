@@ -305,8 +305,13 @@ object FirebaseClient {
             currentUser.userAcceptedBids.map { (key, value) ->
                 convertAcceptBidFirebaseToAcceptBid(value)
             }
+        val bidsAccepted =
+        currentUser.userBidsAccepted.map { (key, value) ->
+            convertAcceptBidFirebaseToAcceptBid(value)
+        }
 
         localDatabase!!.barterDao.insertAcceptedBids(*acceptedBids.toTypedArray())
+        localDatabase!!.barterDao.insertAcceptedBids(*bidsAccepted.toTypedArray())
     }
 
     suspend fun processSelling(productOffering: ProductOffering,

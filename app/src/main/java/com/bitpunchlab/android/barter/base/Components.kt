@@ -273,23 +273,14 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                 .padding(start = 20.dp, end = 20.dp)
                 .clickable { onClick.invoke(product) }
         ) {
-            if (product.images.isNotEmpty()) {
-                val imageState = LoadImage(url = product.images.first())
-                if (imageState.value != null) {
-                    //Log.i("product row", "images is not empty")
-                    //Log.i("product row", "images 0 ${product.images[0]}")
-                    Image(
-                        bitmap = imageState.value!!.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .width(280.dp)
-                            .padding(top = 30.dp)
-                    )
-                }
+            LoadedImageOrPlaceholder(
+                imageUrls = product.images,
+                contentDes = "product's image",
+                modifier = Modifier
+                    .padding(top = 30.dp)
+                    .width(280.dp)
+            )
 
-            } else {
-                Log.i("product row", "images is empty")
-            }
             Text(
                 text = product.name,
                 color = BarterColor.textGreen,
@@ -348,6 +339,27 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
     }
 }
 
+/*
+            if (product.images.isNotEmpty()) {
+                val imageState = LoadImage(url = product.images.first())
+                if (imageState.value != null) {
+                    //Log.i("product row", "images is not empty")
+                    //Log.i("product row", "images 0 ${product.images[0]}")
+                    Image(
+                        bitmap = imageState.value!!.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .width(280.dp)
+                            .padding(top = 30.dp)
+                    )
+                }
+
+            } else {
+                Log.i("product row", "images is empty")
+            }
+
+             */
+
 @Composable
 fun LoadImage(url: String): MutableState<Bitmap?> {
     val bitmapState: MutableState<Bitmap?> = remember {
@@ -372,58 +384,94 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 
 @Composable
 fun <T : Any> BasicBidScreen(product: ProductBidding?, images: List<ProductImage>, viewModel: T) {
-    //val product by ProductBiddingInfo.product.collectAsState()
-    //val images by viewModel.imagesDisplay.collectAsState()
 
     val viewModelMembers = viewModel::class.members
     val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
+
+        Image(
+            painter = painterResource(id = R.mipmap.hammer),
+            contentDescription = "Bid's icon",
+            modifier = Modifier
+                .padding(top = 40.dp)
+                .width(120.dp)
+        )
+
+        if (images.isNotEmpty()) {
             Image(
-                painter = painterResource(id = R.mipmap.hammer),
-                contentDescription = "Bid's icon",
-                modifier = Modifier
-                    .padding(top = 40.dp)
-                    .width(120.dp)
-            )
-            if (images.isNotEmpty()) {
-                Image(
-                    bitmap = images[0].image.asImageBitmap(),
-                    contentDescription = "product's image",
-                    modifier = Modifier
-                        .padding(top = 30.dp)
-                        .width(200.dp)
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = R.mipmap.imageplaceholder),
-                    contentDescription = "image placeholder",
-                    modifier = Modifier
-                        .padding(top = 30.dp)
-                        .width(200.dp)
-                )
-            }
-            Text(
-                text = product?.productName ?: "Not Available",
-                fontSize = 20.sp,
-                color = BarterColor.textGreen,
+                bitmap = images[0].image.asImageBitmap(),
+                contentDescription = "product's image",
                 modifier = Modifier
                     .padding(top = 30.dp)
+                    .width(200.dp)
             )
-            Text(
-                text = product?.productCategory ?: "Not Available",
-                fontSize = 20.sp,
-                color = BarterColor.textGreen,
+        } else {
+            Image(
+                painter = painterResource(id = R.mipmap.imageplaceholder),
+                contentDescription = "image placeholder",
                 modifier = Modifier
                     .padding(top = 30.dp)
+                    .width(200.dp)
             )
-            CustomButton(
-                label = "Show All Images",
-                onClick = { viewModelUpdateShouldDisplayImages.call(viewModel, true) },
-                modifier = Modifier
-                    .padding(top = 25.dp)
-            )
+        }
 
+        Text(
+            text = product?.productName ?: "Not Available",
+            fontSize = 20.sp,
+            color = BarterColor.textGreen,
+            modifier = Modifier
+                .padding(top = 30.dp)
+        )
+        Text(
+            text = product?.productCategory ?: "Not Available",
+            fontSize = 20.sp,
+            color = BarterColor.textGreen,
+            modifier = Modifier
+                .padding(top = 30.dp)
+        )
+        CustomButton(
+            label = "Show All Images",
+            onClick = { viewModelUpdateShouldDisplayImages.call(viewModel, true) },
+            modifier = Modifier
+                .padding(top = 25.dp)
+        )
+    }
+}
+
+@Composable
+fun LoadedImageOrPlaceholder(imageUrls: List<String>, contentDes: String, modifier: Modifier = Modifier) {
+    if (imageUrls.isNotEmpty()) {
+        val bitmap = LoadImage(url = imageUrls[0])
+        if (bitmap.value != null) {
+            Image(
+                bitmap = bitmap.value!!.asImageBitmap(),
+                contentDescription = contentDes,
+                modifier = Modifier
+                    //.width(80.dp)
+                    .then(modifier)
+            )
+        } else {
+            PlaceholderImage()
+        }
+    } else {
+        PlaceholderImage()
+    }
+}
+
+@Composable
+fun PlaceholderImage() {
+    Image(
+        painter = painterResource(id = R.mipmap.imageplaceholder),
+        contentDescription = "placeholder image",
+        modifier = Modifier
+            .width(80.dp)
+    )
 }
 
 
