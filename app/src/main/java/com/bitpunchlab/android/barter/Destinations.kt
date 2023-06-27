@@ -78,6 +78,12 @@ object Report : Destinations {
     override val icon: Int = R.mipmap.report
 }
 
+object ReportDetails : Destinations {
+    override val title: String = "Report Details"
+    override val route: String = "ReportDetails"
+    override val icon: Int = R.mipmap.report
+}
+
 object ImagesDisplay : Destinations {
     override val title: String = "Images Display"
     override val route: String = "ImagesDisplay"

@@ -13,6 +13,10 @@ import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
@@ -47,8 +51,36 @@ object ImageHandler {
                 })
         }
 
-    
-    suspend fun prepareImages(imagesUrl: List<String>) : List<ProductImage> {
+    // since we need to get responses from the other coroutines,
+    // we use channel flow instead of flow
+    suspend fun loadedImagesFlow(imagesUrl: List<String>) : Flow<Pair<Int, ProductImage>> = channelFlow {
+        for (i in 0..imagesUrl.size - 1) {
+            // so before we load the image, we show the placeholder image
+            //emit(Pair(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage())))
+            CoroutineScope(Dispatchers.IO).launch {
+                loadImage(imagesUrl[i])?.let {
+                    send(Pair(i, ProductImage(i.toString(), it)))
+                }
+            }
+        }
+        awaitClose()
+    }
+
+    fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        return baos.toByteArray()
+    }
+
+    fun createPlaceholderImage() : Bitmap {
+        return BitmapFactory.decodeResource(currentContext!!.resources, R.mipmap.imageplaceholder)
+    }
+}
+/*
+    // this method has the problem that it return the whole list at one point of time
+    // if this method is in the view model, it can make images available as soon as
+    // they are set.
+    suspend fun prepareImages(imagesUrl: List<String>) : List<ProductImage>  {
         // retrieve images from cloud storage and store in view model
         // we need to do like this because Images Display Screen's setup
         // can't be customized to use Glide to load images as needed
@@ -70,13 +102,5 @@ object ImageHandler {
 
     }
 
-    fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        return baos.toByteArray()
-    }
 
-    fun createPlaceholderImage() : Bitmap {
-        return BitmapFactory.decodeResource(currentContext!!.resources, R.mipmap.imageplaceholder)
-    }
-}
+ */

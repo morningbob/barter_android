@@ -41,7 +41,7 @@ fun AskingProductsListScreen(navController: NavHostController,
 ) {
 
     val askingProducts = ProductInfo.askingProducts.collectAsState()
-    val currentContext = LocalContext.current
+    //val currentContext = LocalContext.current
 
     Surface(
         modifier = Modifier

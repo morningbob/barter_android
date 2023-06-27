@@ -115,43 +115,15 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 .clickable { productDetailsViewModel.updateShouldPopDetails(true) }
                         )
                     }
-                    LoadedImageOrPlaceholder(
-                        imageUrls = product!!.images,
-                        contentDes = "product's image",
-                        modifier = Modifier
-                            .padding(top = 40.dp)
-                            .width(200.dp)
-                        )
-                    /*
-                    if (product != null && product!!.images.isNotEmpty()) {
-                        val bitmap = LoadImage(url = product!!.images[0])
-                        if (bitmap.value != null) {
-                            Image(
-                                bitmap = bitmap.value!!.asImageBitmap(),
-                                contentDescription = "product's image",
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .padding(top = 40.dp)
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.mipmap.imageplaceholder),
-                                contentDescription = "product image not available",
-                                modifier = Modifier
-                                    .width(200.dp)
-                            )
-                        }
-
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.mipmap.imageplaceholder),
-                            contentDescription = "product image not available",
+                    product?.let {
+                        LoadedImageOrPlaceholder(
+                            imageUrls = product!!.images,
+                            contentDes = "product's image",
                             modifier = Modifier
+                                .padding(top = 40.dp)
                                 .width(200.dp)
                         )
                     }
-
-                     */
 
                     Text(
                         text = product?.name ?: "Not Available",
@@ -176,13 +148,16 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                     CustomButton(
                         label = "View Product Images",
                         onClick = {
-                            if (product != null && product!!.images.isNotEmpty()) {
+                            /*
+                            if (product!!.images.isNotEmpty()) {
                                 productDetailsViewModel.prepareImages(
                                     ImageType.PRODUCT_IMAGE,
                                     product!!.images,
                                     currentContext
                                 )
                             }
+
+                             */
                             productDetailsViewModel.updateShouldDisplayImages(true)
                         },
                         modifier = Modifier

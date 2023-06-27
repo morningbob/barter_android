@@ -10,6 +10,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.ImageHandler
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
@@ -30,6 +31,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -78,13 +80,30 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             ProductInfo.productChosen.collect() { productOffering ->
                 productOffering?.let {
-                    //val bids = mutableListOf<Bid>()
+                    // preloaded with placeholder images,
+                    // also, for mutable list to set the result at particular index
+                    for (i in 0..productOffering.images.size - 1) {
+                        _imagesDisplay.value.add(
+                            ProductImage(
+                                UUID.randomUUID().toString(),
+                                ImageHandler.createPlaceholderImage()
+                            )
+                        )
+                    }
+
                     CoroutineScope(Dispatchers.IO).async {
+                        //CoroutineScope(Dispatchers.IO).launch {
+                        ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
+                            _imagesDisplay.value.set(pairResult.first, pairResult.second)
+                        }
+                        //}
                         FirebaseClient.retrieveProductBidding(productOffering.productId)?.bids?.map { (key, bidFirebase) ->
                                 convertBidFirebaseToBid(bidFirebase)
                             //Log.i("vm get updated bids", "got updated bids")
                         }
+
                     }.await()?.let { bids ->
+
                         BidInfo.updateBids(bids)
                         Log.i("get product bidding ", "updated bids")
                     }
@@ -101,6 +120,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 Log.i("product offering details VM", "ready navigate")
             }
         }
+
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -131,6 +151,25 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     // let me think how and when to retrieve the images from cloud storage
     // and store as bitmaps in this view model
 
+
+    fun deleteImage(image: ProductImage) {
+        Log.i("askingVM", "got image")
+        //val newList = imagesDisplay.value.toMutableList()
+        //newList.remove(image)
+        //_imagesDisplay.value = newList
+    }
+
+    // show images as soon as it is loaded
+
+
+    fun prepareAskingProducts() {
+        ProductInfo.productChosen.value?.let {
+            Log.i("product details vM", "product is not null")
+            ProductInfo.updateAskingProducts(it.askingProducts.askingList)
+        }
+    }
+}
+/*
     fun prepareImages(type: ImageType, imagesUrl: List<String>, context: Context) {
         // retrieve images from cloud storage and store in view model
         // we need to do like this because Images Display Screen's setup
@@ -152,20 +191,4 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     }
 
-    fun deleteImage(image: ProductImage) {
-        Log.i("askingVM", "got image")
-        //val newList = imagesDisplay.value.toMutableList()
-        //newList.remove(image)
-        //_imagesDisplay.value = newList
-    }
-
-    // show images as soon as it is loaded
-
-
-    fun prepareAskingProducts() {
-        ProductInfo.productChosen.value?.let {
-            Log.i("product details vM", "product is not null")
-            ProductInfo.updateAskingProducts(it.askingProducts.askingList)
-        }
-    }
-}
+ */

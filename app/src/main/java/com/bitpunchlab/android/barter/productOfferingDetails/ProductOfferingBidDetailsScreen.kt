@@ -40,8 +40,6 @@ fun ProductOfferingBidDetailsScreen(
     val shouldDisplayImages by productOfferingBidsListViewModel.shouldDisplayImages.collectAsState()
     val acceptBidStatus by productOfferingBidsListViewModel.acceptBidStatus.collectAsState()
 
-    //val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
-
     //Log.i("bid details", "chosen bid $chosenBid")
     //Log.i("bid details", "should show bid ${shouldShowBid}")
 

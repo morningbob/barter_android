@@ -469,8 +469,8 @@ fun PlaceholderImage() {
     Image(
         painter = painterResource(id = R.mipmap.imageplaceholder),
         contentDescription = "placeholder image",
-        modifier = Modifier
-            .width(80.dp)
+        //modifier = Modifier
+        //    .width(80.dp)
     )
 }
 

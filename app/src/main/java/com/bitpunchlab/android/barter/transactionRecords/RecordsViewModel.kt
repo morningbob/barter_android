@@ -21,6 +21,9 @@ class RecordsViewModel : ViewModel() {
     val _acceptedRecords = MutableStateFlow<List<AcceptBid>>(listOf())
     val acceptedRecords : StateFlow<List<AcceptBid>> get() = _acceptedRecords.asStateFlow()
 
+    val _shouldShowRecord = MutableStateFlow<Boolean>(false)
+    val shouldShowRecord : StateFlow<Boolean> get() = _shouldShowRecord.asStateFlow()
+
     val _productOfferedImage = MutableStateFlow<MutableList<Bitmap?>>(mutableListOf())
     val productOfferedImage : StateFlow<MutableList<Bitmap?>> get() = _productOfferedImage.asStateFlow()
 
@@ -33,9 +36,12 @@ class RecordsViewModel : ViewModel() {
                 Log.i("records vm", "retrieved ${records.size} records")
                 _acceptedRecords.value = records
 
-
             }
         }
+    }
+
+    fun updateShouldShowRecord(should: Boolean) {
+        _shouldShowRecord.value = should
     }
 
     fun prepareImages() {
@@ -60,5 +66,4 @@ class RecordsViewModel : ViewModel() {
         //}
     }
 
-    //private fun retrieve
 }

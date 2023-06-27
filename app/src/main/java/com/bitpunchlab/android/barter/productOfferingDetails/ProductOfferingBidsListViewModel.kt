@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.productOfferingDetails
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -56,7 +58,23 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     init {
         CoroutineScope(Dispatchers.IO).launch {
             ProductInfo.productChosen.collect() { productChosen ->
-                _product.value = productChosen
+                productChosen?.let {
+                    _product.value = productChosen
+                    // we initialize the placeholders
+                    for (i in 0..productChosen.images.size - 1) {
+                        _imagesDisplay.value.add(
+                            ProductImage(
+                                UUID.randomUUID().toString(),
+                                ImageHandler.createPlaceholderImage()
+                            )
+                        )
+                    }
+
+                    // we start to load the images for the product chosen here
+                    ImageHandler.loadedImagesFlow(productChosen.images).collect()  { pairResult ->
+                        _imagesDisplay.value.set(pairResult.first, pairResult.second)
+                    }
+                }
             }
         }
     }
@@ -97,22 +115,6 @@ class ProductOfferingBidsListViewModel : ViewModel() {
         //_imagesDisplay.value = newList
     }
 
-    fun prepareImages(imagesUrl: List<String>, context: Context) {
-        // retrieve images from cloud storage and store in view model
-        // we need to do like this because Images Display Screen's setup
-        // can't be customized to use Glide to load images as needed
-
-        for (i in 0..imagesUrl.size - 1) {
-            // so before we load the image, we show the placeholder image
-            _imagesDisplay.value.add(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage(context)))
-            CoroutineScope(Dispatchers.IO).launch {
-                loadImage(imagesUrl[i], context)?.let {
-                    _imagesDisplay.value.set(i, ProductImage(i.toString(), it))
-                }
-            }
-        }
-
-    }
 
     fun acceptBid() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -142,6 +144,25 @@ class ProductOfferingBidsListViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+ */
+/*
+    fun prepareImages(imagesUrl: List<String>, context: Context) {
+        // retrieve images from cloud storage and store in view model
+        // we need to do like this because Images Display Screen's setup
+        // can't be customized to use Glide to load images as needed
+
+        for (i in 0..imagesUrl.size - 1) {
+            // so before we load the image, we show the placeholder image
+            _imagesDisplay.value.add(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage(context)))
+            CoroutineScope(Dispatchers.IO).launch {
+                loadImage(imagesUrl[i], context)?.let {
+                    _imagesDisplay.value.set(i, ProductImage(i.toString(), it))
+                }
+            }
+        }
+
     }
 
  */

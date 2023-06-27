@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.transactionRecords
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.ReportDetails
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.models.AcceptBid
@@ -40,8 +43,13 @@ fun RecordsScreen(navController: NavHostController,
     recordsViewModel: RecordsViewModel = remember { RecordsViewModel() } ) {
     
     val acceptedRecords by recordsViewModel.acceptedRecords.collectAsState()
-    val productOfferedImage by recordsViewModel.productOfferedImage.collectAsState()
+    val shouldShowRecord by recordsViewModel.shouldShowRecord.collectAsState()
 
+    LaunchedEffect(key1 = shouldShowRecord) {
+        if (shouldShowRecord) {
+            navController.navigate(ReportDetails.route)
+        }
+    }
 
     Surface(
         modifier = Modifier
@@ -66,7 +74,13 @@ fun RecordsScreen(navController: NavHostController,
                     .padding(top = 30.dp, start = 50.dp, end = 50.dp)
             ) {
                 items(acceptedRecords,  { accepted -> accepted.acceptId }) { record ->
-                    RecordRow(record = record)
+                    RecordRow(
+                        record = record,
+                        onClick = {
+                            RecordInfo.updateRecordChosen(record)
+                            recordsViewModel.updateShouldShowRecord(true)
+                        }
+                    )
                 }
             }
         }
@@ -74,13 +88,14 @@ fun RecordsScreen(navController: NavHostController,
 }
 
 @Composable
-fun RecordRow(record: AcceptBid) {
+fun RecordRow(record: AcceptBid, onClick: (AcceptBid) -> Unit) {
     Surface() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BarterColor.lightGreen)
-                .padding(top = 8.dp),
+                .padding(top = 8.dp)
+                .clickable { onClick.invoke(record) },
             elevation = 10.dp,
             shape = RoundedCornerShape(15.dp),
             border = BorderStroke(3.dp, BarterColor.textGreen)
