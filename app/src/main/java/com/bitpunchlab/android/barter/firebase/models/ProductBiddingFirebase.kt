@@ -7,7 +7,8 @@ class ProductBiddingFirebase {
     var ownerName: String = ""
     var category: String = ""
     var dateCreated : String = ""
-    var durationLeft: Int = 0
+    var duration: Int = 0
+    var askingProducts = HashMap<String, ProductAskingFirebase>()
     var images = HashMap<String, String>()
     var bids = HashMap<String, BidFirebase>()
 
@@ -15,7 +16,8 @@ class ProductBiddingFirebase {
 
     constructor(productId: String, offeringId: String, productName: String,
                 ownerN: String,
-                productCategory: String, date: String, duration: Int,
+                productCategory: String, date: String, dur: Int,
+                asking: HashMap<String, ProductAskingFirebase> = HashMap(),
                 productImages: HashMap<String, String> = HashMap<String, String>(),
                 bid: HashMap<String, BidFirebase>
                 ) {
@@ -25,7 +27,8 @@ class ProductBiddingFirebase {
         ownerName = ownerN
         category = productCategory
         dateCreated = date
-        durationLeft = duration
+        duration = dur
+        askingProducts = asking
         images = productImages
         bids = bid
     }

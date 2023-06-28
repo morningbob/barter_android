@@ -161,7 +161,7 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                 sellViewModel: SellViewModel, shouldSetProduct: Boolean,
                 modifier: Modifier = Modifier, navController: NavHostController) {
 
-    Log.i("product form", "should expand ${shouldExpandCat}")
+    //Log.i("product form", "should expand ${shouldExpandCat}")
 
     LaunchedEffect(key1 = shouldSetProduct) {
         if (shouldSetProduct) {

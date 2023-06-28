@@ -44,6 +44,7 @@ import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
+import com.bitpunchlab.android.barter.util.parseDateTime
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -255,13 +256,23 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
 }
 
 @Composable
+fun CustomCard(content: @Composable() () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = Modifier
+            .then(modifier),
+        elevation = 10.dp,
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(3.dp, BarterColor.textGreen)
+    ) {
+        content()
+    }
+}
+@Composable
 fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Unit,
             modifier: Modifier = Modifier) {
     Card(
         modifier = Modifier
             .then(modifier),
-            //.clickable { onClick.invoke(product) },
-            //.background(BarterColor.lightBlue),
         elevation = 10.dp,
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(3.dp, BarterColor.textGreen)
@@ -334,8 +345,33 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                     text = "${product.askingProducts.askingList[0].name}",
                     color = BarterColor.textGreen,
                 )
+
+                DateTimeInfo(
+                    dateTimeString = product.dateCreated,
+                    modifier = Modifier
+                        //.padding(top = 1)
+                )
             }
         }
+    }
+}
+
+@Composable
+fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
+
+    val dateTime = parseDateTime(dateTimeString)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier)
+
+    ) {
+        Text(
+            text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
+            fontSize = 20.sp,
+            color = BarterColor.textGreen
+        )
     }
 }
 

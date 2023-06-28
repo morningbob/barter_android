@@ -16,6 +16,8 @@ data class ProductOffering(
     var name: String,
     var category: String,
     var duration: Int,
+    // the date will be in UTC format
+    var dateCreated: String,
     var images : List<String> = listOf(),
     var currentBids : List<String> = listOf(),
     var productOfferingId : String = "",

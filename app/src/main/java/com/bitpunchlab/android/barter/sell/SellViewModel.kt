@@ -2,8 +2,6 @@ package com.bitpunchlab.android.barter.sell
 
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
@@ -12,6 +10,7 @@ import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
+import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -152,12 +151,13 @@ class SellViewModel : ViewModel() {
         }
     }
 
-    // I put empty images list, we will populate it in FirebaseClient
+    // we create the product offering here
     private suspend fun processSelling() : Boolean {
         val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
             name = productName.value, category = productCategory.value.name,
             userId = userId.value, images = listOf(), currentBids = listOf(),
-            duration = sellingDuration.value.value
+            duration = sellingDuration.value.value,
+            dateCreated = getCurrentDateTime()
         )
 
         val updatedAskingProducts = mutableListOf<ProductAsking>()

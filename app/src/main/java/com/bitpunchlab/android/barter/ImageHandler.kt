@@ -63,6 +63,7 @@ object ImageHandler {
                 }
             }
         }
+        // this is required to keep the channel opened
         awaitClose()
     }
 

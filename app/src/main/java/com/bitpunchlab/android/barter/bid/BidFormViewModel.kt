@@ -11,6 +11,7 @@ import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,17 +78,19 @@ class BidFormViewModel : ViewModel() {
                 productName = bidProductName.value,
                 productCategory = bidProductCategory.value.label,
                 ownerName = FirebaseClient.currentUserFirebase.value!!.name,
-                dateCreated = Date().toString(),
+                dateCreated = getCurrentDateTime(),
                 productOfferingForBid = ProductBiddingInfo.product.value?.productOfferingForBid ?: "",
                 bidsHolder = BidsHolder(listOf<Bid>()),
-                durationLeft = 0,
+                duration = 0,
                 productImages = listOf(),
             )
             Log.i("bid formVM", "created bid")
             return Bid(bidId = UUID.randomUUID().toString(),
                 bidUserName = FirebaseClient.currentUserFirebase.value!!.name,
                 bidUserId = FirebaseClient.userId.value,
-                bidProduct = bidProduct, bidTime = Date().toString())
+                bidProduct = bidProduct,
+                bidTime = getCurrentDateTime()
+            )
         }
         return null
     }

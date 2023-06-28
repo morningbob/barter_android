@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.transactionRecords
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +29,7 @@ import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.util.getCurrentTime
 
 @Composable
 fun RecordDetailsScreen(navController: NavHostController,
@@ -37,6 +41,11 @@ fun RecordDetailsScreen(navController: NavHostController,
     val productOfferingImages by recordDetailsViewModel.productOfferingImages.collectAsState()
     val productInExchangeImages by recordDetailsViewModel.productInExchangeImages.collectAsState()
     val shouldDisplayImages by recordDetailsViewModel.shouldDisplayImages.collectAsState()
+    //val record by RecordInfo.recordChosen.collectAsState()
+
+    //Log.i("record details", "bid product images size ${record?.acceptBid?.bidProduct?.productImages?.size}")
+
+    getCurrentTime()
 
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -45,7 +54,8 @@ fun RecordDetailsScreen(navController: NavHostController,
             modifier = Modifier
                 .fillMaxSize()
                 .background(BarterColor.lightGreen)
-                .padding(top = 40.dp),
+                .padding(top = 40.dp, start = 50.dp, end = 50.dp, bottom = 50.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -53,7 +63,6 @@ fun RecordDetailsScreen(navController: NavHostController,
                 contentDescription = "record details icon",
                 modifier = Modifier
                     .width(120.dp)
-
             )
             Text(
                 text = "Product offered:",
@@ -88,13 +97,20 @@ fun RecordDetailsScreen(navController: NavHostController,
                         .padding(top = 15.dp)
                 )
             }
+            Text(
+                text = "Product in exchange:",
+                color = Color.Black,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 15.dp)
+            )
             if (productInExchangeImages.isNotEmpty()) {
                 Image(
                     bitmap = productInExchangeImages[0].image.asImageBitmap(),
                     contentDescription = "first product image",
                     modifier = Modifier
                         .width(200.dp)
-                        .padding(top = 20.dp, start = 50.dp, end = 50.dp)
+                        .padding(top = 20.dp)
                 )
                 CustomButton(
                     label = "View Images",

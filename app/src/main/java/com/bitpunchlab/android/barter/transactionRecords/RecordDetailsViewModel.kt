@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.transactionRecords
 
 import android.util.Log
+import androidx.compose.runtime.ComposeNode
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.ImageHandler
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -15,16 +16,16 @@ import java.util.UUID
 
 class RecordDetailsViewModel : ViewModel() {
 
-    val _productOfferingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productOfferingImages : StateFlow<List<ProductImage>> get() = _productOfferingImages.asStateFlow()
+    private val _productOfferingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    val productOfferingImages : StateFlow<MutableList<ProductImage>> get() = _productOfferingImages.asStateFlow()
 
-    val _productInExchangeImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productInExchangeImages : StateFlow<List<ProductImage>> get() = _productInExchangeImages.asStateFlow()
+    private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    val productInExchangeImages : StateFlow<MutableList<ProductImage>> get() = _productInExchangeImages.asStateFlow()
 
-    val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
+    private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
 
-    val _shouldPopImages = MutableStateFlow<Boolean>(false)
+    private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
     private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
@@ -34,31 +35,43 @@ class RecordDetailsViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             RecordInfo.recordChosen.collect() { record ->
                 record?.let {
-                    for (i in 0..record.acceptProductInConcern.images.size - 1) {
-                        _productOfferingImages.value.add(
-                            ProductImage(
-                                UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
+                    // a coroutine is required for the first collect won't end the second collect
+                    CoroutineScope(Dispatchers.IO).launch {
+                        for (i in 0..record.acceptProductInConcern.images.size - 1) {
+                            _productOfferingImages.value.add(
+                                ProductImage(
+                                    UUID.randomUUID().toString(),
+                                    ImageHandler.createPlaceholderImage()
+                                )
                             )
-                        )
-                    }
+                        }
 
-                    ImageHandler.loadedImagesFlow(record.acceptProductInConcern.images).collect() { pairResult ->
-                        _productOfferingImages.value.set(pairResult.first, pairResult.second)
+                        ImageHandler.loadedImagesFlow(record.acceptProductInConcern.images)
+                            .collect() { pairResult ->
+                                _productOfferingImages.value.set(
+                                    pairResult.first,
+                                    pairResult.second
+                                )
+                            }
                     }
                     Log.i("loading images", "images number ${record.acceptBid.bidProduct!!.productImages.size}")
-                    for (i in 0..record.acceptBid.bidProduct!!.productImages.size - 1) {
-
-                        _productInExchangeImages.value.add(
-                            ProductImage(
-                                UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        for (i in 0..record.acceptBid.bidProduct!!.productImages.size - 1) {
+                            _productInExchangeImages.value.add(
+                                ProductImage(
+                                    UUID.randomUUID().toString(),
+                                    ImageHandler.createPlaceholderImage()
+                                )
                             )
-                        )
-                    }
+                        }
 
-                    ImageHandler.loadedImagesFlow(record.acceptBid.bidProduct.productImages).collect() { pairResult ->
-                        _productInExchangeImages.value.set(pairResult.first, pairResult.second)
+                        ImageHandler.loadedImagesFlow(record.acceptBid.bidProduct!!.productImages)
+                            .collect() { pairResult ->
+                                _productInExchangeImages.value.set(
+                                    pairResult.first,
+                                    pairResult.second
+                                )
+                            }
                     }
                 }
             }

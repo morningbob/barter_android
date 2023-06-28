@@ -22,7 +22,9 @@ data class ProductBidding(
     val ownerName : String,
     val productCategory: String,
     val dateCreated : String,
-    val durationLeft: Int,
+    val duration: Int,
+    @Embedded
+    val askingProducts: List<ProductAsking>,
     var productImages : List<String>,
     @Embedded
     var bidsHolder : BidsHolder,

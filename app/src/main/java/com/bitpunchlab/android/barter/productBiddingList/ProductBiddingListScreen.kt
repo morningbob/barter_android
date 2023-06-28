@@ -37,6 +37,8 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
+import com.bitpunchlab.android.barter.base.CustomButton
+import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.bid.BidScreen
@@ -143,14 +145,32 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
                     color = BarterColor.textGreen,
                     fontSize = 18.sp,
                     modifier = Modifier
-                        .padding(top = 10.dp, start = 20.dp)
+                        .padding(top = 5.dp, start = 20.dp)
                 )
                 Text(
                     text = product.productCategory,
                     color = BarterColor.textGreen,
                     fontSize = 18.sp,
                     modifier = Modifier
-                        .padding(top = 10.dp, start = 20.dp)
+                        .padding(top = 5.dp, start = 20.dp)
+                )
+                Text(
+                    text = product.askingProducts[0].name,
+                    color = BarterColor.textGreen,
+                    fontSize = 18.sp,
+                    modifier = Modifier
+                        .padding(top = 5.dp, start = 20.dp)
+                )
+                CustomButton(
+                    label = "View Asking Products",
+                    onClick = {  },
+                    modifier = Modifier
+                        .padding(top = 5.dp, start = 20.dp)
+                )
+                DateTimeInfo(
+                    dateTimeString = product.dateCreated,
+                    modifier = Modifier
+                        .padding(top = 5.dp, start = 20.dp)
                 )
             }
         }

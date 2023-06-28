@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.transactionRecords
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,12 +34,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.ReportDetails
+import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun RecordsScreen(navController: NavHostController,
     recordsViewModel: RecordsViewModel = remember { RecordsViewModel() } ) {
@@ -55,32 +59,39 @@ fun RecordsScreen(navController: NavHostController,
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BarterColor.lightGreen),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = { BottomBarNavigation(navController = navController) }
         ) {
-            Image(
-                painter = painterResource(id = R.mipmap.records),
-                contentDescription = "Transaction Records icon",
+
+
+            Column(
                 modifier = Modifier
-                    .width(120.dp)
-                    .padding(top = 40.dp)
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .padding(top = 30.dp, start = 50.dp, end = 50.dp)
+                    .fillMaxSize()
+                    .background(BarterColor.lightGreen),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
-                items(acceptedRecords,  { accepted -> accepted.acceptId }) { record ->
-                    RecordRow(
-                        record = record,
-                        onClick = {
-                            RecordInfo.updateRecordChosen(record)
-                            recordsViewModel.updateShouldShowRecord(true)
-                        }
-                    )
+                Image(
+                    painter = painterResource(id = R.mipmap.records),
+                    contentDescription = "Transaction Records icon",
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(top = 40.dp)
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 30.dp, start = 50.dp, end = 50.dp)
+                ) {
+                    items(acceptedRecords, { accepted -> accepted.acceptId }) { record ->
+                        RecordRow(
+                            record = record,
+                            onClick = {
+                                RecordInfo.updateRecordChosen(record)
+                                recordsViewModel.updateShouldShowRecord(true)
+                            }
+                        )
+                    }
                 }
             }
         }

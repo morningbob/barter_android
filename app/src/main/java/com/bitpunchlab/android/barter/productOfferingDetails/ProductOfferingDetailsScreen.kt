@@ -42,6 +42,7 @@ import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
+import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -145,6 +146,15 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 top = 20.dp, start = 50.dp, end = 50.dp
                             )
                     )
+
+                    DateTimeInfo(
+                        dateTimeString = product?.dateCreated ?: "Not Available",
+                        modifier = Modifier
+                            .padding(
+                                top = 20.dp, start = 50.dp, end = 50.dp
+                            )
+                    )
+
                     CustomButton(
                         label = "View Product Images",
                         onClick = {
