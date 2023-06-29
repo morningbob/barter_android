@@ -155,7 +155,7 @@ class SellViewModel : ViewModel() {
     private suspend fun processSelling() : Boolean {
         val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
             name = productName.value, category = productCategory.value.name,
-            userId = userId.value, images = listOf(), currentBids = listOf(),
+            userId = userId.value, images = listOf(),
             duration = sellingDuration.value.value,
             dateCreated = getCurrentDateTime()
         )

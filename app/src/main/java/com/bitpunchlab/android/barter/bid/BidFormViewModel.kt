@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.AskingHolder
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
@@ -73,23 +74,33 @@ class BidFormViewModel : ViewModel() {
     // create the bid
     fun createBid() : Bid? {
         if (bidProductName.value != "" && bidProductCategory.value != Category.NOT_SET) {
-            val bidProduct = ProductBidding(
+            val bidProduct1 = ProductBidding(
                 productBidId = UUID.randomUUID().toString(),
                 productName = bidProductName.value,
                 productCategory = bidProductCategory.value.label,
                 ownerName = FirebaseClient.currentUserFirebase.value!!.name,
-                dateCreated = getCurrentDateTime(),
+                biddingDateCreated = getCurrentDateTime(),
                 productOfferingForBid = ProductBiddingInfo.product.value?.productOfferingForBid ?: "",
                 bidsHolder = BidsHolder(listOf<Bid>()),
-                duration = 0,
+                biddingDuration = 0,
                 productImages = listOf(),
+                biddingAskingProducts = AskingHolder(listOf())
+            )
+            val bidProduct = ProductAsking(
+                productId = UUID.randomUUID().toString(),
+                productOfferingId = ProductBiddingInfo.product.value?.productOfferingForBid!!,
+                name = bidProductName.value,
+                category = bidProductCategory.value.label,
+                images = listOf() // add the images later, need to upload then get url
             )
             Log.i("bid formVM", "created bid")
             return Bid(bidId = UUID.randomUUID().toString(),
                 bidUserName = FirebaseClient.currentUserFirebase.value!!.name,
                 bidUserId = FirebaseClient.userId.value,
                 bidProduct = bidProduct,
-                bidTime = getCurrentDateTime()
+                bidTime = getCurrentDateTime(),
+                bidProductId = ProductBiddingInfo.product.value!!.productOfferingForBid,
+                bidAccepted = false
             )
         }
         return null

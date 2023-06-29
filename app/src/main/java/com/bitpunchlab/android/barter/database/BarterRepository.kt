@@ -52,9 +52,9 @@ object BarterRepository {
         }.await()
     }
 
-    suspend fun getAskingProducts(id: String) : Flow<List<ProductOffering>>? {
-        return database?.barterDao?.getAskingProducts(id)
-    }
+    //suspend fun getAskingProducts(id: String) : Flow<List<ProductOffering>>? {
+    //    return database?.barterDao?.getAskingProducts(id)
+    //}
 
     fun insertProductsBidding(productsBidding: List<ProductBidding>) {
         CoroutineScope(Dispatchers.IO).launch {

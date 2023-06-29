@@ -10,11 +10,16 @@ import kotlinx.parcelize.Parcelize
 data class ProductAsking(
     @PrimaryKey
     var productId: String,
-    var userId: String,
+    var productOfferingId: String,
+    //var userId: String,
     var name: String,
     var category: String,
     //var duration: Int,
     var images : List<String> = listOf(),
     //var currentBids : List<String> = listOf(),
-    var productOfferingId : String = "",
+    //var productOfferingId : String = "",
+) : Parcelable
+@Parcelize
+data class AskingHolder(
+    val askingList : List<ProductAsking>
 ) : Parcelable

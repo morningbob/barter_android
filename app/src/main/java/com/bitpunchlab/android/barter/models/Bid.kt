@@ -15,8 +15,10 @@ data class Bid(
     val bidUserId : String,
     // the asking product that the bidder offers
     @Embedded
-    val bidProduct : ProductBidding? = null,
-    val bidTime : String
+    val bidProduct : ProductAsking,
+    val bidProductId : String,
+    val bidTime : String,
+    val bidAccepted : Boolean
 ) : Parcelable
 
 @Parcelize

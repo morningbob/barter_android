@@ -2,7 +2,7 @@ package com.bitpunchlab.android.barter.firebase.models
 
 class ProductAskingFirebase {
     var id: String = ""
-    var userId: String = ""
+    //var userId: String = ""
     var name: String = ""
     var category: String = ""
     //var sellingDuration : Int = 0
@@ -13,14 +13,14 @@ class ProductAskingFirebase {
 
     constructor()
 
-    constructor(productId: String, productUserId: String,
+    constructor(productId: String,
                 productName: String, productCategory: String,
                 productImages: HashMap<String, String> = HashMap<String, String>(),
                 productOffering: String,
                 )
     {
         id = productId
-        userId = productUserId
+        //userId = productUserId
         name = productName
         category = productCategory
         images = productImages

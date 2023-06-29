@@ -342,7 +342,7 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                 )
 
                 Text(
-                    text = "${product.askingProducts.askingList[0].name}",
+                    text = "",
                     color = BarterColor.textGreen,
                 )
 

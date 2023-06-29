@@ -116,6 +116,8 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     }
 
 
+    // we retrieve the product bidding object stored in the local database
+    // it should be retrieved from the server together with the other products bidding.
     fun acceptBid() {
         CoroutineScope(Dispatchers.IO).launch {
             if (product.value != null && bid.value != null) {

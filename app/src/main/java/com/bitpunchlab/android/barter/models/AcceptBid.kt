@@ -12,7 +12,7 @@ data class AcceptBid(
     @PrimaryKey
     val acceptId : String,
     @Embedded
-    val acceptProductInConcern: ProductOffering,
+    val acceptProductInConcern: ProductBidding,
     @Embedded
     val acceptBid: Bid
 ) : Parcelable

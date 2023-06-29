@@ -5,6 +5,8 @@ import androidx.room.*
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.flow.Flow
@@ -34,13 +36,24 @@ interface BarterDao {
     @Query("SELECT * from users")
     suspend fun getUsersAndProductsOffering() : List<UserAndProductOffering>
 
+    @Transaction
+    @Query("SELECT * FROM products_offering")
+    suspend fun getProductsOfferingAndBids() : List<ProductOfferingAndBid>
+
+    @Transaction
+    @Query("SELECT * FROM products_offering")
+    suspend fun getProductsOfferingAndProductsAsking() : List<ProductOfferingAndProductAsking>
 
     @Transaction
     @Query("SELECT * from users WHERE :id = id")
     fun getUserAndProductsOffering(id: String) : List<UserAndProductOffering>
 
-    @Query("SELECT * from products_offering WHERE :id = productOfferingId")
-    fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
+    @Transaction
+    @Query("SELECT * FROM products_offering WHERE :id = productId")
+    fun getProductOfferingAndProductsAsking(id: String) : List<ProductOfferingAndProductAsking>
+
+    //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
+    //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductsBidding(vararg productBidding: ProductBidding)
@@ -53,4 +66,7 @@ interface BarterDao {
 
     @Query("SELECT * FROM accept_bids")
     fun getAllAcceptedBids() : Flow<List<AcceptBid>>
+
+    @Query("SELECT * FROM products_bidding WHERE :id = productOfferingForBid LIMIT 1")
+    fun getProductBiddingById(id: String) : ProductBidding
 }

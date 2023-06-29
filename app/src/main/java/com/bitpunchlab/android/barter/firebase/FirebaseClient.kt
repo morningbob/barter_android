@@ -19,7 +19,6 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.ProductType
-import com.bitpunchlab.android.barter.util.convertAcceptBidFirebaseToAcceptBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
@@ -81,7 +80,7 @@ object FirebaseClient {
                         _currentUserFirebase.value = currentUser
                         saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
                         prepareProductsOfferingForLocalDatabase(currentUser)
-                        prepareProductsBiddingForLocalDatabase()
+                        //prepareProductsBiddingForLocalDatabase()
                         prepareTransactionRecords(currentUser)
                     }
                // }
@@ -200,7 +199,8 @@ object FirebaseClient {
         // this includes removing the outdated products objects in the database
         // here the productsOffering in the user firebase object
         // has the full product offering object stored in it
-        val productsOffering = userFirebase.productsOffering.map { (key, value) ->
+        val productsOffering = userFirebase.productsOffering.map {
+                (key, value) ->
             convertProductFirebaseToProduct(value)
         }
 
@@ -303,31 +303,36 @@ object FirebaseClient {
     private suspend fun prepareTransactionRecords(currentUser: UserFirebase) {
         val acceptedBids =
             currentUser.userAcceptedBids.map { (key, value) ->
-                convertAcceptBidFirebaseToAcceptBid(value)
+                //convertAcceptBidFirebaseToAcceptBid(value)
             }
         val bidsAccepted =
         currentUser.userBidsAccepted.map { (key, value) ->
-            convertAcceptBidFirebaseToAcceptBid(value)
+            //convertAcceptBidFirebaseToAcceptBid(value)
         }
 
-        localDatabase!!.barterDao.insertAcceptedBids(*acceptedBids.toTypedArray())
-        localDatabase!!.barterDao.insertAcceptedBids(*bidsAccepted.toTypedArray())
+        //localDatabase!!.barterDao.insertAcceptedBids(*acceptedBids.toTypedArray())
+        //localDatabase!!.barterDao.insertAcceptedBids(*bidsAccepted.toTypedArray())
     }
 
     suspend fun processSelling(productOffering: ProductOffering,
                                productImages: List<ProductImage>,
         askingProducts: List<ProductAsking>, askingProductImages: List<List<ProductImage>>) : Boolean {
 
-        val pairResult = uploadImagesAndGetDownloadUrl(productOffering, askingProducts, askingProductImages, productImages)
+        val pairResult =
+            uploadImagesAndGetDownloadUrl(productOffering, askingProducts, askingProductImages, productImages)
         val semiUpdatedProductOffering = pairResult.first
         val askingProductsList = pairResult.second
-        semiUpdatedProductOffering.askingProducts = AskingProductsHolder(askingProductsList)
+        // query the asking products associated with the product offering
+        //localDatabase!!.barterDao.getProductOfferingAndProductsAsking(pro)
+
+
+        //semiUpdatedProductOffering.askingProducts = AskingProductsHolder(askingProductsList)
         // here, we need to wait for the processEachProduct to upload the images to cloud storage
         // and get back download url, then record in the product offering and asking product
         // so the product offering will be updated with both its own images and the asking products
         // objects. They can then be saved in user object in firestore.
         val productFirebase =
-            convertProductOfferingToFirebase(semiUpdatedProductOffering)
+            convertProductOfferingToFirebase(semiUpdatedProductOffering, askingProductsList)
 
         val askingProductsFirebase = askingProductsList.map { each ->
             convertProductAskingToFirebase(each)
@@ -534,7 +539,7 @@ object FirebaseClient {
 
         val newBids = productBidding.bidsHolder.bids.toMutableList()
         // we update the url we got after uploading the images
-        bid.bidProduct?.productImages = downloadUrls
+        bid.bidProduct?.images = downloadUrls
         newBids.add(bid)
         val newProduct = productBidding.copy(bidsHolder = BidsHolder(newBids))
 
@@ -559,12 +564,39 @@ object FirebaseClient {
                 }
         }
 
+    // to accept a bid, we modify the bid's accept flag
+    //
     suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
-        val productFirebase = convertProductOfferingToFirebase(product)
-        val bidFirebase = convertBidToBidFirebase(bid)
 
-        val acceptBidFirebase = AcceptBidFirebase(acceptId = UUID.randomUUID().toString(),
-            product = productFirebase, theBid = bidFirebase)
+        //val productFirebase = convertProductBiddingToProductBiddingFirebase(productBidding)
+
+        // save the bid in local database
+        val updatedBid = bid.copy(bidAccepted = true)
+        val bidFirebase = convertBidToBidFirebase(updatedBid)
+        val productOfferingAskingProducts = CoroutineScope(Dispatchers.IO).async {
+            localDatabase!!.barterDao.getProductOfferingAndProductsAsking(product.productId)
+        }.await()
+        /*
+        val askingProductsList = productOfferingAskingProducts[0].askingProducts.map { product ->
+            convertProductAskingToFirebase(product)
+        }
+        val askingProductsMap = HashMap<String, ProductAskingFirebase>()
+
+        for (i in 0..productOfferingAskingProducts[0].askingProducts.size - 1) {
+            askingProductsMap.put(i.toString(),
+                convertProductAskingToFirebase(productOfferingAskingProducts[0].askingProducts[i]))
+        }
+
+
+         */
+        val productFirebase = convertProductOfferingToFirebase(product,
+            productOfferingAskingProducts[0].askingProducts)
+
+        val acceptBidFirebase = AcceptBidFirebase(
+            acceptId = UUID.randomUUID().toString(),
+            product = productFirebase,
+            theBid = bidFirebase
+        )
         return CoroutineScope(Dispatchers.IO).async {
             uploadAcceptBid(acceptBidFirebase)
         }.await()

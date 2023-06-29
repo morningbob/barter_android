@@ -21,10 +21,10 @@ data class ProductBidding(
     val productName : String,
     val ownerName : String,
     val productCategory: String,
-    val dateCreated : String,
-    val duration: Int,
+    val biddingDateCreated : String,
+    val biddingDuration: Int,
     @Embedded
-    val askingProducts: List<ProductAsking>,
+    val biddingAskingProducts: AskingHolder,
     var productImages : List<String>,
     @Embedded
     var bidsHolder : BidsHolder,

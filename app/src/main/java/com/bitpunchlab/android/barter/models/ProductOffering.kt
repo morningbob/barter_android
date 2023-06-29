@@ -19,10 +19,10 @@ data class ProductOffering(
     // the date will be in UTC format
     var dateCreated: String,
     var images : List<String> = listOf(),
-    var currentBids : List<String> = listOf(),
-    var productOfferingId : String = "",
-    @Embedded
-    var askingProducts : AskingProductsHolder = AskingProductsHolder(listOf())
+    //var currentBids : List<String> = listOf(),
+    //var productOfferingId : String = "",
+    //@Embedded
+    //var askingProducts : AskingProductsHolder = AskingProductsHolder(listOf())
 ) : Parcelable
 
 @Parcelize

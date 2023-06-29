@@ -155,7 +155,7 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
                         .padding(top = 5.dp, start = 20.dp)
                 )
                 Text(
-                    text = product.askingProducts[0].name,
+                    text = "",
                     color = BarterColor.textGreen,
                     fontSize = 18.sp,
                     modifier = Modifier
@@ -168,7 +168,7 @@ fun ProductBiddingRow(product: ProductBidding, onClick: (ProductBidding) -> Unit
                         .padding(top = 5.dp, start = 20.dp)
                 )
                 DateTimeInfo(
-                    dateTimeString = product.dateCreated,
+                    dateTimeString = "",
                     modifier = Modifier
                         .padding(top = 5.dp, start = 20.dp)
                 )
