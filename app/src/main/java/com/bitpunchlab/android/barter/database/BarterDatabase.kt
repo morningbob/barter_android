@@ -15,7 +15,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 
 @Database(entities = [User::class, ProductOffering::class, ProductBidding::class,
-                     ProductAsking::class, Bid::class, AcceptBid::class]
+                     ProductAsking::class, Bid::class]
 , version = 21, exportSchema = false)
 
 @TypeConverters(Converters::class)

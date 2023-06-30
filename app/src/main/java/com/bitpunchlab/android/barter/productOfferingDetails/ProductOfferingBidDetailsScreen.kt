@@ -27,6 +27,7 @@ import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDialog
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -35,6 +36,7 @@ fun ProductOfferingBidDetailsScreen(
     productOfferingBidsListViewModel: ProductOfferingBidsListViewModel
         ) {
 
+    val product by ProductInfo.productChosen.collectAsState()
     val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
     val imagesDisplay by productOfferingBidsListViewModel.imagesDisplay.collectAsState()
     val shouldDisplayImages by productOfferingBidsListViewModel.shouldDisplayImages.collectAsState()
@@ -77,7 +79,7 @@ fun ProductOfferingBidDetailsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     BasicBidScreen(
-                        product = chosenBid!!.bidProduct,
+                        product = product,
                         images = imagesDisplay,
                         viewModel = productOfferingBidsListViewModel
                     )

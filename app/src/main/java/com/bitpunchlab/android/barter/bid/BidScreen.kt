@@ -34,6 +34,7 @@ import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.DialogButton
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ImageType
@@ -45,7 +46,7 @@ fun BidScreen(navController: NavHostController,
     bidViewModel: BidViewModel = remember { BidViewModel() }
 ) {
 
-    val product by ProductBiddingInfo.product.collectAsState()
+    val product by ProductInfo.productChosen.collectAsState()
     val images by bidViewModel.imagesDisplay.collectAsState()
     val shouldDisplayImage by bidViewModel.shouldDisplayImages.collectAsState()
     val shouldPopBid by bidViewModel.shouldPopBid.collectAsState()
@@ -57,7 +58,7 @@ fun BidScreen(navController: NavHostController,
 
     LaunchedEffect(key1 = product) {
         if (product != null) {
-            bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.productImages, currentContext)
+            bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.images, currentContext)
         }
     }
 

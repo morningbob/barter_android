@@ -32,11 +32,11 @@ class RecordsViewModel : ViewModel() {
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            BarterRepository.retrieveAcceptedBids()?.collect() { records ->
-                Log.i("records vm", "retrieved ${records.size} records")
-                _acceptedRecords.value = records
+            //BarterRepository.retrieveAcceptedBids()?.collect() { records ->
+            //    Log.i("records vm", "retrieved ${records.size} records")
+            //    _acceptedRecords.value = records
 
-            }
+            //}
         }
     }
 

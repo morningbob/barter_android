@@ -40,6 +40,7 @@ fun AskingProductsListScreen(navController: NavHostController,
     AskingProductsListViewModel()
 ) {
 
+    val product by ProductInfo.productOfferingWithProductsAsking.collectAsState()
     val askingProducts = ProductInfo.askingProducts.collectAsState()
     //val currentContext = LocalContext.current
 
@@ -47,42 +48,44 @@ fun AskingProductsListScreen(navController: NavHostController,
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BarterColor.lightGreen),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(askingProducts.value, { product -> product.productId }) { product ->
-                val bitmap = LoadImage(url = product.images[0])
-                if (bitmap.value != null) {
-                    Image(
-                        bitmap = bitmap.value!!.asImageBitmap(),
-                        contentDescription = "product's image",
+        product?.let {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BarterColor.lightGreen),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(product!!.askingProducts, { product -> product.productId }) { product ->
+                    val bitmap = LoadImage(url = product.images[0])
+                    if (bitmap.value != null) {
+                        Image(
+                            bitmap = bitmap.value!!.asImageBitmap(),
+                            contentDescription = "product's image",
+                            modifier = Modifier
+                                .width(200.dp)
+                                .padding(top = 40.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.mipmap.imageplaceholder),
+                            contentDescription = "product image not available",
+                            modifier = Modifier
+                                .width(200.dp)
+                        )
+                    }
+
+                    Text(
+                        text = product.name,
                         modifier = Modifier
-                            .width(200.dp)
-                            .padding(top = 40.dp)
+                            .padding(top = 20.dp)
                     )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.mipmap.imageplaceholder),
-                        contentDescription = "product image not available",
+                    Text(
+                        text = product.category,
                         modifier = Modifier
-                            .width(200.dp)
+                            .padding(top = 20.dp)
                     )
                 }
-
-                Text(
-                    text = product.name,
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                )
-                Text(
-                    text = product.category,
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                )
             }
         }
     }

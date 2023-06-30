@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bitpunchlab.android.barter.models.AcceptBid
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
@@ -41,8 +42,14 @@ interface BarterDao {
     suspend fun getProductsOfferingAndBids() : List<ProductOfferingAndBid>
 
     @Transaction
+    @Query("SELECT * FROM products_offering WHERE :id = productId")
+    fun getProductOfferingAndBids(id: String) : Flow<List<ProductOfferingAndBid>>
+
+
+
+    @Transaction
     @Query("SELECT * FROM products_offering")
-    suspend fun getProductsOfferingAndProductsAsking() : List<ProductOfferingAndProductAsking>
+    fun getProductsOfferingAndProductsAsking() : List<ProductOfferingAndProductAsking>
 
     @Transaction
     @Query("SELECT * from users WHERE :id = id")
@@ -50,7 +57,7 @@ interface BarterDao {
 
     @Transaction
     @Query("SELECT * FROM products_offering WHERE :id = productId")
-    fun getProductOfferingAndProductsAsking(id: String) : List<ProductOfferingAndProductAsking>
+    fun getProductOfferingAndProductsAsking(id: String) : Flow<List<ProductOfferingAndProductAsking>>
 
     //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
     //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
@@ -60,13 +67,16 @@ interface BarterDao {
 
     @Query("SELECT * from products_bidding")
     fun getAllProductsBidding() : Flow<List<ProductBidding>>
-
+/*
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAcceptedBids(vararg acceptedBids: AcceptBid)
 
     @Query("SELECT * FROM accept_bids")
     fun getAllAcceptedBids() : Flow<List<AcceptBid>>
-
+*/
     @Query("SELECT * FROM products_bidding WHERE :id = productOfferingForBid LIMIT 1")
     fun getProductBiddingById(id: String) : ProductBidding
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProductsAsking(vararg productAsking: ProductAsking)
 }

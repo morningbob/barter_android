@@ -37,6 +37,7 @@ import com.bitpunchlab.android.barter.base.BasicBidScreen
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.loadImage
@@ -49,6 +50,7 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
           remember { ProductOfferingBidsListViewModel() }
     ) {
 
+    val product by ProductInfo.productOfferingWithBids.collectAsState()
     val bids = BidInfo.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
@@ -90,27 +92,30 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                         .clickable { productOfferingBidsListViewModel.updateShouldPopBids(true) }
                 )
             }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(BarterColor.lightGreen)
-                    .padding(start = 40.dp, end = 40.dp, top = 30.dp)
+            product?.let {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(BarterColor.lightGreen)
+                        .padding(start = 40.dp, end = 40.dp, top = 30.dp)
 
-            ) {
-                items(bids.value, { bid -> bid.bidId }) { bid ->
-                    BidRow(
-                        bid = bid,
-                        onClick = {
-                            productOfferingBidsListViewModel.updateBid(it)
-                            productOfferingBidsListViewModel.updateShouldShowBid(true)
-                        },
-                    )
+                ) {
+                    items(product!!.bids, { bid -> bid.bidId }) { bid ->
+                        BidRow(
+                            bid = bid,
+                            onClick = {
+                                productOfferingBidsListViewModel.updateBid(it)
+                                productOfferingBidsListViewModel.updateShouldShowBid(true)
+                            },
+                        )
+                    }
                 }
+
             }
-            if (shouldShowBid && chosenBid != null && chosenBid!!.bidProduct != null) {
-                Log.i("bids list", "navigate to bid details")
-                ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
-            }
+            //if (shouldShowBid && chosenBid != null && chosenBid!!.bidProduct != null) {
+            //    Log.i("bids list", "navigate to bid details")
+            //    ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
+            //}
         }
     }
 }
@@ -140,7 +145,7 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
                 ) {
                     bid.bidProduct?.let {
                         LoadedImageOrPlaceholder(
-                            imageUrls = bid.bidProduct.productImages,
+                            imageUrls = bid.bidProduct.images,
                             contentDes = "product's image",
                             modifier = Modifier
                                 .width(80.dp)
@@ -151,14 +156,14 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
                 }
                 Column() {
                     Text(
-                        text = bid.bidProduct?.productName ?: "Not Available",
+                        text = bid.bidProduct?.name ?: "Not Available",
                         color = BarterColor.textGreen,
                         fontSize = 18.sp,
                         modifier = Modifier
                             .padding(top = 10.dp, start = 20.dp)
                     )
                     Text(
-                        text = bid.bidProduct?.productCategory ?: "Not Available",
+                        text = bid.bidProduct?.category ?: "Not Available",
                         color = BarterColor.textGreen,
                         fontSize = 18.sp,
                         modifier = Modifier

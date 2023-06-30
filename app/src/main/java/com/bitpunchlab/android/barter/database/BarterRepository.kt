@@ -2,8 +2,12 @@ package com.bitpunchlab.android.barter.database
 
 import android.content.Context
 import com.bitpunchlab.android.barter.models.AcceptBid
+import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +50,12 @@ object BarterRepository {
         }
     }
 
+    fun insertProductsAsking(products: List<ProductAsking>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.insertProductsAsking(*products.toTypedArray())
+        }
+    }
+
     suspend fun getUserProductsOffering(id: String) : List<UserAndProductOffering>? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getUserAndProductsOffering(id)
@@ -68,9 +78,25 @@ object BarterRepository {
         }.await()
     }
 
+    suspend fun getProductOfferingWithProductsAsking(id: String) :
+            Flow<List<ProductOfferingAndProductAsking>>? =
+        CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getProductOfferingAndProductsAsking(id)
+        }.await()
+
+    suspend fun getProductOfferingWithBids(id: String) :
+            Flow<List<ProductOfferingAndBid>>? =
+        CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getProductOfferingAndBids(id)
+        }.await()
+
+
+/*
     suspend fun retrieveAcceptedBids() : Flow<List<AcceptBid>>? {
         return CoroutineScope(Dispatchers.IO).async {
-            database?.barterDao?.getAllAcceptedBids()
+            //database?.barterDao?.getAllAcceptedBids()
         }.await()
     }
+
+ */
 }

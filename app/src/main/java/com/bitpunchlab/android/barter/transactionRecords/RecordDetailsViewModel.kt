@@ -54,9 +54,9 @@ class RecordDetailsViewModel : ViewModel() {
                                 )
                             }
                     }
-                    Log.i("loading images", "images number ${record.acceptBid.bidProduct!!.productImages.size}")
+                    Log.i("loading images", "images number ${record.acceptBid.bidProduct!!.images.size}")
                     CoroutineScope(Dispatchers.IO).launch {
-                        for (i in 0..record.acceptBid.bidProduct!!.productImages.size - 1) {
+                        for (i in 0..record.acceptBid.bidProduct!!.images.size - 1) {
                             _productInExchangeImages.value.add(
                                 ProductImage(
                                     UUID.randomUUID().toString(),
@@ -65,7 +65,7 @@ class RecordDetailsViewModel : ViewModel() {
                             )
                         }
 
-                        ImageHandler.loadedImagesFlow(record.acceptBid.bidProduct!!.productImages)
+                        ImageHandler.loadedImagesFlow(record.acceptBid.bidProduct!!.images)
                             .collect() { pairResult ->
                                 _productInExchangeImages.value.set(
                                     pairResult.first,

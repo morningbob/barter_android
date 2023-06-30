@@ -146,7 +146,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 top = 20.dp, start = 50.dp, end = 50.dp
                             )
                     )
-
+/*
                     DateTimeInfo(
                         dateTimeString = product?.dateCreated ?: "Not Available",
                         modifier = Modifier
@@ -154,6 +154,8 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 top = 20.dp, start = 50.dp, end = 50.dp
                             )
                     )
+
+ */
 
                     CustomButton(
                         label = "View Product Images",

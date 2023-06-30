@@ -29,7 +29,6 @@ import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ProductImage
-import com.bitpunchlab.android.barter.util.getCurrentTime
 
 @Composable
 fun RecordDetailsScreen(navController: NavHostController,
@@ -45,7 +44,7 @@ fun RecordDetailsScreen(navController: NavHostController,
 
     //Log.i("record details", "bid product images size ${record?.acceptBid?.bidProduct?.productImages?.size}")
 
-    getCurrentTime()
+    //getCurrentTime()
 
     Surface(
         modifier = Modifier.fillMaxSize()

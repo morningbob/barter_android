@@ -95,8 +95,11 @@ class AskingProductViewModel : ViewModel() {
             val newProduct = ProductAsking(
                 productId = UUID.randomUUID().toString(),
                 category = productCategory.value.name,
-                userId = FirebaseClient.currentUserFirebase.value!!.id,
+                //userId = FirebaseClient.currentUserFirebase.value!!.id,
                 name = productName.value,
+                // the product offering id is not known at this moment
+                // it is not yet created
+                // it is set in sellVM
                 productOfferingId = ""
             )
 

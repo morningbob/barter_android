@@ -12,9 +12,11 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.ImageHandler
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -55,6 +57,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     private val _shouldShowBidsListStatus = MutableStateFlow<Int>(0)
     val shouldShowBidsListStatus : StateFlow<Int> get() = _shouldShowBidsListStatus.asStateFlow()
+
+    //private val _productOfferingWithProductsAsking = MutableStateFlow<ProductOfferingAndProductAsking?>(null)
+    //val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductAsking?>
+    //    get() = _productOfferingWithProductsAsking.asStateFlow()
 
     // when user clicks view product images, or view asking product images
     // we retrieve the images and put it here
@@ -97,19 +103,28 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                             _imagesDisplay.value.set(pairResult.first, pairResult.second)
                         }
                         //}
-                        FirebaseClient.retrieveProductBidding(productOffering.productId)?.bids?.map { (key, bidFirebase) ->
-                                convertBidFirebaseToBid(bidFirebase)
+                        //FirebaseClient.retrieveProductBidding(productOffering.productId)?.bids?.map { (key, bidFirebase) ->
+                        //        convertBidFirebaseToBid(bidFirebase)
                             //Log.i("vm get updated bids", "got updated bids")
-                        }
+                        //}
 
-                    }.await()?.let { bids ->
+                    }.await()//?.let { bids ->
 
-                        BidInfo.updateBids(bids)
-                        Log.i("get product bidding ", "updated bids")
+                        //BidInfo.updateBids(bids)
+                        //Log.i("get product bidding ", "updated bids")
+                    //}
+
+                    // prepare bids and asking products associated with the product offering
+                    BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)?.collect() {
+                        ProductInfo.updateProductOfferingWithProductsAsking(it[0])
+                    }
+                    BarterRepository.getProductOfferingWithBids(productOffering.productId)?.collect() {
+                        ProductInfo
                     }
                 }
             }
         }
+        /*
         CoroutineScope(Dispatchers.IO).launch {
             combine(shouldShowBidsListStatus, BidInfo.bids) {
                 status, bids ->
@@ -120,7 +135,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 Log.i("product offering details VM", "ready navigate")
             }
         }
-
+*/
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -165,7 +180,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     fun prepareAskingProducts() {
         ProductInfo.productChosen.value?.let {
             Log.i("product details vM", "product is not null")
-            ProductInfo.updateAskingProducts(it.askingProducts.askingList)
+            //ProductInfo.updateAskingProducts(it.askingProducts.askingList)
+
         }
     }
 }

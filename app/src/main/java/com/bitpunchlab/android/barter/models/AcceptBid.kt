@@ -6,13 +6,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
-@Entity(tableName = "accept_bids")
+//@Entity(tableName = "accept_bids")
 @Parcelize
 data class AcceptBid(
-    @PrimaryKey
+    //@PrimaryKey
     val acceptId : String,
-    @Embedded
-    val acceptProductInConcern: ProductBidding,
-    @Embedded
+    //@Embedded
+    val acceptProductInConcern: ProductOffering,
+    //@Embedded
     val acceptBid: Bid
 ) : Parcelable

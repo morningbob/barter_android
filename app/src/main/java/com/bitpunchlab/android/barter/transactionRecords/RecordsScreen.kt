@@ -143,7 +143,7 @@ fun RecordRow(record: AcceptBid, onClick: (AcceptBid) -> Unit) {
                             .padding(top = 0.dp)
                     )
                     Text(
-                        text = record.acceptBid.bidProduct!!.productName,
+                        text = record.acceptBid.bidProduct!!.name,
                         color = BarterColor.textGreen,
                         fontSize = 20.sp,
                         modifier = Modifier

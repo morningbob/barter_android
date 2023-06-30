@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
@@ -345,12 +346,14 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                     text = "",
                     color = BarterColor.textGreen,
                 )
-
+/*
                 DateTimeInfo(
                     dateTimeString = product.dateCreated,
                     modifier = Modifier
                         //.padding(top = 1)
                 )
+
+ */
             }
         }
     }
@@ -419,7 +422,7 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 }
 
 @Composable
-fun <T : Any> BasicBidScreen(product: ProductBidding?, images: List<ProductImage>, viewModel: T) {
+fun <T : Any> BasicBidScreen(product: ProductOffering?, images: List<ProductImage>, viewModel: T) {
 
     val viewModelMembers = viewModel::class.members
     val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
@@ -458,14 +461,14 @@ fun <T : Any> BasicBidScreen(product: ProductBidding?, images: List<ProductImage
         }
 
         Text(
-            text = product?.productName ?: "Not Available",
+            text = product?.name ?: "Not Available",
             fontSize = 20.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
                 .padding(top = 30.dp)
         )
         Text(
-            text = product?.productCategory ?: "Not Available",
+            text = product?.category ?: "Not Available",
             fontSize = 20.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
