@@ -121,11 +121,11 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     fun acceptBid() {
         CoroutineScope(Dispatchers.IO).launch {
             if (product.value != null && bid.value != null) {
-                if (FirebaseClient.processAcceptBid(product.value!!, bid.value!!)) {
+                //if (FirebaseClient.processAcceptBid(product.value!!, bid.value!!)) {
                     updateAcceptBidStatus(3)
-                } else {
+                //} else {
                     updateAcceptBidStatus(4)
-                }
+                //}
             } else {
                 Log.i("accept bid", "product info not available")
                 updateAcceptBidStatus(5)

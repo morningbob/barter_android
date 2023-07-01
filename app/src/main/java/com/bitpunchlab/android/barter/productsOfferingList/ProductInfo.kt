@@ -1,16 +1,27 @@
 package com.bitpunchlab.android.barter.productsOfferingList
 
+import android.util.Log
 import androidx.compose.runtime.collectAsState
-import com.bitpunchlab.android.barter.ProductsOffering
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
+import com.bitpunchlab.android.barter.util.UserMode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 object ProductInfo {
+
+    // it is used to distinguish between user's products they offered
+    // or user view the other user's products offered
+    // the options are different,
+    // like the owner's list will have edit option and view bids option
+    val _userMode = MutableStateFlow<UserMode>(UserMode.OWNER_MODE)
+    val userMode : StateFlow<UserMode> get() = _userMode.asStateFlow()
 
     val _productChosen = MutableStateFlow<ProductOffering?>(null)
     val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
@@ -36,11 +47,17 @@ object ProductInfo {
         _askingProducts.value = products
     }
 
+    fun updateUserMode(mode: UserMode) {
+        _userMode.value = mode
+    }
+
     fun updateProductOfferingWithProductsAsking(product: ProductOfferingAndProductAsking) {
+        Log.i("Product info", "products asking were set")
         _productOfferingWithProductsAsking.value = product
     }
 
     fun updateProductOfferingWithBids(product: ProductOfferingAndBid) {
+        Log.i("Product info", "bids were set")
         _productOfferingWithBids.value = product
     }
 }

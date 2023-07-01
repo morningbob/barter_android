@@ -1,11 +1,15 @@
 package com.bitpunchlab.android.barter.askingProducts
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,13 +47,36 @@ fun AskingProductsListScreen(navController: NavHostController,
 
     val product by ProductInfo.productOfferingWithProductsAsking.collectAsState()
     val askingProducts = ProductInfo.askingProducts.collectAsState()
+    val shouldDismiss by askingProductsListViewModel.shouldDismiss.collectAsState()
     //val currentContext = LocalContext.current
+    Log.i("asking products list", "no of asking products ${product?.askingProducts?.size}")
+
+    LaunchedEffect(key1 = shouldDismiss) {
+        if (shouldDismiss) {
+            navController.popBackStack()
+        }
+    }
 
     Surface(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        product?.let {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(BarterColor.lightGreen)
+                .padding(top = 20.dp, end = 20.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Image(
+                painter = painterResource(id = R.mipmap.cross),
+                contentDescription = "Cancel button",
+                modifier = Modifier
+                    .width(40.dp)
+                    .clickable { askingProductsListViewModel.updateShouldDismiss(true) }
+            )
+        }
+        if (product != null && product!!.askingProducts.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -57,15 +85,24 @@ fun AskingProductsListScreen(navController: NavHostController,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(product!!.askingProducts, { product -> product.productId }) { product ->
-                    val bitmap = LoadImage(url = product.images[0])
-                    if (bitmap.value != null) {
-                        Image(
-                            bitmap = bitmap.value!!.asImageBitmap(),
-                            contentDescription = "product's image",
-                            modifier = Modifier
-                                .width(200.dp)
-                                .padding(top = 40.dp)
-                        )
+                    if (product.images.isNotEmpty()) {
+                        val bitmap = LoadImage(url = product.images[0])
+                        if (bitmap.value != null) {
+                            Image(
+                                bitmap = bitmap.value!!.asImageBitmap(),
+                                contentDescription = "product's image",
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .padding(top = 40.dp)
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.mipmap.imageplaceholder),
+                                contentDescription = "product image not available",
+                                modifier = Modifier
+                                    .width(200.dp)
+                            )
+                        }
                     } else {
                         Image(
                             painter = painterResource(id = R.mipmap.imageplaceholder),

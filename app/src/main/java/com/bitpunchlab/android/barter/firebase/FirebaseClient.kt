@@ -202,15 +202,15 @@ object FirebaseClient {
         // this includes removing the outdated products objects in the database
         // here the productsOffering in the user firebase object
         // has the full product offering object stored in it
-        var askingProducts = listOf<ProductAsking>()
+        var askingProducts = mutableListOf<ProductAsking>()
         val productsOffering = userFirebase.productsOffering.map {
                 (productKey, product) ->
-            askingProducts = product.askingProducts.map { (askingKey, asking) ->
-                convertProductAskingFirebaseToProductAsking(asking)
+            product.askingProducts.map { (askingKey, asking) ->
+                askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
             }
             convertProductFirebaseToProduct(product)
         }
-
+        Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
         BarterRepository.insertProductsOffering(productsOffering)
         BarterRepository.insertProductsAsking(askingProducts)
     }
@@ -581,7 +581,7 @@ object FirebaseClient {
                     }
                 }
         }
-
+/*
     // to accept a bid, we modify the bid's accept flag
     //
     suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
@@ -628,6 +628,8 @@ object FirebaseClient {
             return false
         }
     }
+
+ */
 
     private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase) =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->

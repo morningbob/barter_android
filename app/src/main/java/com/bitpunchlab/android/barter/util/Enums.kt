@@ -22,3 +22,8 @@ enum class ProductType {
     PRODUCT,
     ASKING_PRODUCT
 }
+
+enum class UserMode {
+    BUYER_MODE,
+    OWNER_MODE
+}

@@ -53,6 +53,7 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                                productsOfferingListViewModel: ProductsOfferingListViewModel = remember {
                                 ProductsOfferingListViewModel()}) {
 
+    //val userMode by ProductInfo.userMode.collectAsState()
     val productsOffering by productsOfferingListViewModel.productsOffering.collectAsState()
     val userId by FirebaseClient.userId.collectAsState()
     //val productChosen by ProductInfo.productChosen.collectAsState()

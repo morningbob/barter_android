@@ -37,7 +37,6 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskingProductsList
 import com.bitpunchlab.android.barter.Login
 import com.bitpunchlab.android.barter.ProductOfferingBidsList
-import com.bitpunchlab.android.barter.ProductsOffering
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.CustomButton
@@ -45,12 +44,14 @@ import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
+import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ImageType
+import com.bitpunchlab.android.barter.util.UserMode
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -58,7 +59,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
      productDetailsViewModel: ProductOfferingDetailsViewModel = remember {
          ProductOfferingDetailsViewModel()
      }) {
-
+    val userMode by ProductInfo.userMode.collectAsState()
     val product by ProductInfo.productChosen.collectAsState()
     val shouldDisplayImages by productDetailsViewModel.shouldDisplayImages.collectAsState()
     val shouldDisplayProductAsking by productDetailsViewModel.shouldDisplayAskingProducts.collectAsState()
@@ -184,14 +185,15 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         modifier = Modifier
                             .padding(top = 20.dp)
                     )
-
-                    CustomButton(
-                        label = "View Bids",
-                        onClick = {
-                            //BidInfo.updateBids(product.currentBids)
-                            productDetailsViewModel.updateShouldShowBidsListStatus(1)
-                        }
-                    )
+                    if (userMode == UserMode.OWNER_MODE) {
+                        CustomButton(
+                            label = "View Bids",
+                            onClick = {
+                                //BidInfo.updateBids(product.currentBids)
+                                productDetailsViewModel.updateShouldShowBidsListStatus(1)
+                            }
+                        )
+                    }
                 }
 
                 if (shouldDisplayImages) {
@@ -209,3 +211,18 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
         }
     }
 }
+/*
+    LaunchedEffect(key1 = product) {
+        product?.let {
+            val productList =
+                BarterRepository.getProductOfferingWithProductsAsking(product!!.productId)
+            productList?.let {
+                Log.i("retrieve product for asking", "list size ${it.size}")
+                Log.i("retrieve product for asking", "asking products ${it[0].askingProducts.size}")
+                ProductInfo.updateProductOfferingWithProductsAsking(
+                    it[0]
+                )
+            }
+        }
+    }
+*/

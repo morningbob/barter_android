@@ -23,6 +23,7 @@ import com.bitpunchlab.android.barter.main.MainViewModelFactory
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidsListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
@@ -33,6 +34,7 @@ import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.LogoutScreen
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
+import com.bitpunchlab.android.barter.util.UserMode
 import kotlinx.coroutines.InternalCoroutinesApi
 
 class MainActivity : ComponentActivity() {
@@ -76,7 +78,8 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         composable(Main.route) {
             MainScreen(navController, mainViewModel)
         }
-        composable(ProductsOffering.route) {
+        composable(ProductsOfferingUser.route) {
+            ProductInfo.updateUserMode(UserMode.OWNER_MODE)
             ProductsOfferingListScreen(navController)
         }
         composable(ProductOfferingDetails.route) {
@@ -91,7 +94,8 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         composable(AskProduct.route) {
             AskingProductScreen(navController, sellViewModel)
         }
-        composable(ProductsBiddingList.route) {
+        composable(ProductsOfferingBuyer.route) {
+            ProductInfo.updateUserMode(UserMode.BUYER_MODE)
             ProductBiddingListScreen(navController)
         }
         composable(ProductOfferingBidsList.route) {

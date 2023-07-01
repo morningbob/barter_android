@@ -97,7 +97,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                         )
                     }
 
-                    CoroutineScope(Dispatchers.IO).async {
+                    CoroutineScope(Dispatchers.IO).launch {
                         //CoroutineScope(Dispatchers.IO).launch {
                         ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
                             _imagesDisplay.value.set(pairResult.first, pairResult.second)
@@ -108,7 +108,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                             //Log.i("vm get updated bids", "got updated bids")
                         //}
 
-                    }.await()//?.let { bids ->
+                    }//.await()//?.let { bids ->
 
                         //BidInfo.updateBids(bids)
                         //Log.i("get product bidding ", "updated bids")
@@ -118,8 +118,22 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                     BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)?.collect() {
                         ProductInfo.updateProductOfferingWithProductsAsking(it[0])
                     }
+                    /*
+                    val productList =
+                        BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)
+                    productList?.let {
+                        Log.i("retrieve product for asking", "list size ${it.size}")
+                        ProductInfo.updateProductOfferingWithProductsAsking(
+                            it[0]
+                        )
+                    }
+
+                    if (productList == null) {
+                        Log.i("retrieve product for asking", "list is null")
+                    }
+*/
                     BarterRepository.getProductOfferingWithBids(productOffering.productId)?.collect() {
-                        ProductInfo
+                        ProductInfo.updateProductOfferingWithBids(it[0])
                     }
                 }
             }
