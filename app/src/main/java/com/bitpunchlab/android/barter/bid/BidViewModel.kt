@@ -3,11 +3,14 @@ package com.bitpunchlab.android.barter.bid
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.ImageHandler
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductBidding
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingListScreen
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
@@ -18,6 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -51,25 +55,25 @@ class BidViewModel : ViewModel() {
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
-    fun prepareImages(type: ImageType, imagesUrl: List<String>, context: Context) {
-        // retrieve images from cloud storage and store in view model
-        // we need to do like this because Images Display Screen's setup
-        // can't be customized to use Glide to load images as needed
-        //val images = mutableListOf<ProductImage?>()
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            ProductInfo.productChosen.collect() { product ->
+                product?.let {
+                    for (i in 0..product.images.size - 1) {
+                        _imagesDisplay.value.add(
+                            ProductImage(
+                                UUID.randomUUID().toString(),
+                                ImageHandler.createPlaceholderImage()
+                            )
+                        )
+                    }
 
-        for (i in 0..imagesUrl.size - 1) {
-            //loadImage(url = imagesUrl[i])
-            //images.add(loadImage(imagesUrl[i], context)
-            // so before we load the image, we show the placeholder image
-            _imagesDisplay.value.add(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage(context)))
-            CoroutineScope(Dispatchers.IO).launch {
-                //createPlaceholderImage()
-                loadImage(imagesUrl[i], context)?.let {
-                    _imagesDisplay.value.set(i, ProductImage(i.toString(), it))
+                    ImageHandler.loadedImagesFlow(product.images).collect() { pairResult ->
+                        _imagesDisplay.value.set(pairResult.first, pairResult.second)
+                    }
                 }
             }
         }
-
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -107,9 +111,7 @@ class BidViewModel : ViewModel() {
         //_imagesDisplay.value = newList
     }
 
-
-
-    fun processBidding(product: ProductBidding, bid: Bid, images: List<ProductImage>)  {
+    fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImage>)  {
         _loadingAlpha.value = 100f
 
         val imagesBitmap = images.map { image ->
@@ -128,7 +130,28 @@ class BidViewModel : ViewModel() {
                 _loadingAlpha.value = 0f
             }
          }
-        //}
     }
 
 }
+/*
+    fun prepareImages(type: ImageType, imagesUrl: List<String>, context: Context) {
+        // retrieve images from cloud storage and store in view model
+        // we need to do like this because Images Display Screen's setup
+        // can't be customized to use Glide to load images as needed
+        //val images = mutableListOf<ProductImage?>()
+
+        for (i in 0..imagesUrl.size - 1) {
+            //loadImage(url = imagesUrl[i])
+            //images.add(loadImage(imagesUrl[i], context)
+            // so before we load the image, we show the placeholder image
+            _imagesDisplay.value.add(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage(context)))
+            CoroutineScope(Dispatchers.IO).launch {
+                //createPlaceholderImage()
+                loadImage(imagesUrl[i], context)?.let {
+                    _imagesDisplay.value.set(i, ProductImage(i.toString(), it))
+                }
+            }
+        }
+
+    }
+*/

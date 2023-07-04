@@ -56,7 +56,7 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
     val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
     val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
 
-
+    Log.i("bids list", "no bid in product offering: ${product?.bids?.size}")
     val currentContext = LocalContext.current
 
     LaunchedEffect(key1 = shouldPopBids) {
@@ -65,6 +65,7 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
             navController.popBackStack()
         }
     }
+
 /*
     LaunchedEffect(key1 = chosenBid) {
         if (chosenBid != null && chosenBid!!.bidProduct != null) {
@@ -112,10 +113,10 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                 }
 
             }
-            //if (shouldShowBid && chosenBid != null && chosenBid!!.bidProduct != null) {
-            //    Log.i("bids list", "navigate to bid details")
-            //    ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
-            //}
+            if (shouldShowBid) {
+                Log.i("bids list", "navigate to bid details")
+                ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
+            }
         }
     }
 }

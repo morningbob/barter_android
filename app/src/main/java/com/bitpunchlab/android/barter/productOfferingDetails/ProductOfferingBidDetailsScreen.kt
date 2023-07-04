@@ -79,7 +79,8 @@ fun ProductOfferingBidDetailsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     BasicBidScreen(
-                        product = product,
+                        productName = chosenBid!!.bidProduct.name,
+                        productCategory = chosenBid!!.bidProduct.category,
                         images = imagesDisplay,
                         viewModel = productOfferingBidsListViewModel
                     )

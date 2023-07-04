@@ -10,7 +10,7 @@ class ProductOfferingFirebase {
     var category: String = ""
     var sellingDuration : Int = 0
     var images = HashMap<String, String>()
-    var currentBids = HashMap<String, String>()
+    var currentBids = HashMap<String, BidFirebase>()
     var askingProducts = HashMap<String, ProductAskingFirebase>()
     var dateCreated = ""
 
@@ -20,7 +20,7 @@ class ProductOfferingFirebase {
                 productName: String, productCategory: String,
                 duration: Int,
                 productImages: HashMap<String, String> = HashMap<String, String>(),
-                productCurrentBids: HashMap<String, String> = HashMap<String, String>(),
+                productCurrentBids: HashMap<String, BidFirebase> = HashMap<String, BidFirebase>(),
                 asking: HashMap<String, ProductAskingFirebase> = HashMap(),
                 date: String)
     {

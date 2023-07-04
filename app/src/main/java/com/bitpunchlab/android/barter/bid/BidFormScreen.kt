@@ -40,6 +40,7 @@ import com.bitpunchlab.android.barter.base.CustomTextField
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
@@ -54,6 +55,7 @@ fun BidFormScreen(navController: NavHostController,
                   bidViewModel: BidViewModel
 ) {
 
+    val product by ProductInfo.productChosen.collectAsState()
     val bidProductName by bidFormViewModel.bidProductName.collectAsState()
     val bidProductCategory by bidFormViewModel.bidProductCategory.collectAsState()
     val shouldExpandCategoryDropdown by bidFormViewModel.shouldExpandCategoryDropdown.collectAsState()
@@ -153,9 +155,9 @@ fun BidFormScreen(navController: NavHostController,
                     title = "Send",
                     onClick = {
                         val bid = bidFormViewModel.createBid()
-                        if (ProductBiddingInfo.product.value != null && bid != null) {
+                        if (product != null && bid != null) {
                             CoroutineScope(Dispatchers.IO).launch {
-                                bidViewModel.processBidding(ProductBiddingInfo.product.value!!, bid, imagesDisplay)
+                                bidViewModel.processBidding(product!!, bid, imagesDisplay)
                                 // I clear form here instead of after if clause
                                 // because I want to clear it after the processing has been done.
                                 bidFormViewModel.clearForm()

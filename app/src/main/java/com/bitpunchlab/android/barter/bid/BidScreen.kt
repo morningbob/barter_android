@@ -58,7 +58,7 @@ fun BidScreen(navController: NavHostController,
 
     LaunchedEffect(key1 = product) {
         if (product != null) {
-            bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.images, currentContext)
+            //bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.images, currentContext)
         }
     }
 
@@ -81,11 +81,10 @@ fun BidScreen(navController: NavHostController,
                     .fillMaxSize()
                     .background(BarterColor.lightGreen)
                     .verticalScroll(rememberScrollState()),
-                    //.padding(bottom = 120.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                BasicBidScreen(product = product, images = images, viewModel = bidViewModel)
+                BasicBidScreen(productName = product!!.name, productCategory = product!!.category, images = images, viewModel = bidViewModel)
 
                 ChoiceButton(
                     title = "Bid",

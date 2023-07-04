@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bitpunchlab.android.barter.models.AcceptBid
+import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -57,6 +58,14 @@ interface BarterDao {
     @Query("SELECT * FROM products_offering WHERE :id = productId")
     fun getProductOfferingAndProductsAsking(id: String) : Flow<List<ProductOfferingAndProductAsking>>
 
+    @Transaction
+    @Query("SELECT * FROM products_offering WHERE :id = productId")
+    fun getProductOfferingAndProductsAskingAsList(id: String) : List<ProductOfferingAndProductAsking>
+
+    @Transaction
+    @Query("SELECT * FROM products_offering WHERE :id = productId")
+    fun getProductOfferingAndBidsAsList(id: String) : List<ProductOfferingAndBid>
+
     //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
     //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
 
@@ -65,6 +74,9 @@ interface BarterDao {
 
     @Query("SELECT * from products_bidding")
     fun getAllProductsBidding() : Flow<List<ProductBidding>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBids(vararg bid: Bid)
 /*
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAcceptedBids(vararg acceptedBids: AcceptBid)

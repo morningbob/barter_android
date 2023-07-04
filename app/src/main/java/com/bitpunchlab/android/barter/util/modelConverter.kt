@@ -26,18 +26,25 @@ fun convertUserToUserFirebase(user: User) : UserFirebase {
 
 // I like to maintain the order of the images, that is better for the user
 // here, we set the order of the products and asking products according to the place they are in the list
-fun convertProductOfferingToFirebase(product: ProductOffering, askingProducts: List<ProductAsking>) : ProductOfferingFirebase {
+fun convertProductOfferingToFirebase(product: ProductOffering, askingProducts: List<ProductAsking>,
+    bids: List<Bid>) : ProductOfferingFirebase {
 
     val imagesMap = HashMap<String, String>()
     for (i in 0..product.images.size - 1) {
         imagesMap.put(i.toString(), product.images[i])
     }
     val askingMap = HashMap<String, ProductAskingFirebase>()
-    // this is a product offering, not a asking product
 
     if (askingProducts.isNotEmpty()) {
         for (i in 0..askingProducts.size - 1) {
             askingMap.put(i.toString(), convertProductAskingToFirebase(askingProducts[i]))
+        }
+    }
+
+    val bidsMap = HashMap<String, BidFirebase>()
+    if (bids.isNotEmpty()) {
+        for (i in 0..bids.size - 1) {
+            bidsMap.put(i.toString(), convertBidToBidFirebase(bids[i]))
         }
     }
 
@@ -46,9 +53,9 @@ fun convertProductOfferingToFirebase(product: ProductOffering, askingProducts: L
         productUserId = product.userId,
         productImages = imagesMap, productCategory = product.category,
         duration = product.duration,
-        productCurrentBids = HashMap<String, String>(),
         asking = askingMap,
-        date = product.dateCreated
+        date = product.dateCreated,
+        productCurrentBids = bidsMap
     )
 }
 

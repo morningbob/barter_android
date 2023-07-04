@@ -60,4 +60,11 @@ object ProductInfo {
         Log.i("Product info", "bids were set")
         _productOfferingWithBids.value = product
     }
+
+    fun resetProduct() {
+        _userMode.value = UserMode.OWNER_MODE
+        _productChosen.value = null
+        _productOfferingWithProductsAsking.value = null
+        _productOfferingWithBids.value = null
+    }
 }

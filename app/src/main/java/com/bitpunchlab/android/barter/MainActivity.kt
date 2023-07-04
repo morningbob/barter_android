@@ -96,7 +96,7 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
         composable(ProductsOfferingBuyer.route) {
             ProductInfo.updateUserMode(UserMode.BUYER_MODE)
-            ProductBiddingListScreen(navController)
+            ProductsOfferingListScreen(navController)
         }
         composable(ProductOfferingBidsList.route) {
             ProductOfferingBidsListScreen(navController)

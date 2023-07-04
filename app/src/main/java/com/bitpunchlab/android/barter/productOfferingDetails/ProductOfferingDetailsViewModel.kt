@@ -58,6 +58,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _shouldShowBidsListStatus = MutableStateFlow<Int>(0)
     val shouldShowBidsListStatus : StateFlow<Int> get() = _shouldShowBidsListStatus.asStateFlow()
 
+    private val _shouldBid = MutableStateFlow<Boolean>(false)
+    val shouldBid : StateFlow<Boolean> get() = _shouldBid.asStateFlow()
+
     //private val _productOfferingWithProductsAsking = MutableStateFlow<ProductOfferingAndProductAsking?>(null)
     //val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductAsking?>
     //    get() = _productOfferingWithProductsAsking.asStateFlow()
@@ -102,38 +105,21 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                         ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
                             _imagesDisplay.value.set(pairResult.first, pairResult.second)
                         }
-                        //}
-                        //FirebaseClient.retrieveProductBidding(productOffering.productId)?.bids?.map { (key, bidFirebase) ->
-                        //        convertBidFirebaseToBid(bidFirebase)
-                            //Log.i("vm get updated bids", "got updated bids")
-                        //}
-
-                    }//.await()//?.let { bids ->
-
-                        //BidInfo.updateBids(bids)
-                        //Log.i("get product bidding ", "updated bids")
-                    //}
+                    }
 
                     // prepare bids and asking products associated with the product offering
-                    BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)?.collect() {
-                        ProductInfo.updateProductOfferingWithProductsAsking(it[0])
-                    }
-                    /*
-                    val productList =
+                    CoroutineScope(Dispatchers.IO).launch {
                         BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)
-                    productList?.let {
-                        Log.i("retrieve product for asking", "list size ${it.size}")
-                        ProductInfo.updateProductOfferingWithProductsAsking(
-                            it[0]
-                        )
+                            ?.collect() {
+                                ProductInfo.updateProductOfferingWithProductsAsking(it[0])
+                            }
                     }
-
-                    if (productList == null) {
-                        Log.i("retrieve product for asking", "list is null")
-                    }
-*/
-                    BarterRepository.getProductOfferingWithBids(productOffering.productId)?.collect() {
-                        ProductInfo.updateProductOfferingWithBids(it[0])
+                    CoroutineScope(Dispatchers.IO).launch {
+                        BarterRepository.getProductOfferingWithBids(productOffering.productId)
+                            ?.collect() {
+                                Log.i("product details vm", "getting bids ${it[0].bids.size}")
+                                ProductInfo.updateProductOfferingWithBids(it[0])
+                            }
                     }
                 }
             }
@@ -175,6 +161,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     fun updateShouldPopDetails(should: Boolean) {
         _shouldPopDetails.value = should
+    }
+
+    fun updateShouldBid(should: Boolean) {
+        _shouldBid.value = should
     }
 
     // let me think how and when to retrieve the images from cloud storage

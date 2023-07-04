@@ -30,20 +30,33 @@ class ProductsOfferingListViewModel : ViewModel() {
         ProductInfo.updateProductChosen(null)
         CoroutineScope(Dispatchers.IO).launch {
             ProductInfo.userMode.collect() {
-                CoroutineScope(Dispatchers.IO).launch {
-                    if (it == UserMode.OWNER_MODE) {
-                        FirebaseClient.userId.collect() { id ->
-                            getAllProductsOffering(FirebaseClient.localDatabase!!, id)
-                        }
-                    } else {
-                        BarterRepository.getAllProductOffering()?.collect() {
-                            _productsOffering.value = it
-                        }
+                //CoroutineScope(Dispatchers.IO).launch {
+                if (it == UserMode.OWNER_MODE) {
+                    FirebaseClient.userId.collect() { id ->
+                        getAllProductsOffering(FirebaseClient.localDatabase!!, id)
+                    }
+                } else {
+                    BarterRepository.getAllProductOffering()?.collect() {
+                        Log.i("product offering list vm", "no of products retrieved ${it.size}")
+                        _productsOffering.value = it
                     }
                 }
             }
 
         }
+        /*
+        CoroutineScope(Dispatchers.IO).launch {
+            ProductInfo.userMode.collect() {
+                if (it == UserMode.BUYER_MODE) {
+                    BarterRepository.getAllProductOffering()?.collect() {
+                        Log.i("product offering list vm", "no of products retrieved ${it.size}")
+                        _productsOffering.value = it
+                    }
+                }
+            }
+        }
+
+         */
     }
 
     suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {

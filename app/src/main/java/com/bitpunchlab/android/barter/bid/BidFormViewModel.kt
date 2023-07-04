@@ -10,6 +10,7 @@ import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
@@ -20,8 +21,6 @@ import java.util.Date
 import java.util.UUID
 
 class BidFormViewModel : ViewModel() {
-
-
 
     private val _bidTime = MutableStateFlow("")
     val bidTime : StateFlow<String> get() = _bidTime.asStateFlow()
@@ -74,21 +73,9 @@ class BidFormViewModel : ViewModel() {
     // create the bid
     fun createBid() : Bid? {
         if (bidProductName.value != "" && bidProductCategory.value != Category.NOT_SET) {
-            val bidProduct1 = ProductBidding(
-                productBidId = UUID.randomUUID().toString(),
-                productName = bidProductName.value,
-                productCategory = bidProductCategory.value.label,
-                ownerName = FirebaseClient.currentUserFirebase.value!!.name,
-                biddingDateCreated = getCurrentDateTime(),
-                productOfferingForBid = ProductBiddingInfo.product.value?.productOfferingForBid ?: "",
-                bidsHolder = BidsHolder(listOf<Bid>()),
-                biddingDuration = 0,
-                productImages = listOf(),
-                biddingAskingProducts = AskingHolder(listOf())
-            )
             val bidProduct = ProductAsking(
                 productId = UUID.randomUUID().toString(),
-                productOfferingId = ProductBiddingInfo.product.value?.productOfferingForBid!!,
+                productOfferingId = ProductInfo.productChosen.value?.productId!!,
                 name = bidProductName.value,
                 category = bidProductCategory.value.label,
                 images = listOf() // add the images later, need to upload then get url
@@ -99,7 +86,7 @@ class BidFormViewModel : ViewModel() {
                 bidUserId = FirebaseClient.userId.value,
                 bidProduct = bidProduct,
                 bidTime = getCurrentDateTime(),
-                bidProductId = ProductBiddingInfo.product.value!!.productOfferingForBid,
+                bidProductId = ProductInfo.productChosen.value!!.productId,
                 bidAccepted = false
             )
         }
@@ -118,3 +105,18 @@ class BidFormViewModel : ViewModel() {
         _bidProductCategory.value = Category.NOT_SET
     }
 }
+/*
+            val bidProduct1 = ProductBidding(
+                productBidId = UUID.randomUUID().toString(),
+                productName = bidProductName.value,
+                productCategory = bidProductCategory.value.label,
+                ownerName = FirebaseClient.currentUserFirebase.value!!.name,
+                biddingDateCreated = getCurrentDateTime(),
+                productOfferingForBid = ProductBiddingInfo.product.value?.productOfferingForBid ?: "",
+                bidsHolder = BidsHolder(listOf<Bid>()),
+                biddingDuration = 0,
+                productImages = listOf(),
+                biddingAskingProducts = AskingHolder(listOf())
+            )
+
+             */

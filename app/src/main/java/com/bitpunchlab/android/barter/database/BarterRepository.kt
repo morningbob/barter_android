@@ -90,6 +90,12 @@ object BarterRepository {
             database?.barterDao?.getProductOfferingAndBids(id)
         }.await()
 
+    fun insertBids(bids: List<Bid>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.insertBids(*bids.toTypedArray())
+        }
+    }
+
 
 /*
     suspend fun retrieveAcceptedBids() : Flow<List<AcceptBid>>? {

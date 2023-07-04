@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskingProductsList
+import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.Login
 import com.bitpunchlab.android.barter.ProductOfferingBidsList
 import com.bitpunchlab.android.barter.R
@@ -44,6 +45,7 @@ import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
+import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
@@ -66,12 +68,15 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val shouldShowBidsListStatus by productDetailsViewModel.shouldShowBidsListStatus.collectAsState()
     val loadingAlpha by productDetailsViewModel.loadingAlpha.collectAsState()
     val shouldPopDetails by productDetailsViewModel.shouldPopDetails.collectAsState()
+    val shouldBid by productDetailsViewModel.shouldBid.collectAsState()
 
     val currentContext = LocalContext.current
 
     LaunchedEffect(key1 = shouldPopDetails) {
         if (shouldPopDetails) {
             productDetailsViewModel.updateShouldPopDetails(false)
+            // reset product offering and the associated asking products and bids
+            ProductInfo.resetProduct()
             navController.popBackStack()
         }
     }
@@ -84,8 +89,14 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     }
 
     LaunchedEffect(key1 = shouldShowBidsListStatus) {
-        if (shouldShowBidsListStatus == 2) {
+        if (shouldShowBidsListStatus == 1) {
             navController.navigate(ProductOfferingBidsList.route)
+        }
+    }
+
+    LaunchedEffect(key1 = shouldBid) {
+        if (shouldBid) {
+            navController.navigate(Bid.route)
         }
     }
 
@@ -193,6 +204,13 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 productDetailsViewModel.updateShouldShowBidsListStatus(1)
                             }
                         )
+                    } else {
+                        CustomButton(
+                            label = "Bid",
+                            onClick = {
+
+                                productDetailsViewModel.updateShouldBid(true)
+                            })
                     }
                 }
 

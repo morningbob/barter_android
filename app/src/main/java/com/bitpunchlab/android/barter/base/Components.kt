@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -270,7 +271,7 @@ fun CustomCard(content: @Composable() () -> Unit, modifier: Modifier = Modifier)
 }
 @Composable
 fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Unit,
-            modifier: Modifier = Modifier) {
+            modifier: Modifier = Modifier, backgroundColor: Color) {
     Card(
         modifier = Modifier
             .then(modifier),
@@ -281,7 +282,7 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BarterColor.lightBlue)
+                .background(backgroundColor)
                 .padding(start = 20.dp, end = 20.dp)
                 .clickable { onClick.invoke(product) }
         ) {
@@ -422,7 +423,7 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 }
 
 @Composable
-fun <T : Any> BasicBidScreen(product: ProductOffering?, images: List<ProductImage>, viewModel: T) {
+fun <T : Any> BasicBidScreen(productName: String, productCategory: String, images: List<ProductImage>, viewModel: T) {
 
     val viewModelMembers = viewModel::class.members
     val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
@@ -432,7 +433,6 @@ fun <T : Any> BasicBidScreen(product: ProductOffering?, images: List<ProductImag
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
 
         Image(
             painter = painterResource(id = R.mipmap.hammer),
@@ -461,14 +461,14 @@ fun <T : Any> BasicBidScreen(product: ProductOffering?, images: List<ProductImag
         }
 
         Text(
-            text = product?.name ?: "Not Available",
+            text = productName ?: "Not Available",
             fontSize = 20.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
                 .padding(top = 30.dp)
         )
         Text(
-            text = product?.category ?: "Not Available",
+            text = productCategory ?: "Not Available",
             fontSize = 20.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
