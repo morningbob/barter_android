@@ -1,18 +1,14 @@
 package com.bitpunchlab.android.barter.productsOfferingList
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
-import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
+import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.util.UserMode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 object ProductInfo {
 
@@ -26,12 +22,12 @@ object ProductInfo {
     val _productChosen = MutableStateFlow<ProductOffering?>(null)
     val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
 
-    private val _productOfferingWithProductsAsking = MutableStateFlow<ProductOfferingAndProductAsking?>(null)
-    val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductAsking?>
+    private val _productOfferingWithProductsAsking = MutableStateFlow<ProductOfferingAndProductsAsking?>(null)
+    val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductsAsking?>
         get() = _productOfferingWithProductsAsking.asStateFlow()
 
-    private val _productOfferingWithBids = MutableStateFlow<ProductOfferingAndBid?>(null)
-    val productOfferingWithBids : StateFlow<ProductOfferingAndBid?>
+    private val _productOfferingWithBids = MutableStateFlow<ProductOfferingAndBids?>(null)
+    val productOfferingWithBids : StateFlow<ProductOfferingAndBids?>
         get() = _productOfferingWithBids.asStateFlow()
 
     // asking product are Product Asking objects
@@ -51,12 +47,12 @@ object ProductInfo {
         _userMode.value = mode
     }
 
-    fun updateProductOfferingWithProductsAsking(product: ProductOfferingAndProductAsking) {
+    fun updateProductOfferingWithProductsAsking(product: ProductOfferingAndProductsAsking) {
         Log.i("Product info", "products asking were set")
         _productOfferingWithProductsAsking.value = product
     }
 
-    fun updateProductOfferingWithBids(product: ProductOfferingAndBid) {
+    fun updateProductOfferingWithBids(product: ProductOfferingAndBids) {
         Log.i("Product info", "bids were set")
         _productOfferingWithBids.value = product
     }

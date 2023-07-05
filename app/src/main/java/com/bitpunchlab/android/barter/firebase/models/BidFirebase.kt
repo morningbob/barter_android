@@ -8,20 +8,22 @@ class BidFirebase {
     var bidProduct : ProductAskingFirebase? = null
     var bidProductId = ""
     var bidTime = ""
-    var accepted = false
+    var acceptBidId = ""
+    //var acceptBidId = false
 
     constructor()
 
     constructor(bidId: String, bidUserId: String,
                 name: String, biddingFirebase: ProductAskingFirebase?,
                 biddingProductId: String,
-        time: String, accept: Boolean) {
+        time: String, acceptId: String) {//, accept: Boolean) {
         id = bidId
         userName = name
         userId = bidUserId
         bidProduct = biddingFirebase
         bidProductId = biddingProductId
         bidTime = time
-        accepted = accept
+        acceptBidId = acceptId
+        //accepted = accept
     }
 }

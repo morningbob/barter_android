@@ -51,11 +51,14 @@ fun convertProductOfferingToFirebase(product: ProductOffering, askingProducts: L
     return ProductOfferingFirebase(
         productId = product.productId, productName = product.name,
         productUserId = product.userId,
+        productUserName = product.userName,
         productImages = imagesMap, productCategory = product.category,
         duration = product.duration,
         asking = askingMap,
         date = product.dateCreated,
-        productCurrentBids = bidsMap
+        productCurrentBids = bidsMap,
+        productStatus = product.status,
+        acceptId = product.acceptBidId
     )
 }
 
@@ -64,17 +67,20 @@ fun convertProductOfferingToFirebase(product: ProductOffering, askingProducts: L
 fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : ProductOffering {
 
     val imagesList = sortElements(productFirebase.images)
-    val askingProductsFirebase = sortElements(productFirebase.askingProducts)
+    //val askingProductsFirebase = sortElements(productFirebase.askingProducts)
     //val askingProducts = askingProductsFirebase.map { each ->
     //    convertProductFirebaseToProductAsking(each)
     //}
 
     return ProductOffering(
         productId = productFirebase.id, name = productFirebase.name,
-        userId = productFirebase.userId, category = productFirebase.category,
+        userId = productFirebase.userId, userName = productFirebase.userName,
+        category = productFirebase.category,
         images = imagesList, duration = productFirebase.sellingDuration,
         //askingProducts = AskingProductsHolder(askingProducts),
-        dateCreated = productFirebase.dateCreated
+        dateCreated = productFirebase.dateCreated,
+        status = productFirebase.status,
+
     )
 }
 
@@ -198,7 +204,7 @@ fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
         bidTime = bidFirebase.bidTime,
         bidProduct = bidProduct!!,
         bidProductId = bidFirebase.bidProductId,
-        bidAccepted = bidFirebase.accepted
+        acceptBidId = bidFirebase.acceptBidId
     )
 }
 
@@ -210,19 +216,33 @@ fun convertBidToBidFirebase(bid: Bid) : BidFirebase {
         bidUserId = bid.bidUserId,
         biddingFirebase = convertProductAskingToFirebase(bid.bidProduct), //(bid.bidProduct!!),
         time = bid.bidTime,
-        accept = bid.bidAccepted,
+        acceptId = bid.acceptBidId,
         biddingProductId = bid.bidProductId
     )
 }
 /*
 fun convertAcceptBidFirebaseToAcceptBid(acceptBidFirebase: AcceptBidFirebase) : AcceptBid {
+
+    val productImages = sortElements(acceptBidFirebase.product!!.images)
+    val productBidImages = sortElements(acceptBidFirebase.bid!!.bidProduct!!.images)
+
     return AcceptBid(
-        acceptBid = convertBidFirebaseToBid(acceptBidFirebase.bid!!),
-        acceptProductInConcern = convertProductBiddingFirebaseToProductBidding(acceptBidFirebase.productBidding!!),
-        acceptId = acceptBidFirebase.id
+        acceptId = acceptBidFirebase.id,
+        productId = acceptBidFirebase.product!!.id,
+        productName = acceptBidFirebase.product!!.name,
+        productCategory = acceptBidFirebase.product!!.category,
+        productImages = productImages,
+        productSellerName = acceptBidFirebase.product!!.userName,
+        productBidName = acceptBidFirebase.bid!!.bidProduct!!.name,
+        productBidCategory = acceptBidFirebase.bid!!.bidProduct!!.category,
+        productBidImages = productBidImages,
+        productBidderName = acceptBidFirebase.bid!!.userName,
+        bidDate = acceptBidFirebase.bid!!.bidTime
     )
 }
-*/
+
+ */
+
 fun <T> sortElements(productsMap: HashMap<String, T>) : List<T>{
     val listOfSortProduct = mutableListOf<SortHelpObject<T>>()
     for ((key, value) in productsMap) {

@@ -5,15 +5,14 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 class AcceptBidFirebase {
 
     var id : String = ""
-    var productOffering : ProductOfferingFirebase? = null
+    var product : ProductOfferingFirebase? = null
     var bid : BidFirebase? = null
 
     constructor()
 
-    constructor(acceptId: String, product: ProductOfferingFirebase, theBid: BidFirebase) {
+    constructor(acceptId: String, productOffering: ProductOfferingFirebase, theBid: BidFirebase) {
         id = acceptId
-        productOffering = product
+        product = productOffering
         bid = theBid
-
     }
 }

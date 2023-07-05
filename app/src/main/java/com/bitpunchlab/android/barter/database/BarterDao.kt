@@ -1,14 +1,17 @@
 package com.bitpunchlab.android.barter.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bitpunchlab.android.barter.models.AcceptBid
+import com.bitpunchlab.android.barter.models.AcceptBidAndBid
+import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.BidAndAcceptBid
+import com.bitpunchlab.android.barter.models.ProductAndAcceptBid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
-import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
+import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.flow.Flow
@@ -40,15 +43,15 @@ interface BarterDao {
 
     @Transaction
     @Query("SELECT * FROM products_offering")
-    suspend fun getProductsOfferingAndBids() : List<ProductOfferingAndBid>
+    suspend fun getProductsOfferingAndBids() : List<ProductOfferingAndBids>
 
     @Transaction
     @Query("SELECT * FROM products_offering WHERE :id = productId")
-    fun getProductOfferingAndBids(id: String) : Flow<List<ProductOfferingAndBid>>
+    fun getProductOfferingAndBids(id: String) : Flow<List<ProductOfferingAndBids>>
 
     @Transaction
     @Query("SELECT * FROM products_offering")
-    fun getProductsOfferingAndProductsAsking() : List<ProductOfferingAndProductAsking>
+    fun getProductsOfferingAndProductsAsking() : List<ProductOfferingAndProductsAsking>
 
     @Transaction
     @Query("SELECT * from users WHERE :id = id")
@@ -56,15 +59,15 @@ interface BarterDao {
 
     @Transaction
     @Query("SELECT * FROM products_offering WHERE :id = productId")
-    fun getProductOfferingAndProductsAsking(id: String) : Flow<List<ProductOfferingAndProductAsking>>
+    fun getProductOfferingAndProductsAsking(id: String) : Flow<List<ProductOfferingAndProductsAsking>>
 
     @Transaction
     @Query("SELECT * FROM products_offering WHERE :id = productId")
-    fun getProductOfferingAndProductsAskingAsList(id: String) : List<ProductOfferingAndProductAsking>
+    fun getProductOfferingAndProductsAskingAsList(id: String) : List<ProductOfferingAndProductsAsking>
 
     @Transaction
     @Query("SELECT * FROM products_offering WHERE :id = productId")
-    fun getProductOfferingAndBidsAsList(id: String) : List<ProductOfferingAndBid>
+    fun getProductOfferingAndBidsAsList(id: String) : List<ProductOfferingAndBids>
 
     //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
     //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
@@ -89,4 +92,45 @@ interface BarterDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductsAsking(vararg productAsking: ProductAsking)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAcceptBids(vararg bid: AcceptBid)
+
+    //@Query("SELECT * FROM accept_bids WHERE")
+    //suspend fun getAcceptedBids(userId: String) : Flow<List<AcceptBid>>
+
+    @Transaction
+    @Query("SELECT * FROM accept_bids")
+    fun getAcceptBidAndProduct() : List<AcceptBidAndProduct>
+
+    @Transaction
+    @Query("SELECT * FROM accept_bids")
+    fun getAcceptBidAndBid() : List<AcceptBidAndBid>
+
+    @Transaction
+    @Query("SELECT * FROM accept_bids WHERE :id == acceptId")
+    fun getAcceptBidAndProductById(id: String) : List<AcceptBidAndProduct>
+
+    @Transaction
+    @Query("SELECT * FROM accept_bids WHERE :id == acceptId")
+    fun getAcceptBidAndBidById(id: String) : List<AcceptBidAndBid>
+
+/*
+    @Transaction
+    @Query("SELECT * FROM products_offering")
+    fun getProductAndAcceptBid() : List<ProductAndAcceptBid>
+
+    @Transaction
+    @Query("SELECT * FROM bids")
+    fun getBidAndAcceptBid() : List<BidAndAcceptBid>
+
+    @Transaction
+    @Query("SELECT * FROM products_offering WHERE :id == productId")
+    fun getProductAndAcceptBidById(id: String) : List<ProductAndAcceptBid>
+
+    @Transaction
+    @Query("SELECT * FROM bids WHERE :id == bidId")
+    fun getBidAndAcceptBidById(id: String) : List<BidAndAcceptBid>
+
+ */
 }

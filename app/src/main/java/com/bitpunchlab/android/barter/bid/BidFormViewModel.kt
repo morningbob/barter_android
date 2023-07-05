@@ -87,7 +87,7 @@ class BidFormViewModel : ViewModel() {
                 bidProduct = bidProduct,
                 bidTime = getCurrentDateTime(),
                 bidProductId = ProductInfo.productChosen.value!!.productId,
-                bidAccepted = false
+
             )
         }
         return null

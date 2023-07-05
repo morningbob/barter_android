@@ -1,42 +1,18 @@
 package com.bitpunchlab.android.barter.productOfferingDetails
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.ImageHandler
-import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.database.BarterRepository
-import com.bitpunchlab.android.barter.firebase.FirebaseClient
-import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
-import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
-import com.bitpunchlab.android.barter.util.createPlaceholderImage
-import com.bitpunchlab.android.barter.util.loadImage
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.UUID
 
 // here we prepare the bids list by querying firestore, the corresponding product bidding

@@ -123,7 +123,7 @@ fun RecordRow(record: AcceptBid, onClick: (AcceptBid) -> Unit) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     LoadedImageOrPlaceholder(
-                        imageUrls = record.acceptProductInConcern.images,
+                        imageUrls = listOf<String>(),//record.acceptProductInConcern.images,
                         contentDes = "the product's image",
                         modifier = Modifier
                             .width(80.dp)
@@ -143,7 +143,7 @@ fun RecordRow(record: AcceptBid, onClick: (AcceptBid) -> Unit) {
                             .padding(top = 0.dp)
                     )
                     Text(
-                        text = record.acceptBid.bidProduct!!.name,
+                        text = "",//,record.acceptBid.bidProduct!!.name,
                         color = BarterColor.textGreen,
                         fontSize = 20.sp,
                         modifier = Modifier
@@ -157,7 +157,7 @@ fun RecordRow(record: AcceptBid, onClick: (AcceptBid) -> Unit) {
                             .padding(top = 8.dp)
                     )
                     Text(
-                        text = record.acceptProductInConcern.name,
+                        text = "",//record.acceptProductInConcern.name,
                         color = BarterColor.textGreen,
                         fontSize = 20.sp,
                         modifier = Modifier

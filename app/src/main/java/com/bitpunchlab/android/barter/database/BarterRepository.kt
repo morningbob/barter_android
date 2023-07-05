@@ -1,25 +1,18 @@
 package com.bitpunchlab.android.barter.database
 
-import android.content.Context
-import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
-import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
+import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object BarterRepository {
 
@@ -79,13 +72,13 @@ object BarterRepository {
     }
 
     suspend fun getProductOfferingWithProductsAsking(id: String) :
-            Flow<List<ProductOfferingAndProductAsking>>? =
+            Flow<List<ProductOfferingAndProductsAsking>>? =
         CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getProductOfferingAndProductsAsking(id)
         }.await()
 
     suspend fun getProductOfferingWithBids(id: String) :
-            Flow<List<ProductOfferingAndBid>>? =
+            Flow<List<ProductOfferingAndBids>>? =
         CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getProductOfferingAndBids(id)
         }.await()

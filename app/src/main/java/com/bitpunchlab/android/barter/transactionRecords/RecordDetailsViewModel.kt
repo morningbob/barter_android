@@ -32,6 +32,7 @@ class RecordDetailsViewModel : ViewModel() {
     val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
     init {
+        /*
         CoroutineScope(Dispatchers.IO).launch {
             RecordInfo.recordChosen.collect() { record ->
                 record?.let {
@@ -76,6 +77,8 @@ class RecordDetailsViewModel : ViewModel() {
                 }
             }
         }
+
+         */
     }
 
 

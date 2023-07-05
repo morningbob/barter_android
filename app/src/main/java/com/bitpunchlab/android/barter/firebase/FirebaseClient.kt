@@ -10,24 +10,19 @@ import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
-import com.bitpunchlab.android.barter.models.AskingProductsHolder
 import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.models.ProductOfferingAndBid
-import com.bitpunchlab.android.barter.models.ProductOfferingAndProductAsking
+import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
+import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ProductImage
-import com.bitpunchlab.android.barter.util.ProductType
 import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductAskingFirebaseToProductAsking
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
 import com.bitpunchlab.android.barter.util.convertProductBiddingFirebaseToProductBidding
-import com.bitpunchlab.android.barter.util.convertProductBiddingToProductBiddingFirebase
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
@@ -37,11 +32,9 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -86,6 +79,7 @@ object FirebaseClient {
                         _currentUserFirebase.value = currentUser
                         saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
                         prepareProductsOfferingForLocalDatabase(currentUser)
+                        prepareOpenTransactions(currentUser)
                         //prepareProductsBiddingForLocalDatabase()
                         prepareTransactionRecords(currentUser)
                     }
@@ -199,6 +193,7 @@ object FirebaseClient {
         BarterRepository.insertCurrentUser(user)
     }
 
+    // we prepare the asking products, bids,
     private fun prepareProductsOfferingForLocalDatabase(userFirebase: UserFirebase) {
         // retrieve the products offering and products bidding info
         // create those objects and save in local database
@@ -225,6 +220,24 @@ object FirebaseClient {
         BarterRepository.insertProductsOffering(productsOffering)
         BarterRepository.insertProductsAsking(askingProducts)
         BarterRepository.insertBids(bids)
+    }
+
+    // the bids that users bidding, the bids that users accepted
+    private fun prepareOpenTransactions(userFirebase: UserFirebase) {
+        //val acceptedBids = mutableListOf<AcceptBid>()
+        val acceptedBids = userFirebase.userAcceptedBids.map { (bidKey, bid) ->
+            //convertAcceptBidFirebaseToAcceptBid(bid)
+        }
+
+        val bidsAccepted = userFirebase.userBidsAccepted.map { (bidKey, bid) ->
+            //convertAcceptBidFirebaseToAcceptBid(bid)
+        }
+
+        // if bid's bid.userId == user's id, this accept bid is the user bids for a product
+        // if the product's user id == user's id, this accept bid is the user accepted the other's bid
+
+        val allBids = acceptedBids + bidsAccepted
+
     }
 
     private fun prepareProductsBiddingForLocalDatabase() {
@@ -600,13 +613,13 @@ object FirebaseClient {
         return resultProductOffering && resultBidCollection
     }
 
-    private suspend fun retrieveProductBids(id: String) : List<ProductOfferingAndBid> {
+    private suspend fun retrieveProductBids(id: String) : List<ProductOfferingAndBids> {
         return CoroutineScope(Dispatchers.IO).async {
             localDatabase!!.barterDao.getProductOfferingAndBidsAsList(id)
         }.await()
     }
   
-    private suspend fun retrieveProductAskingProducts(id: String) : List<ProductOfferingAndProductAsking> {
+    private suspend fun retrieveProductAskingProducts(id: String) : List<ProductOfferingAndProductsAsking> {
         return CoroutineScope(Dispatchers.IO).async {
             localDatabase!!.barterDao.getProductOfferingAndProductsAskingAsList(id)
         }.await()
@@ -651,6 +664,45 @@ object FirebaseClient {
         // write to Accept Bid collection
 
     //}
+
+    suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
+        // write to accept bid collection
+
+        // turn  the product offering into waiting status in collection
+        // update user object (buyers and seller) for waiting transaction
+
+        // let buyer and seller send exchange message
+        //
+        //return uploadBidAccepted(convertBidToBidFirebase(bid))
+        val acceptBid = AcceptBidFirebase(
+            acceptId = UUID.randomUUID().toString(),
+            // we provide empty asking products and empty bids
+            // we only need the other info
+            productOffering = convertProductOfferingToFirebase(product, listOf(), listOf()),
+            theBid = convertBidToBidFirebase(bid)
+        )
+        return uploadAcceptBid(acceptBid)
+        //return false
+    }
+
+    private suspend fun uploadBidAccepted(bid: BidFirebase) =
+        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+            Firebase.firestore
+                .collection("acceptBids")
+                .document(bid.id)
+                .set(bid)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("upload accept bid", "success")
+                        cancellableContinuation.resume(true) {}
+
+                    } else {
+                        Log.i("upload accept bid", "failed")
+                        cancellableContinuation.resume(false) {}
+                }
+        }
+
+    }
 
 /*
     // to accept a bid, we modify the bid's accept flag

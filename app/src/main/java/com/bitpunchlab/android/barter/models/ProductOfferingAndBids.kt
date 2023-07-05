@@ -3,13 +3,12 @@ package com.bitpunchlab.android.barter.models
 import androidx.room.Embedded
 import androidx.room.Relation
 
-data class ProductOfferingAndProductAsking(
+data class ProductOfferingAndBids(
     @Embedded
     val productOffering : ProductOffering,
     @Relation(
         parentColumn = "productId",
-        entityColumn = "productOfferingId"
+        entityColumn = "bidProductId"
     )
-
-    val askingProducts : List<ProductAsking>
+    val bids : List<Bid>
 )
