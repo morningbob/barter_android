@@ -50,6 +50,7 @@ import com.bitpunchlab.android.barter.util.parseDateTime
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.reflect.KClass
 
@@ -479,6 +480,107 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
             onClick = { viewModelUpdateShouldDisplayImages.call(viewModel, true) },
             modifier = Modifier
                 .padding(top = 25.dp)
+        )
+    }
+}
+
+@Composable
+fun <T> BasicRecordScreen(viewModel: T) {
+
+    val viewModelCollection = viewModel!!::class.members
+
+    val viewModelProductOfferingImages = viewModel.javaClass.getDeclaredField("_productOfferingImages")
+    viewModelProductOfferingImages.isAccessible = true
+    val viewModelProductInExchangeImages = viewModel.javaClass.getDeclaredField("_productInExchangeImages")
+    viewModelProductInExchangeImages.isAccessible = true
+    val productOfferingImages by (viewModelProductOfferingImages.get(viewModel)
+        as MutableStateFlow<List<ProductImage>>).collectAsState()
+    val productInExchangeImages by (viewModelProductInExchangeImages.get(viewModel)
+        as MutableStateFlow<List<ProductImage>>).collectAsState()
+    //val viewModelShouldDisplayImages = viewModel.javaClass.getDeclaredField("_shouldDisplayImages")
+    //viewModelShouldDisplayImages.isAccessible = true
+    //val shouldDisplayImages by (viewModelShouldDisplayImages.get(viewModel)
+    //        as MutableStateFlow<Boolean>).collectAsState()
+    val updateShouldDisplayImages = viewModel.javaClass.getDeclaredMethod("updateShouldDisplayImages")
+    updateShouldDisplayImages.isAccessible = true
+    val prepareImagesDisplay = viewModel.javaClass.getDeclaredMethod("prepareImagesDisplay")
+    prepareImagesDisplay.isAccessible = true
+    //val viewModelShouldDisplayImages = viewModel.javaClass.declaredMethods.first{ it.name == "shouldDisplayImages" }
+
+    Image(
+        painter = painterResource(id = R.mipmap.recorddetails),
+        contentDescription = "record details icon",
+        modifier = Modifier
+            .width(120.dp)
+    )
+    Text(
+        text = "Product offered:",
+        color = Color.Black,
+        fontSize = 20.sp,
+        modifier = Modifier
+            .padding(top = 15.dp)
+    )
+    if (productOfferingImages.isNotEmpty()) {
+        Image(
+            bitmap = productOfferingImages[0].image.asImageBitmap(),
+            contentDescription = "first product image",
+            modifier = Modifier
+                .width(200.dp)
+                .padding(top = 20.dp)//, start = 50.dp, end = 50.dp)
+        )
+        CustomButton(
+            label = "View Images",
+            onClick = {
+                prepareImagesDisplay.invoke(viewModel, productOfferingImages)
+                updateShouldDisplayImages.invoke(viewModel, true)
+                //recordDetailsViewModel.prepareImagesDisplay(productOfferingImages)
+                //recordDetailsViewModel.updateShouldDisplayImages(true)
+            },
+            modifier = Modifier
+                .padding(top = 20.dp)
+        )
+    } else {
+        Text(
+            text = "Image not available",
+            color = BarterColor.textGreen,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(top = 15.dp)
+        )
+    }
+    Text(
+        text = "Product in exchange:",
+        color = Color.Black,
+        fontSize = 20.sp,
+        modifier = Modifier
+            .padding(top = 15.dp)
+    )
+    if (productInExchangeImages.isNotEmpty()) {
+        Image(
+            bitmap = productInExchangeImages[0].image.asImageBitmap(),
+            contentDescription = "first product image",
+            modifier = Modifier
+                .width(200.dp)
+                .padding(top = 20.dp)
+        )
+        CustomButton(
+            label = "View Images",
+            onClick = {
+                prepareImagesDisplay.invoke(viewModel, productInExchangeImages)
+                updateShouldDisplayImages.invoke(viewModel, true)
+                //recordDetailsViewModel.prepareImagesDisplay(productInExchangeImages)
+                //recordDetailsViewModel.updateShouldDisplayImages(true)
+            },
+            modifier = Modifier
+                .padding(top = 20.dp)
+        )
+    } else {
+        Text(
+            text = "Image not available",
+            color = BarterColor.textGreen,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(top = 15.dp)
         )
     }
 }

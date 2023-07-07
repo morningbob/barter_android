@@ -82,7 +82,7 @@ fun RecordsScreen(navController: NavHostController,
                 LazyColumn(
                     modifier = Modifier
                         .padding(top = 30.dp, start = 50.dp, end = 50.dp)
-                ) {
+                ) {/*
                     items(acceptedRecords, { accepted -> accepted.acceptId }) { record ->
                         RecordRow(
                             record = record,
@@ -92,6 +92,7 @@ fun RecordsScreen(navController: NavHostController,
                             }
                         )
                     }
+                    */
                 }
             }
         }

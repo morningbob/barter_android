@@ -13,6 +13,7 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.models.UserAndAcceptBid
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.flow.Flow
 
@@ -114,6 +115,16 @@ interface BarterDao {
     @Transaction
     @Query("SELECT * FROM accept_bids WHERE :id == acceptId")
     fun getAcceptBidAndBidById(id: String) : List<AcceptBidAndBid>
+
+    @Transaction
+    @Query("SELECT * FROM users")
+    fun getUserAndAcceptBids() : List<UserAndAcceptBid>
+
+    @Transaction
+    @Query("SELECT * FROM users WHERE :id == id")
+    fun getUserAndAcceptBidsById(id: String) : Flow<List<UserAndAcceptBid>>
+
+    //@Query("SELECT * FROM ")
 
 /*
     @Transaction

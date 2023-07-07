@@ -1,5 +1,7 @@
 package com.bitpunchlab.android.barter.database
 
+import com.bitpunchlab.android.barter.models.AcceptBidAndBid
+import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
@@ -7,6 +9,7 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.models.UserAndAcceptBid
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +19,7 @@ import kotlinx.coroutines.launch
 
 object BarterRepository {
 
-    var database : BarterDatabase? = null
+    var database: BarterDatabase? = null
 
     fun insertCurrentUser(user: User) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -24,20 +27,20 @@ object BarterRepository {
         }
     }
 
-    fun getAllUsers() : Flow<List<User>>? {
+    fun getAllUsers(): Flow<List<User>>? {
         return database?.barterDao?.getAllUsers()
     }
 
-    fun getCurrentUser(id: String) : Flow<List<User>>? {
+    fun getCurrentUser(id: String): Flow<List<User>>? {
         return database?.barterDao?.getUser(id)
     }
 
-    fun getAllProductOffering() : Flow<List<ProductOffering>>? {
+    fun getAllProductOffering(): Flow<List<ProductOffering>>? {
         return database?.barterDao?.getAllProductOffering()
 
     }
 
-    fun insertProductsOffering(products: List<ProductOffering>)  {
+    fun insertProductsOffering(products: List<ProductOffering>) {
         CoroutineScope(Dispatchers.IO).launch {
             database?.barterDao?.insertProductsOffering(*products.toTypedArray())
         }
@@ -49,7 +52,7 @@ object BarterRepository {
         }
     }
 
-    suspend fun getUserProductsOffering(id: String) : List<UserAndProductOffering>? {
+    suspend fun getUserProductsOffering(id: String): List<UserAndProductOffering>? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getUserAndProductsOffering(id)
         }.await()
@@ -65,19 +68,19 @@ object BarterRepository {
         }
     }
 
-    suspend fun getAllProductsBidding() : Flow<List<ProductBidding>>? {
+    suspend fun getAllProductsBidding(): Flow<List<ProductBidding>>? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getAllProductsBidding()
         }.await()
     }
 
-    suspend fun getProductOfferingWithProductsAsking(id: String) :
+    suspend fun getProductOfferingWithProductsAsking(id: String):
             Flow<List<ProductOfferingAndProductsAsking>>? =
         CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getProductOfferingAndProductsAsking(id)
         }.await()
 
-    suspend fun getProductOfferingWithBids(id: String) :
+    suspend fun getProductOfferingWithBids(id: String):
             Flow<List<ProductOfferingAndBids>>? =
         CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getProductOfferingAndBids(id)
@@ -89,6 +92,22 @@ object BarterRepository {
         }
     }
 
+    suspend fun getUserAndAcceptBids(id: String): Flow<List<UserAndAcceptBid>>? =
+        CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getUserAndAcceptBidsById(id)
+        }.await()
+
+    suspend fun getAcceptBidAndProductById(id: String) : List<AcceptBidAndProduct>? =
+        CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getAcceptBidAndProductById(id)
+        }.await()
+
+    suspend fun getAcceptBidAndBidById(id: String) : List<AcceptBidAndBid>? =
+        CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getAcceptBidAndBidById(id)
+        }.await()
+}
+
 
 /*
     suspend fun retrieveAcceptedBids() : Flow<List<AcceptBid>>? {
@@ -98,4 +117,3 @@ object BarterRepository {
     }
 
  */
-}

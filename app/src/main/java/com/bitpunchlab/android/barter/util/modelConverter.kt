@@ -220,6 +220,8 @@ fun convertBidToBidFirebase(bid: Bid) : BidFirebase {
         biddingProductId = bid.bidProductId
     )
 }
+
+
 /*
 fun convertAcceptBidFirebaseToAcceptBid(acceptBidFirebase: AcceptBidFirebase) : AcceptBid {
 

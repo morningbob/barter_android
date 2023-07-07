@@ -10,6 +10,7 @@ import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
+import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.acos
 
 object FirebaseClient {
 
@@ -78,7 +80,8 @@ object FirebaseClient {
                     currentUser?.let {
                         _currentUserFirebase.value = currentUser
                         saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
-                        prepareProductsOfferingForLocalDatabase(currentUser)
+                        prepareProductsOffering()
+                        prepareProductsInUserForLocalDatabase(currentUser)
                         prepareOpenTransactions(currentUser)
                         //prepareProductsBiddingForLocalDatabase()
                         prepareTransactionRecords(currentUser)
@@ -193,27 +196,56 @@ object FirebaseClient {
         BarterRepository.insertCurrentUser(user)
     }
 
+    private suspend fun prepareProductsOffering() {
+        val productsFirebase = CoroutineScope(Dispatchers.IO).async {
+           retrieveProductsOfferingFirebase()
+        }.await()
+
+        val (products, askingProducts, bids) = decomposeProductOfferingFirebase(productsFirebase)
+
+        BarterRepository.insertProductsOffering(products)
+        BarterRepository.insertProductsAsking(askingProducts)
+        BarterRepository.insertBids(bids)
+    }
+
+    private suspend fun retrieveProductsOfferingFirebase() =
+        suspendCancellableCoroutine<List<ProductOfferingFirebase>> { cancellableContinuation ->
+            Firebase.firestore
+                .collection("productsOffering")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.documents.isNotEmpty()) {
+                        Log.i("retrieve products", "succeeded")
+                        val products = mutableListOf<ProductOfferingFirebase>()
+
+                        snapshot.documents.map { doc ->
+                            doc.toObject(ProductOfferingFirebase::class.java)?.let {
+                                products.add(it)
+                            }
+                        }
+                        cancellableContinuation.resume(products) {}
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.i("retrieve products", "failed")
+                    cancellableContinuation.resume(listOf()) {}
+                }
+        }
+
     // we prepare the asking products, bids,
-    private fun prepareProductsOfferingForLocalDatabase(userFirebase: UserFirebase) {
+    private fun prepareProductsInUserForLocalDatabase(userFirebase: UserFirebase) {
         // retrieve the products offering and products bidding info
         // create those objects and save in local database
         // this includes removing the outdated products objects in the database
         // here the productsOffering in the user firebase object
         // has the full product offering object stored in it
         // asking products
-        val askingProducts = mutableListOf<ProductAsking>()
-        val bids = mutableListOf<Bid>()
-        val productsOffering = userFirebase.productsOffering.map {
-                (productKey, product) ->
-            product.askingProducts.map { (askingKey, asking) ->
-                askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
-            }
-            product.currentBids.map { (bidKey, bid) ->
-                bids.add(convertBidFirebaseToBid(bid))
-            }
-            convertProductFirebaseToProduct(product)
+        val products = userFirebase.productsOffering.map { (key, product) ->
+            product
         }
 
+        val tripleResult = decomposeProductOfferingFirebase(products)
+        val (productsOffering, askingProducts, bids) = tripleResult
 
         Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
         Log.i("prepare product offering", "no of bids ${bids.size}")
@@ -222,22 +254,52 @@ object FirebaseClient {
         BarterRepository.insertBids(bids)
     }
 
+    private fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
+        Triple<List<ProductOffering>, List<ProductAsking>, List<Bid>> {
+        val askingProducts = mutableListOf<ProductAsking>()
+        val bids = mutableListOf<Bid>()
+        val productsOffering = productsOfferingFirebase.map {
+                product ->
+            product.askingProducts.map { (askingKey, asking) ->
+                askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
+            }
+            product.currentBids.map { (bidKey, bid) ->
+                bids.add(convertBidFirebaseToBid(bid))
+            }
+            convertProductFirebaseToProduct(product)
+        }
+        return Triple(productsOffering, askingProducts, bids)
+    }
+
     // the bids that users bidding, the bids that users accepted
     private fun prepareOpenTransactions(userFirebase: UserFirebase) {
-        //val acceptedBids = mutableListOf<AcceptBid>()
-        val acceptedBids = userFirebase.userAcceptedBids.map { (bidKey, bid) ->
-            //convertAcceptBidFirebaseToAcceptBid(bid)
+        // save the product and bid from userFirebase, accepted bids and bidAccepted
+        val acceptedBids = mutableListOf<AcceptBid>()
+        //val bidsAccepted = mutableListOf<AcceptBid>()
+        val products = mutableListOf<ProductOffering>()
+        val bids = mutableListOf<Bid>()
+
+        val allBids = mutableListOf<AcceptBid>()
+
+        userFirebase.userAcceptedBids.map { (bidKey, acceptBid) ->
+            Log.i("prepare open transactions", "processing one accepted bid")
+            allBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId))
+            products.add(convertProductFirebaseToProduct(acceptBid.product!!))
+            bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
 
-        val bidsAccepted = userFirebase.userBidsAccepted.map { (bidKey, bid) ->
-            //convertAcceptBidFirebaseToAcceptBid(bid)
+        userFirebase.userBidsAccepted.map { (bidKey, acceptBid) ->
+            Log.i("prepare open transactions", "processing one bid accepted")
+            allBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId))
+            products.add(convertProductFirebaseToProduct(acceptBid.product!!))
+            bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
 
-        // if bid's bid.userId == user's id, this accept bid is the user bids for a product
-        // if the product's user id == user's id, this accept bid is the user accepted the other's bid
-
-        val allBids = acceptedBids + bidsAccepted
-
+        CoroutineScope(Dispatchers.IO).launch {
+            localDatabase!!.barterDao.insertAcceptBids(*acceptedBids.toTypedArray())
+            localDatabase!!.barterDao.insertBids(*bids.toTypedArray())
+            localDatabase!!.barterDao.insertProductsOffering(*products.toTypedArray())
+        }
     }
 
     private fun prepareProductsBiddingForLocalDatabase() {
@@ -780,5 +842,19 @@ object FirebaseClient {
             cancellableContinuation.resume(false) {}
         }
 
+*/
+    /*
+        val askingProducts = mutableListOf<ProductAsking>()
+        val bids = mutableListOf<Bid>()
+        val productsOffering = userFirebase.productsOffering.map {
+                (productKey, product) ->
+            product.askingProducts.map { (askingKey, asking) ->
+                askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
+            }
+            product.currentBids.map { (bidKey, bid) ->
+                bids.add(convertBidFirebaseToBid(bid))
+            }
+            convertProductFirebaseToProduct(product)
+        }
 */
 }

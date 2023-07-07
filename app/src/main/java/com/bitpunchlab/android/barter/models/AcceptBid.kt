@@ -11,6 +11,9 @@ import kotlinx.parcelize.Parcelize
 data class AcceptBid(
     @PrimaryKey
     val acceptId : String,
+    // true represent seller
+    val isSeller : Boolean,
+    val userId : String
     //val productId : String,
     //val bidId : String
 ) : Parcelable

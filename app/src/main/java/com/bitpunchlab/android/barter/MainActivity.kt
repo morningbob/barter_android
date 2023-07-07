@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bitpunchlab.android.barter.acceptBids.AcceptBidsListScreen
 import com.bitpunchlab.android.barter.askingProducts.AskingProductsListScreen
 import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.database.BarterDatabase
@@ -104,14 +105,14 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         composable(Bid.route) {
             BidScreen(navController)
         }
+        composable(AcceptBidsList.route) {
+            AcceptBidsListScreen(navController)
+        }
         composable(Report.route) {
             RecordsScreen(navController)
         }
         composable(ReportDetails.route) {
             RecordDetailsScreen(navController)
-        }
-        composable(ImagesDisplay.route) {
-
         }
         composable(Logout.route) {
             LogoutScreen(navController = navController)
