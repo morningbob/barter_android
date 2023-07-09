@@ -1,18 +1,10 @@
 package com.bitpunchlab.android.barter.transactionRecords
 
-import android.util.Log
-import androidx.compose.runtime.ComposeNode
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.ImageHandler
 import com.bitpunchlab.android.barter.util.ProductImage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import java.util.UUID
 
 class RecordDetailsViewModel : ViewModel() {
 

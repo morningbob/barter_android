@@ -1,12 +1,11 @@
-package com.bitpunchlab.android.barter
+package com.bitpunchlab.android.barter.util
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import com.bitpunchlab.android.barter.util.ProductImage
-import com.bitpunchlab.android.barter.util.createPlaceholderImage
+import com.bitpunchlab.android.barter.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -16,11 +15,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
-import java.util.UUID
 
 // the image loader is so important for the app to display images
 // keeping a context in it while the app is active

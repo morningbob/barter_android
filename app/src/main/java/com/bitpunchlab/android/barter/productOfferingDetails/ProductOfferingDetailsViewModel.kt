@@ -2,7 +2,7 @@ package com.bitpunchlab.android.barter.productOfferingDetails
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.ImageHandler
+import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo

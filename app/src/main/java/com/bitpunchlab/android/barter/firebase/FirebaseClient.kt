@@ -279,18 +279,20 @@ object FirebaseClient {
         val products = mutableListOf<ProductOffering>()
         val bids = mutableListOf<Bid>()
 
-        val allBids = mutableListOf<AcceptBid>()
+        //val allBids = mutableListOf<AcceptBid>()
 
         userFirebase.userAcceptedBids.map { (bidKey, acceptBid) ->
             Log.i("prepare open transactions", "processing one accepted bid")
-            allBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId))
+           //Log.i("prepare open transactions", "the userId of the accept bid ${acceptBid.product?.userId}")
+            //Log.i("prepare open transactions", "current userId ${currentUserFirebase.value!!.id}")
+            acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId))
             products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
 
         userFirebase.userBidsAccepted.map { (bidKey, acceptBid) ->
-            Log.i("prepare open transactions", "processing one bid accepted")
-            allBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId))
+            //Log.i("prepare open transactions", "processing one bid accepted")
+            acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId))
             products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
@@ -298,6 +300,7 @@ object FirebaseClient {
         CoroutineScope(Dispatchers.IO).launch {
             localDatabase!!.barterDao.insertAcceptBids(*acceptedBids.toTypedArray())
             localDatabase!!.barterDao.insertBids(*bids.toTypedArray())
+            Log.i("prepare open transactions", "bids to be saved ${bids.size}")
             localDatabase!!.barterDao.insertProductsOffering(*products.toTypedArray())
         }
     }

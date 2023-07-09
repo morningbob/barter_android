@@ -21,7 +21,6 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
-import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidsListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
@@ -35,6 +34,7 @@ import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.LogoutScreen
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
+import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.UserMode
 import kotlinx.coroutines.InternalCoroutinesApi
 

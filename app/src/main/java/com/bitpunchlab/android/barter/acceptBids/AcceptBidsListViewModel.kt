@@ -7,6 +7,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.BidAndAcceptBid
 import com.bitpunchlab.android.barter.models.BidWithDetails
+import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -36,10 +37,26 @@ class AcceptBidsListViewModel : ViewModel() {
     val _bidsAcceptedDetail = MutableStateFlow<MutableList<BidWithDetails>>(mutableListOf())
     val bidsAcceptedDetail : StateFlow<MutableList<BidWithDetails>> get() = _bidsAcceptedDetail.asStateFlow()
 
+    private val _productOfferingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    val productOfferingImages : StateFlow<MutableList<ProductImage>> get() = _productOfferingImages.asStateFlow()
+
+    private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    val productInExchangeImages : StateFlow<MutableList<ProductImage>> get() = _productInExchangeImages.asStateFlow()
+
     val _shouldDisplayDetails = MutableStateFlow<Boolean>(false)
     val shouldDisplayDetails : StateFlow<Boolean> get() = _shouldDisplayDetails.asStateFlow()
 
+    private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
+    val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
+
+    private val _shouldPopImages = MutableStateFlow<Boolean>(false)
+    val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
+
+    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+
     init {
+        //_bidsDetail.value = acceptedBidsDetail.value
         prepareBidDetails()
         // retrieve all accepted bids and put them in appropriate bids list
         CoroutineScope(Dispatchers.IO).launch {
@@ -49,6 +66,7 @@ class AcceptBidsListViewModel : ViewModel() {
                     BarterRepository.getUserAndAcceptBids(id)
                 }.await()
                 userAcceptBidsFlow?.collect() { userAcceptBids ->
+                    Log.i("accept bid list vm", "userAcceptedBids ${userAcceptBids.size}")
                     Log.i("accept bid list vm", "got no accept bids: ${userAcceptBids[0].acceptBids.size}")
                     _acceptBids.value = userAcceptBids[0].acceptBids
                     //prepareBidDetails(userAcceptBids[0].acceptBids)
@@ -62,6 +80,7 @@ class AcceptBidsListViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             acceptBids.collect() { theBids ->
                 for (theBid in theBids) {
+                    Log.i("accept bid view model", "processing the bid ${theBid.acceptId}")
                     CoroutineScope(Dispatchers.IO).launch {
                         val bidProductDeferred = CoroutineScope(Dispatchers.IO).async {
                             BarterRepository.getAcceptBidAndProductById(theBid.acceptId)
@@ -78,7 +97,8 @@ class AcceptBidsListViewModel : ViewModel() {
                                 bid = bid
                             )
                             if (theBid.isSeller) {
-                                _acceptedBidsDetail.value.add(bidDetails)
+                                //_acceptedBidsDetail.value.add(bidDetails)
+                                _bidsDetail.value.add(bidDetails)
                             } else {
                                 _bidsAcceptedDetail.value.add(bidDetails)
                             }
@@ -92,6 +112,18 @@ class AcceptBidsListViewModel : ViewModel() {
 
     fun updateShouldDisplayDetails(should: Boolean) {
         _shouldDisplayDetails.value = should
+    }
+
+    fun updateShouldDisplayImages(should: Boolean) {
+        _shouldDisplayImages.value = should
+    }
+
+    fun updateShouldPopImages(should: Boolean) {
+        _shouldPopImages.value = should
+    }
+
+    fun prepareImagesDisplay(images: List<ProductImage>) {
+        _imagesDisplay.value = images
     }
 
 }

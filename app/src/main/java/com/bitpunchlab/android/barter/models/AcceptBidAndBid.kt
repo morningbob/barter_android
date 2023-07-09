@@ -9,7 +9,7 @@ data class AcceptBidAndBid(
     val acceptBid: AcceptBid,
     @Relation(
         parentColumn = "acceptId",
-        entityColumn = "bidAcceptId"
+        entityColumn = "acceptBidId"
     )
     val bid: Bid
 )

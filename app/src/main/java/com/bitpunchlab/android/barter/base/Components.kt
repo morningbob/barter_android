@@ -485,7 +485,7 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
 }
 
 @Composable
-fun <T> BasicRecordScreen(viewModel: T) {
+fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
 
     val viewModelCollection = viewModel!!::class.members
 
@@ -497,91 +497,114 @@ fun <T> BasicRecordScreen(viewModel: T) {
         as MutableStateFlow<List<ProductImage>>).collectAsState()
     val productInExchangeImages by (viewModelProductInExchangeImages.get(viewModel)
         as MutableStateFlow<List<ProductImage>>).collectAsState()
-    //val viewModelShouldDisplayImages = viewModel.javaClass.getDeclaredField("_shouldDisplayImages")
-    //viewModelShouldDisplayImages.isAccessible = true
-    //val shouldDisplayImages by (viewModelShouldDisplayImages.get(viewModel)
-    //        as MutableStateFlow<Boolean>).collectAsState()
-    val updateShouldDisplayImages = viewModel.javaClass.getDeclaredMethod("updateShouldDisplayImages")
+    val updateShouldDisplayImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldDisplayImages" }
     updateShouldDisplayImages.isAccessible = true
-    val prepareImagesDisplay = viewModel.javaClass.getDeclaredMethod("prepareImagesDisplay")
+    val updateShouldPopImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldPopImages" }
+    updateShouldPopImages.isAccessible = true
+    val updateShouldDisplayDetails = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldDisplayDetails" }
+    updateShouldDisplayDetails.isAccessible = true
+    val prepareImagesDisplay = viewModel.javaClass.declaredMethods.first { it.name == "prepareImagesDisplay" }
     prepareImagesDisplay.isAccessible = true
-    //val viewModelShouldDisplayImages = viewModel.javaClass.declaredMethods.first{ it.name == "shouldDisplayImages" }
 
-    Image(
-        painter = painterResource(id = R.mipmap.recorddetails),
-        contentDescription = "record details icon",
+    Column(
         modifier = Modifier
-            .width(120.dp)
-    )
-    Text(
-        text = "Product offered:",
-        color = Color.Black,
-        fontSize = 20.sp,
-        modifier = Modifier
-            .padding(top = 15.dp)
-    )
-    if (productOfferingImages.isNotEmpty()) {
+            .then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 25.dp, bottom = 15.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Image(
+                painter = painterResource(id = R.mipmap.cross),
+                contentDescription = "cancel icon",
+                modifier = Modifier
+                    .width(40.dp)
+                    .clickable {
+                        updateShouldDisplayDetails.invoke(viewModel, false)
+                        //viewModelUpdateShouldPopImages.invoke(viewModel, true)
+                        //viewModelUpdateShouldDisplayImages.invoke(viewModel, false)
+                    },
+            )
+        }
         Image(
-            bitmap = productOfferingImages[0].image.asImageBitmap(),
-            contentDescription = "first product image",
+            painter = painterResource(id = R.mipmap.recorddetails),
+            contentDescription = "record details icon",
             modifier = Modifier
-                .width(200.dp)
-                .padding(top = 20.dp)//, start = 50.dp, end = 50.dp)
+                .width(120.dp)
         )
-        CustomButton(
-            label = "View Images",
-            onClick = {
-                prepareImagesDisplay.invoke(viewModel, productOfferingImages)
-                updateShouldDisplayImages.invoke(viewModel, true)
-                //recordDetailsViewModel.prepareImagesDisplay(productOfferingImages)
-                //recordDetailsViewModel.updateShouldDisplayImages(true)
-            },
-            modifier = Modifier
-                .padding(top = 20.dp)
-        )
-    } else {
         Text(
-            text = "Image not available",
-            color = BarterColor.textGreen,
+            text = "Product offered:",
+            color = Color.Black,
             fontSize = 20.sp,
             modifier = Modifier
                 .padding(top = 15.dp)
         )
-    }
-    Text(
-        text = "Product in exchange:",
-        color = Color.Black,
-        fontSize = 20.sp,
-        modifier = Modifier
-            .padding(top = 15.dp)
-    )
-    if (productInExchangeImages.isNotEmpty()) {
-        Image(
-            bitmap = productInExchangeImages[0].image.asImageBitmap(),
-            contentDescription = "first product image",
-            modifier = Modifier
-                .width(200.dp)
-                .padding(top = 20.dp)
-        )
-        CustomButton(
-            label = "View Images",
-            onClick = {
-                prepareImagesDisplay.invoke(viewModel, productInExchangeImages)
-                updateShouldDisplayImages.invoke(viewModel, true)
-                //recordDetailsViewModel.prepareImagesDisplay(productInExchangeImages)
-                //recordDetailsViewModel.updateShouldDisplayImages(true)
-            },
-            modifier = Modifier
-                .padding(top = 20.dp)
-        )
-    } else {
+        if (productOfferingImages.isNotEmpty()) {
+            Image(
+                bitmap = productOfferingImages[0].image.asImageBitmap(),
+                contentDescription = "first product image",
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(top = 20.dp)//, start = 50.dp, end = 50.dp)
+            )
+            CustomButton(
+                label = "View Images",
+                onClick = {
+                    prepareImagesDisplay.invoke(viewModel, productOfferingImages)
+                    updateShouldDisplayImages.invoke(viewModel, true)
+                    //recordDetailsViewModel.prepareImagesDisplay(productOfferingImages)
+                    //recordDetailsViewModel.updateShouldDisplayImages(true)
+                },
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            )
+        } else {
+            Text(
+                text = "Image not available",
+                color = BarterColor.textGreen,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 15.dp)
+            )
+        }
         Text(
-            text = "Image not available",
-            color = BarterColor.textGreen,
+            text = "Product in exchange:",
+            color = Color.Black,
             fontSize = 20.sp,
             modifier = Modifier
                 .padding(top = 15.dp)
         )
+        if (productInExchangeImages.isNotEmpty()) {
+            Image(
+                bitmap = productInExchangeImages[0].image.asImageBitmap(),
+                contentDescription = "first product image",
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(top = 20.dp)
+            )
+            CustomButton(
+                label = "View Images",
+                onClick = {
+                    prepareImagesDisplay.invoke(viewModel, productInExchangeImages)
+                    updateShouldDisplayImages.invoke(viewModel, true)
+                    //recordDetailsViewModel.prepareImagesDisplay(productInExchangeImages)
+                    //recordDetailsViewModel.updateShouldDisplayImages(true)
+                },
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            )
+        } else {
+            Text(
+                text = "Image not available",
+                color = BarterColor.textGreen,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 15.dp)
+            )
+        }
     }
 }
 

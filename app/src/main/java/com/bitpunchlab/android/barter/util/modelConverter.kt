@@ -77,9 +77,9 @@ fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : 
         userId = productFirebase.userId, userName = productFirebase.userName,
         category = productFirebase.category,
         images = imagesList, duration = productFirebase.sellingDuration,
-        //askingProducts = AskingProductsHolder(askingProducts),
         dateCreated = productFirebase.dateCreated,
         status = productFirebase.status,
+        acceptBidId = productFirebase.acceptBidId
 
     )
 }
