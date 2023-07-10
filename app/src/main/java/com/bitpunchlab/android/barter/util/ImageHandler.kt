@@ -53,7 +53,7 @@ object ImageHandler {
     suspend fun loadedImagesFlow(imagesUrl: List<String>) : Flow<Pair<Int, ProductImage>> = channelFlow {
         for (i in 0..imagesUrl.size - 1) {
             // so before we load the image, we show the placeholder image
-            //emit(Pair(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage())))
+
             CoroutineScope(Dispatchers.IO).launch {
                 loadImage(imagesUrl[i])?.let {
                     send(Pair(i, ProductImage(i.toString(), it)))

@@ -42,21 +42,12 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 
     var shouldCancel by remember { mutableStateOf(false) }
 
-    var imageType = ImageType.PRODUCT_IMAGE
+    //var imageType = ImageType.PRODUCT_IMAGE
     val screenContext = LocalContext.current
 
     LaunchedEffect(key1 = shouldCancel) {
         if (shouldCancel) {
             navController.popBackStack()
-        }
-    }
-
-    LaunchedEffect(key1 = shouldDisplayImages) {
-        if (shouldDisplayImages) {
-            Log.i("sell screen", "should display images true")
-            //navController.navigate(ImagesDisplay.route)
-        } else {
-            Log.i("sell screen", "should display images false")
         }
     }
 
@@ -105,7 +96,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 
                 // a form to get the product's detail
                 ProductForm(
-                    ProductType.PRODUCT, productName, pickImageLauncher, shouldExpandCategory,
+                    productName, pickImageLauncher, shouldExpandCategory,
                     productCategory, shouldExpandDuration, sellingDuration, sellViewModel,
                     shouldSetAskingProduct,
                     Modifier.padding(top = 30.dp), navController
@@ -155,13 +146,11 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 // product category, name, images, asked products (3), selling duration (like how many days)
 // 
 @Composable
-fun ProductForm(productType: ProductType, productName: String, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
+fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
                 shouldExpandCat: Boolean, productCategory: Category,
                 shouldExpandDuration: Boolean, sellingDuration: SellingDuration,
                 sellViewModel: SellViewModel, shouldSetProduct: Boolean,
                 modifier: Modifier = Modifier, navController: NavHostController) {
-
-    //Log.i("product form", "should expand ${shouldExpandCat}")
 
     LaunchedEffect(key1 = shouldSetProduct) {
         if (shouldSetProduct) {
@@ -185,7 +174,6 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
@@ -209,24 +197,38 @@ fun ProductForm(productType: ProductType, productName: String, pickImageLauncher
                     },
                     onDismiss = { },
                     items = listOf(SellingDuration.ONE_DAY, SellingDuration.TWO_DAYS),
-                    modifier = Modifier.padding(start = 20.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp)
                 )
             }
-
             Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 20.dp)
             ) {
+                CustomButton(
+                    label = "Exchange Products",
+                    onClick = {
+                        // show a list of asking products that were already set
+                    },
+                    modifier = Modifier
+                        //.fillMaxWidth()
+                        .fillMaxWidth(0.5f)
+                        //.padding(start = 30.dp, bottom = 20.dp)
+                )
                 ChoiceButton(
-                    title = "Set exchange product",
+                    title = "Add",
                     onClick = {
                         sellViewModel.updateShouldSetProduct(true)
-                        //navController.navigate(AskProduct.route)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(start = 20.dp, bottom = 20.dp)
                 )
             }
+
+
     }
 }
 
@@ -285,29 +287,34 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 modifier = Modifier
                     //.fillMaxWidth()
                     .padding(start = 20.dp)
+                    .fillMaxWidth()
             )
         }
-        ChoiceButton(
-            title = "Upload image",
-            onClick = {
-                pickImageLauncher.launch("image/*")
-            },
-            Modifier
+        Row(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp),
-        )
+                .padding(top = 20.dp)
+        ) {
+            CustomButton(
+                label = "Images",
+                onClick = {
+                    Log.i("base product form", "set should display image true")
+                    viewModelPrepareImagesDisplay.call(viewModel)
+                    viewModelUpdateShouldDisplayImages.call(viewModel, true)
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    //.padding(start = 30.dp, bottom = 20.dp)
+            )
+            ChoiceButton(
+                title = "Upload",
+                onClick = { pickImageLauncher.launch("image/*") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, bottom = 20.dp)
+            )
 
-        ChoiceButton(
-            title = "View images",
-            onClick = {
-                Log.i("base product form", "set should display image true")
-                viewModelPrepareImagesDisplay.call(viewModel)
-                viewModelUpdateShouldDisplayImages.call(viewModel, true)
-            },
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-        )
+        }
     }
 }
 
@@ -355,6 +362,23 @@ fun ProcessSellingInvalidFieldDialog(sellViewModel: SellViewModel) {
         onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
         onPositive = { sellViewModel.updateProcessSellingStatus(0) })
 }
+/*
+Row(
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            ) {
+                ChoiceButton(
+                    title = "Add",
+                    onClick = {
+                        sellViewModel.updateShouldSetProduct(true)
+                        //navController.navigate(AskProduct.route)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+ */
+
 
 
 

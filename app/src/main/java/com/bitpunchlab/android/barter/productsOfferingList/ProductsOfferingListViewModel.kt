@@ -44,19 +44,6 @@ class ProductsOfferingListViewModel : ViewModel() {
             }
 
         }
-        /*
-        CoroutineScope(Dispatchers.IO).launch {
-            ProductInfo.userMode.collect() {
-                if (it == UserMode.BUYER_MODE) {
-                    BarterRepository.getAllProductOffering()?.collect() {
-                        Log.i("product offering list vm", "no of products retrieved ${it.size}")
-                        _productsOffering.value = it
-                    }
-                }
-            }
-        }
-
-         */
     }
 
     suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {

@@ -84,6 +84,12 @@ object AcceptBidsList : Destinations {
     override val icon: Int = R.mipmap.bidbar
 }
 
+object AcceptBidDetails : Destinations {
+    override val title: String = "Accept Bid Details"
+    override val route: String = "AcceptBidDetails"
+    override val icon: Int = R.mipmap.bidbar
+}
+
 object Report : Destinations {
     override val title: String = "Report"
     override val route: String = "Report"

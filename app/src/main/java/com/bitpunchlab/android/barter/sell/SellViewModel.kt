@@ -153,7 +153,8 @@ class SellViewModel : ViewModel() {
 
     // we create the product offering here
     private suspend fun processSelling() : Boolean {
-        val productOffering = ProductOffering(productId = UUID.randomUUID().toString(),
+        val productOffering = ProductOffering(
+            productId = UUID.randomUUID().toString(),
             name = productName.value, category = productCategory.value.name,
             userId = userId.value, images = listOf(),
             userName = FirebaseClient.currentUserFirebase.value?.name ?: "",

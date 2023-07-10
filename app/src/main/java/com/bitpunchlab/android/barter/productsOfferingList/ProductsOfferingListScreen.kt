@@ -37,6 +37,7 @@ import com.bitpunchlab.android.barter.BarterNavigation
 import com.bitpunchlab.android.barter.ProductOfferingDetails
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
+import com.bitpunchlab.android.barter.base.ProductRow
 import com.bitpunchlab.android.barter.base.ProductRowDisplay
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
@@ -58,8 +59,6 @@ fun ProductsOfferingListScreen(navController: NavHostController,
 
     val userMode by ProductInfo.userMode.collectAsState()
     val productsOffering by productsOfferingListViewModel.productsOffering.collectAsState()
-    //val userId by FirebaseClient.userId.collectAsState()
-    //val productChosen by ProductInfo.productChosen.collectAsState()
     val shouldDisplayDetails by productsOfferingListViewModel.shouldDisplayDetails.collectAsState()
     val iconId : Int
     val backgroundColor : Color
@@ -70,8 +69,6 @@ fun ProductsOfferingListScreen(navController: NavHostController,
         backgroundColor = BarterColor.lightYellow
         iconId = R.mipmap.bidding
     }
-
-    //Log.i("product offering list", "no of product offering: ${productsOffering.size}")
 
     LaunchedEffect(key1 = shouldDisplayDetails) {
         if (shouldDisplayDetails) {
@@ -109,14 +106,14 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                     contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
                 ) {
                     items(productsOffering) { each ->
-                        ProductRowDisplay(
+                        ProductRow(
                             product = each,
                             onClick = {
                                 ProductInfo.updateProductChosen(it)
                                 productsOfferingListViewModel.updateShouldDisplayProductDetails(true)
                             },
-                            modifier = Modifier
-                                .padding(top = 8.dp, bottom = 8.dp),
+                            modifier = Modifier,
+                                //.padding(top = 8.dp, bottom = 15.dp),
                             backgroundColor = backgroundColor
                         )
                     }
@@ -125,37 +122,3 @@ fun ProductsOfferingListScreen(navController: NavHostController,
         }
     }
 }
-
-/*
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F86f01956-2baf-4e9d-9c3f-b08b0a127bb6_0.jpg?alt=media&token=db25a9f0-e674-4be5-b952-73863b9c891c")
-                            .setHeader("User-Agent", "Mozilla/5.0")
-                            .build()),
-                    contentDescription = "product's image",
-                    modifier = Modifier
-                        //.width(120.dp)
-                        //.fillMaxSize()
-                        .width(200.dp)
-                )
-
-                Image(
-                    painter = rememberAsyncImagePainter("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F5f3301a9-3bca-4c69-8105-61acb533fa41_0.jpg?alt=media&token=fb729072-20cf-4d7b-8571-095c07ad0dad"),//.//product.images[0]),
-                    contentDescription = "product's image",
-                    modifier = Modifier
-                        .width(120.dp)
-                )
-*/
-/*
-    LaunchedEffect(key1 = userId) {
-        CoroutineScope(Dispatchers.IO).launch {
-            productsOfferingListViewModel.getAllProductsOffering(
-                FirebaseClient.localDatabase!!,
-                userId
-            )
-        }
-        // we need to wait for the products offering retrieval finished
-    }
-
- */

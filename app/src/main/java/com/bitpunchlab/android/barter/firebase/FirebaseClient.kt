@@ -142,8 +142,6 @@ object FirebaseClient {
             if (signupAuth(email, password)) {
                 // pass the info to auth, when it is ready,
                 // we can create user and save to firestore
-                //userEmail = email
-                //userName = name
                 finishedAuthSignup.collect() { finished ->
                     // reset
                     createAccount = false
@@ -279,8 +277,6 @@ object FirebaseClient {
         val products = mutableListOf<ProductOffering>()
         val bids = mutableListOf<Bid>()
 
-        //val allBids = mutableListOf<AcceptBid>()
-
         userFirebase.userAcceptedBids.map { (bidKey, acceptBid) ->
             Log.i("prepare open transactions", "processing one accepted bid")
            //Log.i("prepare open transactions", "the userId of the accept bid ${acceptBid.product?.userId}")
@@ -302,20 +298,6 @@ object FirebaseClient {
             localDatabase!!.barterDao.insertBids(*bids.toTypedArray())
             Log.i("prepare open transactions", "bids to be saved ${bids.size}")
             localDatabase!!.barterDao.insertProductsOffering(*products.toTypedArray())
-        }
-    }
-
-    private fun prepareProductsBiddingForLocalDatabase() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val productsBiddingFirebaseDeferred = CoroutineScope(Dispatchers.IO).async {
-                retrieveProductsBidding()
-            }
-            val productsBiddingFirebase = productsBiddingFirebaseDeferred.await()
-            Log.i("prepare products bidding", "got from firestore ${productsBiddingFirebase.size}")
-            val productsBidding = productsBiddingFirebase.map { product ->
-                convertProductBiddingFirebaseToProductBidding(product)
-            }
-            BarterRepository.insertProductsBidding(productsBidding)
         }
     }
 
@@ -347,56 +329,6 @@ object FirebaseClient {
                 }
         }
 
-    private suspend fun retrieveProductsBidding() =
-        suspendCancellableCoroutine<List<ProductBiddingFirebase>> {
-            cancellableContinuation ->
-
-            Firebase.firestore
-                .collection("productsBidding")
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    Log.i("retrieve products bidding", "success")
-                    if (snapshot.documents.isNotEmpty()) {
-                        val productsBidding = mutableListOf<ProductBiddingFirebase>()
-                        for (productDoc in snapshot.documents) {
-                            productDoc.toObject<ProductBiddingFirebase>()?.let {
-                                productsBidding.add(it)
-                            }
-                        }
-                        cancellableContinuation.resume(productsBidding) {}
-
-                    } else {
-                        Log.i("retrieve products bidding", "is empty")
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.i("retrieve products bidding", "failed ${e}")
-                }
-    }
-
-    suspend fun retrieveProductBidding(productOfferingId: String) : ProductBiddingFirebase? =
-        suspendCancellableCoroutine { cancellableContinuation ->
-            Firebase.firestore
-                .collection("productsBidding")
-                .whereEqualTo("productOfferingId", productOfferingId)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    if (snapshot.documents.isNotEmpty()) {
-                        Log.i("retrieve product bidding", "success")
-                        val productBidding = snapshot.documents[0].toObject<ProductBiddingFirebase>()
-                        cancellableContinuation.resume(productBidding) {}
-                    } else {
-                        Log.i("retrieve product bidding", "product doesn't exist")
-                        cancellableContinuation.resume(null) {}
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.i("retrieve product bidding", "failure $e")
-                    cancellableContinuation.resume(null) {}
-                }
-
-        }
-
     private suspend fun prepareTransactionRecords(currentUser: UserFirebase) {
         val acceptedBids =
             currentUser.userAcceptedBids.map { (key, value) ->
@@ -420,13 +352,7 @@ object FirebaseClient {
         val semiUpdatedProductOffering = pairResult.first
         val askingProductsList = pairResult.second
         // query the asking products associated with the product offering
-        //localDatabase!!.barterDao.getProductOfferingAndProductsAsking(pro)
 
-        //val askingProductsUpdated = askingProductsList.map { product ->
-        //    product.copy(productOfferingId = semiUpdatedProductOffering.productId)
-        //}
-
-        //semiUpdatedProductOffering.askingProducts = AskingProductsHolder(askingProductsList)
         // here, we need to wait for the processEachProduct to upload the images to cloud storage
         // and get back download url, then record in the product offering and asking product
         // so the product offering will be updated with both its own images and the asking products
@@ -437,11 +363,7 @@ object FirebaseClient {
         val askingProductsFirebase = askingProductsList.map { each ->
             convertProductAskingToFirebase(each)
         }
-        //val resultAskingDeferred = CoroutineScope(Dispatchers.IO).async {
-        //    saveAllAskingProductFirebase(askingProductsFirebase)
-        //}
 
-        //val productOfferingFirebase = convertProductOfferingToFirebase(productOffering)
         val askingProductsFirebaseMap = HashMap<String, ProductAskingFirebase>()
         for (i in 0..askingProductsFirebase.size - 1) {
             askingProductsFirebaseMap.put(i.toString(), askingProductsFirebase[i])
@@ -453,8 +375,6 @@ object FirebaseClient {
             saveProductOfferingFirebase(productFirebase)
         }
 
-        //val resultAsking = resultAskingDeferred.await()
-
         val resultUpdateUser = updateProductSellingInUserFirebase(
             currentUserFirebase.value!!,
             productFirebase,
@@ -462,7 +382,7 @@ object FirebaseClient {
 
         val resultProduct = resultProductDeferred.await()
 
-        return resultProduct && resultUpdateUser//resultProduct && resultAsking && resultUpdateUser
+        return resultProduct && resultUpdateUser
     }
 
     private suspend fun uploadImagesAndGetDownloadUrl(productOffering: ProductOffering,

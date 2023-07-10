@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -38,6 +40,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -115,6 +118,18 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
         modifier = Modifier.then(modifier)
+    )
+}
+
+@Composable
+fun ContentText(content: String, textSize: TextUnit = 18.sp,
+                textColor: Color = BarterColor.textGreen, modifier: Modifier) {
+    Text(
+        text = content,
+        color = textColor,
+        fontSize = textSize,
+        modifier = Modifier
+            .then(modifier)
     )
 }
 
@@ -285,19 +300,21 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                 .fillMaxWidth()
                 .background(backgroundColor)
                 .padding(start = 20.dp, end = 20.dp)
-                .clickable { onClick.invoke(product) }
+                .clickable { onClick.invoke(product) },
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoadedImageOrPlaceholder(
                 imageUrls = product.images,
                 contentDes = "product's image",
                 modifier = Modifier
                     .padding(top = 30.dp)
-                    .width(280.dp)
+                    .width(150.dp)
             )
 
             Text(
                 text = product.name,
                 color = BarterColor.textGreen,
+                fontSize = 18.sp,
                 modifier = Modifier
                     .padding(top = 10.dp)
             )
@@ -309,11 +326,13 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                 Text(
                     text = "Category: ",
                     color = BarterColor.textGreen,
+                    fontSize = 18.sp,
                     textAlign = TextAlign.Start
                 )
                 Text(
                     text = product.category,
                     color = BarterColor.textGreen,
+                    fontSize = 18.sp,
                 )
             }
             Row(
@@ -324,13 +343,13 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                 Text(
                     text = "Selling Duration: ",
                     color = BarterColor.textGreen,
-                    //modifier = Modifier.then(modifier)
-
+                    fontSize = 18.sp,
                     textAlign = TextAlign.Start
                 )
                 Text(
                     text = "${product.duration} days",
                     color = BarterColor.textGreen,
+                    fontSize = 18.sp,
                 )
             }
             Row(
@@ -341,21 +360,148 @@ fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Un
                 Text(
                     text = "Asking Products: ",
                     color = BarterColor.textGreen,
+                    fontSize = 18.sp,
                     textAlign = TextAlign.Start
                 )
 
                 Text(
                     text = "",
                     color = BarterColor.textGreen,
+                    fontSize = 18.sp,
                 )
-/*
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 30.dp),
+            ) {
                 DateTimeInfo(
                     dateTimeString = product.dateCreated,
                     modifier = Modifier
-                        //.padding(top = 1)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
+               modifier: Modifier = Modifier, backgroundColor: Color) {
+    Card(
+        elevation = 10.dp,
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(3.dp, BarterColor.textGreen)
+    ) {
+        Column(
+            modifier
+                .fillMaxSize()
+                .background(backgroundColor)
+                .padding(bottom = 15.dp)
+                .clickable { onClick.invoke(product) }
+                .then(modifier),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LoadedImageOrPlaceholder(
+                    imageUrls = product.images,
+                    contentDes = "product's image",
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .width(100.dp)
                 )
 
- */
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .padding(start = 20.dp, end = 20.dp)
+
+                ) {
+                    Text(
+                        text = product.name,
+                        color = BarterColor.textGreen,
+                        fontSize = 21.sp,
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        Text(
+                            text = "Category: ",
+                            color = BarterColor.textGreen,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        Text(
+                            text = product.category,
+                            color = BarterColor.textGreen,
+                            fontSize = 18.sp,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        Text(
+                            text = "Selling Duration: ",
+                            color = BarterColor.textGreen,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        Text(
+                            text = "${product.duration} days",
+                            fontSize = 18.sp,
+                            color = BarterColor.textGreen,
+                        )
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        Text(
+                            text = "Asking Products: ",
+                            color = BarterColor.textGreen,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+
+            }
+            Row(
+                modifier = Modifier
+                    //.fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                DateTimeInfo(
+                    dateTimeString = product.dateCreated,
+                    modifier = Modifier
+                )
             }
         }
     }
@@ -368,38 +514,17 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            //.fillMaxWidth()
             .then(modifier)
 
     ) {
         Text(
             text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
-            fontSize = 20.sp,
-            color = BarterColor.textGreen
+            fontSize = 18.sp,
+            color = Color.Blue
         )
     }
 }
-
-/*
-            if (product.images.isNotEmpty()) {
-                val imageState = LoadImage(url = product.images.first())
-                if (imageState.value != null) {
-                    //Log.i("product row", "images is not empty")
-                    //Log.i("product row", "images 0 ${product.images[0]}")
-                    Image(
-                        bitmap = imageState.value!!.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .width(280.dp)
-                            .padding(top = 30.dp)
-                    )
-                }
-
-            } else {
-                Log.i("product row", "images is empty")
-            }
-
-             */
 
 @Composable
 fun LoadImage(url: String): MutableState<Bitmap?> {
@@ -485,7 +610,7 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
 }
 
 @Composable
-fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
+fun <T> BasicRecordScreen(bidWithDetails: BidWithDetails, viewModel: T, modifier: Modifier = Modifier) {
 
     val viewModelCollection = viewModel!!::class.members
 
@@ -501,8 +626,8 @@ fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
     updateShouldDisplayImages.isAccessible = true
     val updateShouldPopImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldPopImages" }
     updateShouldPopImages.isAccessible = true
-    val updateShouldDisplayDetails = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldDisplayDetails" }
-    updateShouldDisplayDetails.isAccessible = true
+    //val updateShouldDisplayDetails = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldDisplayDetails" }
+    //updateShouldDisplayDetails.isAccessible = true
     val prepareImagesDisplay = viewModel.javaClass.declaredMethods.first { it.name == "prepareImagesDisplay" }
     prepareImagesDisplay.isAccessible = true
 
@@ -511,24 +636,7 @@ fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
             .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 40.dp, end = 25.dp, bottom = 15.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Image(
-                painter = painterResource(id = R.mipmap.cross),
-                contentDescription = "cancel icon",
-                modifier = Modifier
-                    .width(40.dp)
-                    .clickable {
-                        updateShouldDisplayDetails.invoke(viewModel, false)
-                        //viewModelUpdateShouldPopImages.invoke(viewModel, true)
-                        //viewModelUpdateShouldDisplayImages.invoke(viewModel, false)
-                    },
-            )
-        }
+
         Image(
             painter = painterResource(id = R.mipmap.recorddetails),
             contentDescription = "record details icon",
@@ -548,15 +656,13 @@ fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
                 contentDescription = "first product image",
                 modifier = Modifier
                     .width(200.dp)
-                    .padding(top = 20.dp)//, start = 50.dp, end = 50.dp)
+                    .padding(top = 20.dp)
             )
             CustomButton(
                 label = "View Images",
                 onClick = {
                     prepareImagesDisplay.invoke(viewModel, productOfferingImages)
                     updateShouldDisplayImages.invoke(viewModel, true)
-                    //recordDetailsViewModel.prepareImagesDisplay(productOfferingImages)
-                    //recordDetailsViewModel.updateShouldDisplayImages(true)
                 },
                 modifier = Modifier
                     .padding(top = 20.dp)
@@ -590,8 +696,6 @@ fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
                 onClick = {
                     prepareImagesDisplay.invoke(viewModel, productInExchangeImages)
                     updateShouldDisplayImages.invoke(viewModel, true)
-                    //recordDetailsViewModel.prepareImagesDisplay(productInExchangeImages)
-                    //recordDetailsViewModel.updateShouldDisplayImages(true)
                 },
                 modifier = Modifier
                     .padding(top = 20.dp)
@@ -610,21 +714,28 @@ fun <T> BasicRecordScreen(viewModel: T, modifier: Modifier = Modifier) {
 
 @Composable
 fun LoadedImageOrPlaceholder(imageUrls: List<String>, contentDes: String, modifier: Modifier = Modifier) {
-    if (imageUrls.isNotEmpty()) {
-        val bitmap = LoadImage(url = imageUrls[0])
-        if (bitmap.value != null) {
-            Image(
-                bitmap = bitmap.value!!.asImageBitmap(),
-                contentDescription = contentDes,
-                modifier = Modifier
-                    //.width(80.dp)
-                    .then(modifier)
-            )
+    Column(
+        modifier = Modifier
+            .then(modifier)
+            //.fillMaxWidth(),
+        //horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        if (imageUrls.isNotEmpty()) {
+            val bitmap = LoadImage(url = imageUrls[0])
+            if (bitmap.value != null) {
+                Image(
+                    bitmap = bitmap.value!!.asImageBitmap(),
+                    contentDescription = contentDes,
+                    modifier = Modifier
+                        //.then(modifier)
+                )
+            } else {
+                PlaceholderImage()
+            }
         } else {
             PlaceholderImage()
         }
-    } else {
-        PlaceholderImage()
     }
 }
 
@@ -633,22 +744,7 @@ fun PlaceholderImage() {
     Image(
         painter = painterResource(id = R.mipmap.imageplaceholder),
         contentDescription = "placeholder image",
-        //modifier = Modifier
-        //    .width(80.dp)
     )
 }
 
 
-/*
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F86f01956-2baf-4e9d-9c3f-b08b0a127bb6_0.jpg?alt=media&token=db25a9f0-e674-4be5-b952-73863b9c891c")
-                        .setHeader("User-Agent", "Mozilla/5.0")
-                        .build()),
-                contentDescription = "product's image",
-                modifier = Modifier
-                    .width(200.dp)
-            )
-
-             */
