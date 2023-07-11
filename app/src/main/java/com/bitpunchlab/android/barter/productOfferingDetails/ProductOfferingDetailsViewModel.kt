@@ -100,18 +100,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 }
             }
         }
-        /*
-        CoroutineScope(Dispatchers.IO).launch {
-            combine(shouldShowBidsListStatus, BidInfo.bids) {
-                status, bids ->
-                if (status == 1 && bids.isNotEmpty()) {
-                    updateShouldShowBidsListStatus(2)
-                }
-            }.collect() {
-                Log.i("product offering details VM", "ready navigate")
-            }
-        }
-*/
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -155,36 +143,19 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     }
 
     // show images as soon as it is loaded
-
-
     fun prepareAskingProducts() {
         ProductInfo.productChosen.value?.let {
             Log.i("product details vM", "product is not null")
             //ProductInfo.updateAskingProducts(it.askingProducts.askingList)
-
-        }
-    }
-}
-/*
-    fun prepareImages(type: ImageType, imagesUrl: List<String>, context: Context) {
-        // retrieve images from cloud storage and store in view model
-        // we need to do like this because Images Display Screen's setup
-        // can't be customized to use Glide to load images as needed
-        //val images = mutableListOf<ProductImage?>()
-
-        for (i in 0..imagesUrl.size - 1) {
-            //loadImage(url = imagesUrl[i])
-            //images.add(loadImage(imagesUrl[i], context)
-            // so before we load the image, we show the placeholder image
-            _imagesDisplay.value.add(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage(context)))
-            CoroutineScope(Dispatchers.IO).launch {
-                //createPlaceholderImage()
-                loadImage(imagesUrl[i], context)?.let {
-                    _imagesDisplay.value.set(i, ProductImage(i.toString(), it))
+            ProductInfo.productOfferingWithProductsAsking.value?.let {
+                //ProductInfo.updateAskingProducts(it.askingProducts)
+                val products = it.askingProducts.map { product ->
+                    //ProductAskingDisplay(
+                    //    id = product.productId,
+                    //    product = product,
+                    //    image = )
                 }
             }
         }
-
     }
-
- */
+}

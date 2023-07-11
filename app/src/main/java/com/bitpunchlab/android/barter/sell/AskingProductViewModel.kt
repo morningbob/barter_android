@@ -29,7 +29,7 @@ class AskingProductViewModel : ViewModel() {
     val productCategory : StateFlow<Category> get() = _productCategory.asStateFlow()
 
     private val _askingProductImages = MutableStateFlow<List<ProductImage>>(mutableListOf())
-    val askingProductImages : StateFlow<List<ProductImage>> get() = _askingProductImages.asStateFlow()
+    private val askingProductImages : StateFlow<List<ProductImage>> get() = _askingProductImages.asStateFlow()
 
     private val _status = MutableStateFlow(0)
     val status : StateFlow<Int> get() = _status.asStateFlow()

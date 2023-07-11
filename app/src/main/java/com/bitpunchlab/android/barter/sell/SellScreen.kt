@@ -21,9 +21,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskProduct
+import com.bitpunchlab.android.barter.AskingProductsList
 import com.bitpunchlab.android.barter.ImagesDisplay
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.*
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -39,6 +41,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val shouldDisplayImages by sellViewModel.shouldDisplayImages.collectAsState()
     val processSellingStatus by sellViewModel.processSellingStatus.collectAsState()
     val loadingAlpha by sellViewModel.loadingAlpha.collectAsState()
+    val shouldShowAsking by sellViewModel.shouldShowAsking.collectAsState()
 
     var shouldCancel by remember { mutableStateOf(false) }
 
@@ -47,7 +50,15 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 
     LaunchedEffect(key1 = shouldCancel) {
         if (shouldCancel) {
+            shouldCancel = false
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(key1 = shouldShowAsking) {
+        if (shouldShowAsking) {
+            sellViewModel.updateShouldShowAsking(false)
+            navController.navigate(AskingProductsList.route)
         }
     }
 
@@ -118,7 +129,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                         onClick = { shouldCancel = true },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 30.dp, bottom = 100.dp)
+                            .padding(start = 20.dp, bottom = 100.dp)
                     )
                 }
             }
@@ -176,7 +187,7 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp),
+                    .padding(top = 0.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
                 CustomTextField(
@@ -203,19 +214,23 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
                 )
             }
             Row(
+                verticalAlignment = Alignment.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp)
+                    .padding(top = 20.dp),
+
             ) {
                 CustomButton(
                     label = "Exchange Products",
                     onClick = {
                         // show a list of asking products that were already set
+                        // we need to prepare the asking products list in ProductInfo's asking products
+                        // the asking products list screen depends on this variable
+                        sellViewModel.prepareAskingProducts()
+                        sellViewModel.updateShouldShowAsking(true)
                     },
                     modifier = Modifier
-                        //.fillMaxWidth()
                         .fillMaxWidth(0.5f)
-                        //.padding(start = 30.dp, bottom = 20.dp)
                 )
                 ChoiceButton(
                     title = "Add",
@@ -227,8 +242,6 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
                         .padding(start = 20.dp, bottom = 20.dp)
                 )
             }
-
-
     }
 }
 
@@ -256,7 +269,6 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp),
@@ -285,26 +297,27 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                 onDismiss = {  },
                 items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                 modifier = Modifier
-                    //.fillMaxWidth()
-                    .padding(start = 20.dp)
                     .fillMaxWidth()
+                    .padding(start = 20.dp)
             )
         }
         Row(
+            verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 20.dp),
+
         ) {
             CustomButton(
                 label = "Images",
                 onClick = {
-                    Log.i("base product form", "set should display image true")
+                    //Log.i("base product form", "set should display image true")
                     viewModelPrepareImagesDisplay.call(viewModel)
                     viewModelUpdateShouldDisplayImages.call(viewModel, true)
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    //.padding(start = 30.dp, bottom = 20.dp)
+                    .fillMaxWidth(0.5f),
+
             )
             ChoiceButton(
                 title = "Upload",
@@ -313,7 +326,6 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
                     .fillMaxWidth()
                     .padding(start = 20.dp, bottom = 20.dp)
             )
-
         }
     }
 }
@@ -362,22 +374,7 @@ fun ProcessSellingInvalidFieldDialog(sellViewModel: SellViewModel) {
         onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
         onPositive = { sellViewModel.updateProcessSellingStatus(0) })
 }
-/*
-Row(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-            ) {
-                ChoiceButton(
-                    title = "Add",
-                    onClick = {
-                        sellViewModel.updateShouldSetProduct(true)
-                        //navController.navigate(AskProduct.route)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
- */
+
 
 
 

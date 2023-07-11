@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -64,6 +65,9 @@ class SellViewModel : ViewModel() {
     private val _processSellingStatus = MutableStateFlow(0)
     val processSellingStatus : StateFlow<Int> get() = _processSellingStatus.asStateFlow()
 
+    private val _shouldShowAsking = MutableStateFlow(false)
+    val shouldShowAsking : StateFlow<Boolean> get() = _shouldShowAsking.asStateFlow()
+
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
@@ -118,6 +122,15 @@ class SellViewModel : ViewModel() {
     }
     fun updateShouldDisplayImages(should: Boolean) {
         _shouldDisplayImages.value = should
+    }
+
+    fun updateShouldShowAsking(should: Boolean) {
+        _shouldShowAsking.value = should
+    }
+
+    fun prepareAskingProducts() {
+        ProductInfo.updateAskingProducts(AskingProductInfo.askingProducts)
+        ProductInfo.updateAskingImages(AskingProductInfo.askingProductsImages)
     }
 
     fun onSendClicked() {

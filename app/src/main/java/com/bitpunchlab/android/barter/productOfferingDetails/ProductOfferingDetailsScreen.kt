@@ -70,8 +70,6 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val shouldPopDetails by productDetailsViewModel.shouldPopDetails.collectAsState()
     val shouldBid by productDetailsViewModel.shouldBid.collectAsState()
 
-    val currentContext = LocalContext.current
-
     LaunchedEffect(key1 = shouldPopDetails) {
         if (shouldPopDetails) {
             productDetailsViewModel.updateShouldPopDetails(false)
@@ -83,7 +81,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
     LaunchedEffect(key1 = shouldDisplayProductAsking) {
         if (shouldDisplayProductAsking) {
-            Log.i("product details", "should navigate asking products true")
+            //Log.i("product details", "should navigate asking products true")
             navController.navigate(AskingProductsList.route)
         }
     }
@@ -172,16 +170,6 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                     CustomButton(
                         label = "View Product Images",
                         onClick = {
-                            /*
-                            if (product!!.images.isNotEmpty()) {
-                                productDetailsViewModel.prepareImages(
-                                    ImageType.PRODUCT_IMAGE,
-                                    product!!.images,
-                                    currentContext
-                                )
-                            }
-
-                             */
                             productDetailsViewModel.updateShouldDisplayImages(true)
                         },
                         modifier = Modifier
@@ -200,7 +188,6 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         CustomButton(
                             label = "View Bids",
                             onClick = {
-                                //BidInfo.updateBids(product.currentBids)
                                 productDetailsViewModel.updateShouldShowBidsListStatus(1)
                             }
                         )
@@ -208,7 +195,6 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         CustomButton(
                             label = "Bid",
                             onClick = {
-
                                 productDetailsViewModel.updateShouldBid(true)
                             })
                     }
@@ -229,18 +215,3 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
         }
     }
 }
-/*
-    LaunchedEffect(key1 = product) {
-        product?.let {
-            val productList =
-                BarterRepository.getProductOfferingWithProductsAsking(product!!.productId)
-            productList?.let {
-                Log.i("retrieve product for asking", "list size ${it.size}")
-                Log.i("retrieve product for asking", "asking products ${it[0].askingProducts.size}")
-                ProductInfo.updateProductOfferingWithProductsAsking(
-                    it[0]
-                )
-            }
-        }
-    }
-*/

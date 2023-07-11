@@ -70,14 +70,7 @@ fun AskingProductScreen(navController: NavHostController,
             val bitmap = RetrievePhotoHelper.getBitmap(uri, screenContext)
             bitmap?.let {
                 Log.i("launcher", "got bitmap")
-                //when (imageType) {
-                    //ImageType.PRODUCT_IMAGE -> {
-                    //    askingProductViewModel.updateProductImages(it)
-                    //}
-                    //ImageType.ASKING_IMAGE -> {
                         askingProductViewModel.updateAskingImages(it)
-                    //}
-                //}
             }
         }
     }

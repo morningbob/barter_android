@@ -89,7 +89,6 @@ fun CustomButton(label: String, onClick: () -> Unit, enable: Boolean = true,
     OutlinedButton(
         onClick = { onClick.invoke() },
         modifier = Modifier
-            //.border(BorderStroke(2.dp, BarterColor.green), RoundedCornerShape(15.dp))
             .then(modifier),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = BarterColor.lightGreen,
@@ -104,7 +103,8 @@ fun CustomButton(label: String, onClick: () -> Unit, enable: Boolean = true,
         Text(
             text = label,
             fontSize = 18.sp,
-            color = BarterColor.green
+            color = BarterColor.green,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -232,15 +232,16 @@ fun <T: Any> CustomDropDown(title: String, shouldExpand: Boolean,
     Column(
         modifier = Modifier.then(modifier)
     ) {
-        //var expand = shouldExpand
         ChoiceButton(
             title = title,
-            onClick = { onClickButton.invoke() }
+            onClick = { onClickButton.invoke() },
+            modifier = Modifier.fillMaxWidth()
         )
-
         DropdownMenu(
             expanded = shouldExpand,
-            onDismissRequest = { onDismiss.invoke() }) {
+            onDismissRequest = { onDismiss.invoke() },
+            modifier = Modifier
+            ) {
 
             items.map { item ->
                 val nameField = item.javaClass.getDeclaredField("label")
