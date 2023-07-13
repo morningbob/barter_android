@@ -94,15 +94,15 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 Image(
                     painter = painterResource(id = R.mipmap.healthcheck),
                     modifier = Modifier
-                        .padding(top = 40.dp)
-                        .width(120.dp),
+                        .padding(top = 30.dp)
+                        .width(100.dp),
                     contentDescription = "Selling page icon"
                 )
 
                 TitleText(
                     title = "Sell",
                     modifier = Modifier
-                        .padding(top = 30.dp)
+                        .padding(top = 20.dp)
                 )
 
                 // a form to get the product's detail
@@ -110,7 +110,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                     productName, pickImageLauncher, shouldExpandCategory,
                     productCategory, shouldExpandDuration, sellingDuration, sellViewModel,
                     shouldSetAskingProduct,
-                    Modifier.padding(top = 30.dp), navController
+                    Modifier.padding(top = 25.dp), navController
                 )
 
                 Row(

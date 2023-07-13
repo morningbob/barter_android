@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -60,6 +61,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     private val _shouldPopDetails = MutableStateFlow<Boolean>(false)
     val shouldPopDetails : StateFlow<Boolean> get() = _shouldPopDetails.asStateFlow()
+
+    private val _deleteProductStatus = MutableStateFlow<Int>(0)
+    val deleteProductStatus : StateFlow<Int> get() = _deleteProductStatus.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -131,8 +135,23 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _shouldBid.value = should
     }
 
-    // let me think how and when to retrieve the images from cloud storage
-    // and store as bitmaps in this view model
+    fun updateDeleteProductStatus(status: Int) {
+        _deleteProductStatus.value = status
+    }
+
+    fun confirmDelete() {
+        _deleteProductStatus.value = 1
+    }
+
+    fun deleteProduct(product: ProductOffering) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (FirebaseClient.processDeleteProduct(product)) {
+                _deleteProductStatus.value = 2
+            } else {
+                _deleteProductStatus.value = 3
+            }
+        }
+    }
 
 
     fun deleteImage(image: ProductImage) {
@@ -146,15 +165,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     fun prepareAskingProducts() {
         ProductInfo.productChosen.value?.let {
             Log.i("product details vM", "product is not null")
-            //ProductInfo.updateAskingProducts(it.askingProducts.askingList)
             ProductInfo.productOfferingWithProductsAsking.value?.let {
-                //ProductInfo.updateAskingProducts(it.askingProducts)
-                val products = it.askingProducts.map { product ->
-                    //ProductAskingDisplay(
-                    //    id = product.productId,
-                    //    product = product,
-                    //    image = )
-                }
+                ProductInfo.updateAskingProducts(it.askingProducts)
             }
         }
     }

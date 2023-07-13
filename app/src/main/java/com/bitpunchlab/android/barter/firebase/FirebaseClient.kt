@@ -415,26 +415,6 @@ object FirebaseClient {
                 cancellableContinuation.resume(Pair(productOffering, listOfAskingProducts)) {}
             }
     }
-/*
-    private suspend fun saveAllAskingProductFirebase(
-        askingProductsFirebase: List<ProductAskingFirebase>) =
-        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
-            //val results = mutableListOf<Boolean>()
-            for (i in 0..askingProductsFirebase.size - 1) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val result = CoroutineScope(Dispatchers.IO).async {
-                        saveProductOfferingFirebase(askingProductsFirebase[i],
-                            askingProductsFirebase[i].id,
-                            ProductType.ASKING_PRODUCT)
-                    }.await()
-                    if (!result) {
-                        cancellableContinuation.resume(false) {}
-                    }
-                }
-            }
-            cancellableContinuation.resume(true) {}
-        }
-*/
     private suspend fun processEachProduct(productId: String,
         productImages: List<ProductImage>) : Pair<List<String>, List<String>> {
         Log.i("process each product", "started")
@@ -627,29 +607,6 @@ object FirebaseClient {
         }
     }
 
-    private suspend fun saveProductBiddingFirebase(productBiddingFirebase: ProductBiddingFirebase) =
-        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
-            Firebase.firestore
-                .collection("productsBidding")
-                .document(productBiddingFirebase.id)
-                .set(productBiddingFirebase)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.i("update product bidding for bids", "success")
-                        cancellableContinuation.resume(true) {}
-                    } else {
-                        Log.i("update product bidding for bids", "failed ${task.exception}")
-                        cancellableContinuation.resume(false) {}
-                    }
-                }
-        }
-
-    //suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
-        // upload pic and get url
-        // write to Accept Bid collection
-
-    //}
-
     suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
         // write to accept bid collection
 
@@ -670,74 +627,37 @@ object FirebaseClient {
         //return false
     }
 
-    private suspend fun uploadBidAccepted(bid: BidFirebase) =
+    suspend fun processDeleteProduct(product: ProductOffering) : Boolean {
+        val report = HashMap<String, String>()
+        report.put("productId", product.productId)
+        report.put("userId", product.userId)
+
+        return CoroutineScope(Dispatchers.IO).async { deleteProductFirebase(report) }.await()
+
+    }
+
+    // write to the delete collection
+    // the cloud function deletes the product from productsOffering collection
+    // and the owner user object.
+    // this approach is better for the server to reverse changes
+
+    suspend fun deleteProductFirebase(report: HashMap<String, String>) =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
-            Firebase.firestore
-                .collection("acceptBids")
-                .document(bid.id)
-                .set(bid)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.i("upload accept bid", "success")
-                        cancellableContinuation.resume(true) {}
 
-                    } else {
-                        Log.i("upload accept bid", "failed")
-                        cancellableContinuation.resume(false) {}
+        Firebase.firestore
+            .collection("deleteProduct")
+            .document(report.get("productId")!!)
+            .set(report)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.i("delete product firebase", "success")
+                    cancellableContinuation.resume(true) {}
+                } else {
+                    Log.i("delete product firebase", "failed ${task.exception}")
+                    cancellableContinuation.resume(false) {}
                 }
-        }
-
+            }
     }
-
-/*
-    // to accept a bid, we modify the bid's accept flag
-    //
-    suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
-
-        //val productFirebase = convertProductBiddingToProductBiddingFirebase(productBidding)
-
-        // save the bid in local database
-        val updatedBid = bid.copy(bidAccepted = true)
-        val bidFirebase = convertBidToBidFirebase(updatedBid)
-        var productOfferingAskingProducts : ProductOfferingAndProductAsking? = null
-         CoroutineScope(Dispatchers.IO).async {
-            localDatabase!!.barterDao.getProductOfferingAndProductsAsking(product.productId)
-        }.await().collect() {
-             productOfferingAskingProducts = it[0]
-        }
-        /*
-        val askingProductsList = productOfferingAskingProducts[0].askingProducts.map { product ->
-            convertProductAskingToFirebase(product)
-        }
-        val askingProductsMap = HashMap<String, ProductAskingFirebase>()
-
-        for (i in 0..productOfferingAskingProducts[0].askingProducts.size - 1) {
-            askingProductsMap.put(i.toString(),
-                convertProductAskingToFirebase(productOfferingAskingProducts[0].askingProducts[i]))
-        }
-
-
-         */
-        if (productOfferingAskingProducts != null) {
-            val productFirebase = convertProductOfferingToFirebase(
-                product,
-                productOfferingAskingProducts!!.askingProducts
-            )
-
-            val acceptBidFirebase = AcceptBidFirebase(
-                acceptId = UUID.randomUUID().toString(),
-                product = productFirebase,
-                theBid = bidFirebase
-            )
-            return CoroutineScope(Dispatchers.IO).async {
-                uploadAcceptBid(acceptBidFirebase)
-            }.await()
-        } else {
-            return false
-        }
-    }
-
- */
 
     private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase) =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
@@ -756,28 +676,4 @@ object FirebaseClient {
                     }
                 }
         }
-
-
-
-/*
-    private suspend fun saveProductBiddingFirebase(bidFirebase: BidFirebase) : Boolean =
-        suspendCancellableCoroutine { cancellableContinuation ->
-            cancellableContinuation.resume(false) {}
-        }
-
-*/
-    /*
-        val askingProducts = mutableListOf<ProductAsking>()
-        val bids = mutableListOf<Bid>()
-        val productsOffering = userFirebase.productsOffering.map {
-                (productKey, product) ->
-            product.askingProducts.map { (askingKey, asking) ->
-                askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
-            }
-            product.currentBids.map { (bidKey, bid) ->
-                bids.add(convertBidFirebaseToBid(bid))
-            }
-            convertProductFirebaseToProduct(product)
-        }
-*/
 }

@@ -71,13 +71,13 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     painter = painterResource(id = R.mipmap.stall),
                     contentDescription = "main page icon",
                     modifier = Modifier
-                        .padding(top = 40.dp)
-                        .width(120.dp)
+                        .padding(top = 30.dp)
+                        .width(100.dp)
                 )
                 TitleText(
                     title = "Hello, ${userName}!",
                     modifier = Modifier
-                        .padding(top = 40.dp)
+                        .padding(top = 30.dp)
                 )
 
                 Button(

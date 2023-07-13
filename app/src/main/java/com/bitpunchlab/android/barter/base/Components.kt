@@ -286,104 +286,6 @@ fun CustomCard(content: @Composable() () -> Unit, modifier: Modifier = Modifier)
         content()
     }
 }
-@Composable
-fun ProductRowDisplay(product: ProductOffering, onClick: (ProductOffering) -> Unit,
-            modifier: Modifier = Modifier, backgroundColor: Color) {
-    Card(
-        modifier = Modifier
-            .then(modifier),
-        elevation = 10.dp,
-        shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(3.dp, BarterColor.textGreen)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(backgroundColor)
-                .padding(start = 20.dp, end = 20.dp)
-                .clickable { onClick.invoke(product) },
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LoadedImageOrPlaceholder(
-                imageUrls = product.images,
-                contentDes = "product's image",
-                modifier = Modifier
-                    .padding(top = 30.dp)
-                    .width(150.dp)
-            )
-
-            Text(
-                text = product.name,
-                color = BarterColor.textGreen,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(top = 10.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp, end = 20.dp),
-            ) {
-                Text(
-                    text = "Category: ",
-                    color = BarterColor.textGreen,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Start
-                )
-                Text(
-                    text = product.category,
-                    color = BarterColor.textGreen,
-                    fontSize = 18.sp,
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp, end = 20.dp),
-            ) {
-                Text(
-                    text = "Selling Duration: ",
-                    color = BarterColor.textGreen,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Start
-                )
-                Text(
-                    text = "${product.duration} days",
-                    color = BarterColor.textGreen,
-                    fontSize = 18.sp,
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 10.dp),
-            ) {
-                Text(
-                    text = "Asking Products: ",
-                    color = BarterColor.textGreen,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Start
-                )
-
-                Text(
-                    text = "",
-                    color = BarterColor.textGreen,
-                    fontSize = 18.sp,
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 30.dp),
-            ) {
-                DateTimeInfo(
-                    dateTimeString = product.dateCreated,
-                    modifier = Modifier
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
@@ -489,6 +391,18 @@ fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
                             textAlign = TextAlign.Start
                         )
                     }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        Text(
+                            text = "",
+                            color = BarterColor.textGreen,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Start
+                        )
+                    }
                 }
 
             }
@@ -515,15 +429,22 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
 
     Column(
         modifier = Modifier
-            //.fillMaxWidth()
             .then(modifier)
 
     ) {
-        Text(
-            text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
-            fontSize = 18.sp,
-            color = Color.Blue
-        )
+        if (dateTime != null) {
+            Text(
+                text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
+                fontSize = 18.sp,
+                color = Color.Blue
+            )
+        } else {
+            Text(
+                text = "Date and time info not available",
+                fontSize = 18.sp,
+                color = Color.Blue
+            )
+        }
     }
 }
 
@@ -708,6 +629,43 @@ fun <T> BasicRecordScreen(bidWithDetails: BidWithDetails, viewModel: T, modifier
                 fontSize = 20.sp,
                 modifier = Modifier
                     .padding(top = 15.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
+    Row(
+        modifier = Modifier
+            //.fillMaxWidth()
+            .height(80.dp)
+            .padding()
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Image(
+            painter = painterResource(id = iconId),
+            contentDescription = title,
+            modifier = Modifier
+                .width(80.dp)
+                .padding(end = 20.dp)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+
+        ) {
+            Text(
+                text = title,
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Bold,
+                color = BarterColor.textGreen,
+                modifier = Modifier,
+                //.padding(start = 30.dp, end = 30.dp),
+                textAlign = TextAlign.Start
             )
         }
     }

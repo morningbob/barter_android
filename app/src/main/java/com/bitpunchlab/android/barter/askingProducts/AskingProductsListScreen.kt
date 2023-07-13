@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,8 +53,6 @@ fun AskingProductsListScreen(navController: NavHostController,
         AskingProductsListViewModel()
     }
 ) {
-    //val askingProductsDisplay by ProductInfo
-    //val product by ProductInfo.productOfferingWithProductsAsking.collectAsState()
     val askingProducts by ProductInfo.askingProducts.collectAsState()
     val askingImages by ProductInfo.askingImages.collectAsState()
     val shouldDismiss by askingProductsListViewModel.shouldDismiss.collectAsState()
@@ -70,12 +69,14 @@ fun AskingProductsListScreen(navController: NavHostController,
             .fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BarterColor.lightGreen)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BarterColor.lightGreen)
+                    .background(Color.Transparent)
                     .padding(top = 20.dp, end = 20.dp),
                 horizontalArrangement = Arrangement.End
             ) {
@@ -105,7 +106,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     contentDescription = "product's image",
                                     modifier = Modifier
                                         .width(200.dp)
-                                        .padding(top = 20.dp)
+                                        .padding(top = 10.dp)
                                 )
                             } else {
                                 Image(
@@ -113,7 +114,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     contentDescription = "product image not available",
                                     modifier = Modifier
                                         .width(200.dp)
-                                        .padding(top = 20.dp)
+                                        .padding(top = 10.dp)
                                 )
                             }
                         } else if (askingImages.isNotEmpty()) {
@@ -123,7 +124,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     contentDescription = "product's image",
                                     modifier = Modifier
                                         .width(200.dp)
-                                        .padding(top = 20.dp)
+                                        .padding(top = 10.dp)
                                 )
                             } else {
                                 Image(
@@ -131,7 +132,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     contentDescription = "product image not available",
                                     modifier = Modifier
                                         .width(200.dp)
-                                        .padding(top = 20.dp)
+                                        .padding(top = 10.dp)
                                 )
                             }
                         } else {
@@ -140,7 +141,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                 contentDescription = "product image not available",
                                 modifier = Modifier
                                     .width(200.dp)
-                                    .padding(top = 20.dp)
+                                    .padding(top = 10.dp)
                             )
                         }
 
@@ -151,12 +152,6 @@ fun AskingProductsListScreen(navController: NavHostController,
                         )
                         Text(
                             text = product.category,
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                        )
-                        Text(
-                            text = "crazy",
-
                             modifier = Modifier
                                 .padding(top = 20.dp)
                         )

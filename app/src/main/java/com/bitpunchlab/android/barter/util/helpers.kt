@@ -20,6 +20,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 fun validateEmail(email: String) : String {
     if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -95,13 +96,17 @@ fun getCurrentDateTime() : String {
     return newFormat.toString()
 }
 
-fun parseDateTime(dateTimeString: String) : LocalDateTime {
+fun parseDateTime(dateTimeString: String) : LocalDateTime? {
     val formatter = DateTimeFormatter.ISO_DATE_TIME
-    val dateTime = LocalDateTime.parse(dateTimeString, formatter)
+    var dateTime : LocalDateTime? = null
+    try {
+        dateTime = LocalDateTime.parse(dateTimeString, formatter)
+    } catch (e: DateTimeParseException) {
+        Log.i("parse date time", "parsing error: $e")
+    }
+
     return dateTime
 }
-
-
 
 data class ProductImage(
     var id : String,

@@ -32,10 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AcceptBidDetails
+import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
-import com.bitpunchlab.android.barter.base.ProductRowDisplay
+import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -62,8 +63,16 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
             Column(modifier = Modifier
                 .fillMaxSize()
                 .background(BarterColor.lightGreen)
-                .padding(top = 40.dp, start = 40.dp, end = 40.dp)
+                .padding(top = 20.dp, start = 40.dp, end = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                TitleRow(
+                    iconId = R.mipmap.acceptbid,
+                    title = "Accepted Bids",
+                    modifier = Modifier
+                        .padding(bottom = 20.dp)
+                    )
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize(),

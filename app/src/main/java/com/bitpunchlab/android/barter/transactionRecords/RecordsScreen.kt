@@ -76,8 +76,8 @@ fun RecordsScreen(navController: NavHostController,
                     painter = painterResource(id = R.mipmap.records),
                     contentDescription = "Transaction Records icon",
                     modifier = Modifier
-                        .width(120.dp)
-                        .padding(top = 40.dp)
+                        .width(100.dp)
+                        .padding(top = 30.dp)
                 )
                 LazyColumn(
                     modifier = Modifier
