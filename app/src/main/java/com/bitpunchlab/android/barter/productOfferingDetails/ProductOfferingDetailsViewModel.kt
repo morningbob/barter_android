@@ -7,6 +7,7 @@ import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,10 +39,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _shouldBid = MutableStateFlow<Boolean>(false)
     val shouldBid : StateFlow<Boolean> get() = _shouldBid.asStateFlow()
 
-    //private val _productOfferingWithProductsAsking = MutableStateFlow<ProductOfferingAndProductAsking?>(null)
-    //val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductAsking?>
-    //    get() = _productOfferingWithProductsAsking.asStateFlow()
-
     // when user clicks view product images, or view asking product images
     // we retrieve the images and put it here
     // so the images display screen can retrieve it here
@@ -66,42 +63,31 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     val deleteProductStatus : StateFlow<Int> get() = _deleteProductStatus.asStateFlow()
 
     init {
+        // this is to prepare the images to be shown in image display screen
         CoroutineScope(Dispatchers.IO).launch {
-            ProductInfo.productChosen.collect() { productOffering ->
-                productOffering?.let {
-                    // preloaded with placeholder images,
-                    // also, for mutable list to set the result at particular index
-                    for (i in 0..productOffering.images.size - 1) {
-                        _imagesDisplay.value.add(
-                            ProductImage(
-                                UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
-                            )
-                        )
-                    }
-
-                    CoroutineScope(Dispatchers.IO).launch {
-                        //CoroutineScope(Dispatchers.IO).launch {
-                        ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
-                            _imagesDisplay.value.set(pairResult.first, pairResult.second)
-                        }
-                    }
-
-                    // prepare bids and asking products associated with the product offering
-                    CoroutineScope(Dispatchers.IO).launch {
-                        BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)
-                            ?.collect() {
-                                ProductInfo.updateProductOfferingWithProductsAsking(it[0])
-                            }
-                    }
-                    CoroutineScope(Dispatchers.IO).launch {
-                        BarterRepository.getProductOfferingWithBids(productOffering.productId)
-                            ?.collect() {
-                                Log.i("product details vm", "getting bids ${it[0].bids.size}")
-                                ProductInfo.updateProductOfferingWithBids(it[0])
-                            }
-                    }
+            LocalDatabaseManager.sellerProductImages.collect() {
+                _imagesDisplay.value = it
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            //LocalDatabaseManager.
+            LocalDatabaseManager.productOfferingWithProductsAsking.collect() {
+                it?.let {
+                    ProductInfo.updateAskingProducts(it.askingProducts)
                 }
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            LocalDatabaseManager.askingProductImages.collect() {
+                if (it.isNotEmpty()) {
+                    ProductInfo.updateAskingImages(it)
+                }
+            }
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            LocalDatabaseManager.productOfferingWithBids.collect() {
+                //ProductInfo
             }
         }
     }
@@ -171,3 +157,44 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         }
     }
 }
+/*
+        CoroutineScope(Dispatchers.IO).launch {
+            ProductInfo.productChosen.collect() { productOffering ->
+                productOffering?.let {
+                    // preloaded with placeholder images,
+                    // also, for mutable list to set the result at particular index
+                    for (i in 0..productOffering.images.size - 1) {
+                        _imagesDisplay.value.add(
+                            ProductImage(
+                                UUID.randomUUID().toString(),
+                                ImageHandler.createPlaceholderImage()
+                            )
+                        )
+                    }
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        //CoroutineScope(Dispatchers.IO).launch {
+                        ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
+                            _imagesDisplay.value.set(pairResult.first, pairResult.second)
+                        }
+                    }
+
+                    // prepare bids and asking products associated with the product offering
+                    CoroutineScope(Dispatchers.IO).launch {
+                        BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)
+                            ?.collect() {
+                                ProductInfo.updateProductOfferingWithProductsAsking(it[0])
+                            }
+                    }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        BarterRepository.getProductOfferingWithBids(productOffering.productId)
+                            ?.collect() {
+                                Log.i("product details vm", "getting bids ${it[0].bids.size}")
+                                ProductInfo.updateProductOfferingWithBids(it[0])
+                            }
+                    }
+                }
+            }
+        }
+
+         */

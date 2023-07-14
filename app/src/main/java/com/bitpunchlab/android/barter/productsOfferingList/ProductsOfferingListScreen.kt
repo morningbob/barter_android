@@ -23,6 +23,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,26 +44,31 @@ import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ProductRow
 import com.bitpunchlab.android.barter.base.TitleRow
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProductsOfferingListScreen(navController: NavHostController,
+                               userMode: UserMode,
                                productsOfferingListViewModel: ProductsOfferingListViewModel = remember {
                                 ProductsOfferingListViewModel()}) {
 
-    val userMode by ProductInfo.userMode.collectAsState()
-    val productsOffering by productsOfferingListViewModel.productsOffering.collectAsState()
+    productsOfferingListViewModel.userMode = userMode
     val shouldDisplayDetails by productsOfferingListViewModel.shouldDisplayDetails.collectAsState()
     val iconId : Int
     val backgroundColor : Color
     val title : String
+    val products : State<List<ProductOffering>>
     if (userMode == UserMode.OWNER_MODE) {
+        products = LocalDatabaseManager.userProductsOffering.collectAsState()
         backgroundColor = BarterColor.lightBlue
         iconId = R.mipmap.products
         title = "Your Products"
     } else {
+        products = LocalDatabaseManager.allProductsOffering.collectAsState()
         backgroundColor = BarterColor.lightYellow
         iconId = R.mipmap.bidding
         title = "Products Available"
@@ -99,7 +105,7 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                         //.fillMaxWidth(0.75f),
                     //contentPadding = PaddingValues(horizontal = 0.dp, vertical = 30.dp),
                 ) {
-                    items(productsOffering) { each ->
+                    items(products.value) { each ->
                         Column(
                             modifier = Modifier
                                 .padding(top = 12.dp, bottom = 12.dp)
@@ -107,7 +113,8 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                             ProductRow(
                                 product = each,
                                 onClick = {
-                                    ProductInfo.updateProductChosen(it)
+                                    LocalDatabaseManager.updateProductChosen(it)
+                                    ProductInfo.updateUserMode(userMode)
                                     productsOfferingListViewModel.updateShouldDisplayProductDetails(
                                         true
                                     )

@@ -7,6 +7,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,24 +52,8 @@ class ProductOfferingBidsListViewModel : ViewModel() {
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            ProductInfo.productChosen.collect() { productChosen ->
-                productChosen?.let {
-                    _product.value = productChosen
-                    // we initialize the placeholders
-                    for (i in 0..productChosen.images.size - 1) {
-                        _imagesDisplay.value.add(
-                            ProductImage(
-                                UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
-                            )
-                        )
-                    }
-
-                    // we start to load the images for the product chosen here
-                    ImageHandler.loadedImagesFlow(productChosen.images).collect()  { pairResult ->
-                        _imagesDisplay.value.set(pairResult.first, pairResult.second)
-                    }
-                }
+            LocalDatabaseManager.bidProductImages.collect() {
+                _imagesDisplay.value = it
             }
         }
     }
@@ -162,3 +147,25 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     }
 
  */
+/*
+           ProductInfo.productChosen.collect() { productChosen ->
+               productChosen?.let {
+                   _product.value = productChosen
+                   // we initialize the placeholders
+                   for (i in 0..productChosen.images.size - 1) {
+                       _imagesDisplay.value.add(
+                           ProductImage(
+                               UUID.randomUUID().toString(),
+                               ImageHandler.createPlaceholderImage()
+                           )
+                       )
+                   }
+
+                   // we start to load the images for the product chosen here
+                   ImageHandler.loadedImagesFlow(productChosen.images).collect()  { pairResult ->
+                       _imagesDisplay.value.set(pairResult.first, pairResult.second)
+                   }
+               }
+           }
+
+            */

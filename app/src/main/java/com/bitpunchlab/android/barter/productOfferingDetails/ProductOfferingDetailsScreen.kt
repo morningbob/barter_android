@@ -59,6 +59,7 @@ import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListS
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ImageType
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -68,7 +69,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
          ProductOfferingDetailsViewModel()
      }) {
     val userMode by ProductInfo.userMode.collectAsState()
-    val product by ProductInfo.productChosen.collectAsState()
+    val product by LocalDatabaseManager.productChosen.collectAsState()
     val shouldDisplayImages by productDetailsViewModel.shouldDisplayImages.collectAsState()
     val shouldDisplayProductAsking by productDetailsViewModel.shouldDisplayAskingProducts.collectAsState()
     val shouldShowBidsListStatus by productDetailsViewModel.shouldShowBidsListStatus.collectAsState()
@@ -81,7 +82,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
         if (shouldPopDetails) {
             productDetailsViewModel.updateShouldPopDetails(false)
             // reset product offering and the associated asking products and bids
-            ProductInfo.resetProduct()
+            LocalDatabaseManager.resetProduct()
             navController.popBackStack()
         }
     }

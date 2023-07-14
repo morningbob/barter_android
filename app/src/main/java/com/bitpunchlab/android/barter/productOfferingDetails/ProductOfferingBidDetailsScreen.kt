@@ -32,15 +32,17 @@ import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 
 @Composable
 fun ProductOfferingBidDetailsScreen(
     productOfferingBidsListViewModel: ProductOfferingBidsListViewModel
         ) {
 
-    val product by ProductInfo.productChosen.collectAsState()
-    val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
-    val imagesDisplay by productOfferingBidsListViewModel.imagesDisplay.collectAsState()
+    //val product by ProductInfo.productChosen.collectAsState()
+    val chosenBid by LocalDatabaseManager.bidChosen.collectAsState()
+    //val imagesDisplay by productOfferingBidsListViewModel.imagesDisplay.collectAsState()
+    val imagesDisplay by LocalDatabaseManager.bidProductImages.collectAsState()
     val shouldDisplayImages by productOfferingBidsListViewModel.shouldDisplayImages.collectAsState()
     val acceptBidStatus by productOfferingBidsListViewModel.acceptBidStatus.collectAsState()
 

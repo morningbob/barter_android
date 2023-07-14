@@ -39,6 +39,7 @@ import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.loadImage
 import java.util.UUID
@@ -50,14 +51,14 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
           remember { ProductOfferingBidsListViewModel() }
     ) {
 
-    val product by ProductInfo.productOfferingWithBids.collectAsState()
-    val bids = BidInfo.bids.collectAsState()
+    val product by LocalDatabaseManager.productOfferingWithBids.collectAsState()
+
+    //val bids = BidInfo.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
-    val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
+    //val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
     val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
 
-    Log.i("bids list", "no bid in product offering: ${product?.bids?.size}")
-    val currentContext = LocalContext.current
+    //Log.i("bids list", "no bid in product offering: ${product?.bids?.size}")
 
     LaunchedEffect(key1 = shouldPopBids) {
         if (shouldPopBids) {
@@ -66,13 +67,6 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
         }
     }
 
-/*
-    LaunchedEffect(key1 = chosenBid) {
-        if (chosenBid != null && chosenBid!!.bidProduct != null) {
-            productOfferingBidsListViewModel.prepareImages(chosenBid!!.bidProduct!!.productImages, currentContext)
-        }
-    }
-*/
     Surface(modifier = Modifier.fillMaxSize()) {
 
         Column(
@@ -105,7 +99,8 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                         BidRow(
                             bid = bid,
                             onClick = {
-                                productOfferingBidsListViewModel.updateBid(it)
+                                //productOfferingBidsListViewModel.updateBid(it)
+                                LocalDatabaseManager.updateBidChosen(it)
                                 productOfferingBidsListViewModel.updateShouldShowBid(true)
                             },
                         )
