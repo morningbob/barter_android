@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.bitpunchlab.android.barter.BidDetails
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
@@ -64,6 +65,12 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
         if (shouldPopBids) {
             productOfferingBidsListViewModel.updateShouldPopBids(false)
             navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(key1 = shouldShowBid) {
+        if (shouldShowBid) {
+            navController.navigate(BidDetails.route)
         }
     }
 
@@ -108,10 +115,10 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                 }
 
             }
-            if (shouldShowBid) {
-                Log.i("bids list", "navigate to bid details")
-                ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
-            }
+            //if (shouldShowBid) {
+                //Log.i("bids list", "navigate to bid details")
+            //    ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
+            //}
         }
     }
 }

@@ -22,6 +22,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
+import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidDetailsScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidsListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
@@ -81,7 +82,6 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
             MainScreen(navController, mainViewModel)
         }
         composable(ProductsOfferingUser.route) {
-            ProductInfo.updateUserMode(UserMode.OWNER_MODE)
             ProductsOfferingListScreen(navController, UserMode.OWNER_MODE)
         }
         composable(ProductOfferingDetails.route) {
@@ -97,7 +97,6 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
             AskingProductScreen(navController, sellViewModel)
         }
         composable(ProductsOfferingBuyer.route) {
-            ProductInfo.updateUserMode(UserMode.BUYER_MODE)
             ProductsOfferingListScreen(navController, UserMode.BUYER_MODE)
         }
         composable(ProductOfferingBidsList.route) {
@@ -105,6 +104,9 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
         composable(Bid.route) {
             BidScreen(navController)
+        }
+        composable(BidDetails.route) {
+            ProductOfferingBidDetailsScreen(navController)
         }
         composable(AcceptBidsList.route) {
             AcceptBidsListScreen(navController)

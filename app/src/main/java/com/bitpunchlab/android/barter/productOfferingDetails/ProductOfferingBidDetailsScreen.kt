@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,25 +36,32 @@ import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 
 @Composable
-fun ProductOfferingBidDetailsScreen(
-    productOfferingBidsListViewModel: ProductOfferingBidsListViewModel
-        ) {
-
-    //val product by ProductInfo.productChosen.collectAsState()
+fun ProductOfferingBidDetailsScreen(navController: NavHostController,
+    productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel =
+        remember {
+            ProductOfferingBidDetailsViewModel()
+        }) {
     val chosenBid by LocalDatabaseManager.bidChosen.collectAsState()
-    //val imagesDisplay by productOfferingBidsListViewModel.imagesDisplay.collectAsState()
     val imagesDisplay by LocalDatabaseManager.bidProductImages.collectAsState()
-    val shouldDisplayImages by productOfferingBidsListViewModel.shouldDisplayImages.collectAsState()
-    val acceptBidStatus by productOfferingBidsListViewModel.acceptBidStatus.collectAsState()
+    //Log.i("bid detail screen", "updated images")
+    //productOfferingBidsListViewModel.updateImagesDisplay(imagesDisplay)
+    val shouldDisplayImages by productOfferingBidDetailsViewModel.shouldDisplayImages.collectAsState()
+    val acceptBidStatus by productOfferingBidDetailsViewModel.acceptBidStatus.collectAsState()
+    val shouldShowBid by productOfferingBidDetailsViewModel.shouldShowBid.collectAsState()
+
+    LaunchedEffect(key1 = shouldShowBid) {
+        if (shouldShowBid) {
+            navController.popBackStack()
+        }
+    }
 
     //Log.i("bid details", "chosen bid $chosenBid")
     //Log.i("bid details", "should show bid ${shouldShowBid}")
 
-    Dialog(
-        onDismissRequest = {  },
-        //properties = DialogProperties(decorFitsSystemWindows = true),
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
+    //Dialog(
+    //    onDismissRequest = {  },
+    //    properties = DialogProperties(usePlatformDefaultWidth = false)
+    //) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -73,7 +81,11 @@ fun ProductOfferingBidDetailsScreen(
                         contentDescription = "Cancel button",
                         modifier = Modifier
                             .width(40.dp)
-                            .clickable { productOfferingBidsListViewModel.updateShouldShowBid(false) }
+                            .clickable {
+                                productOfferingBidDetailsViewModel.updateShouldShowBid(
+                                    false
+                                )
+                            }
                     )
                 }
                 // product offered images
@@ -87,33 +99,33 @@ fun ProductOfferingBidDetailsScreen(
                         productName = chosenBid!!.bidProduct.name,
                         productCategory = chosenBid!!.bidProduct.category,
                         images = imagesDisplay,
-                        viewModel = productOfferingBidsListViewModel
+                        viewModel = productOfferingBidDetailsViewModel
                     )
                     // confirm before execute
                     CustomButton(
                         label = "Accept Bid",
-                        onClick = { productOfferingBidsListViewModel.acceptBid() },
+                        onClick = { productOfferingBidDetailsViewModel.acceptBid() },
                         modifier = Modifier
                             .padding(top = 20.dp)
                     )
                     CustomButton(
                         label = "Back",
                         onClick = {
-                            Log.i("bid details", "should show bid is set to false")
-                            productOfferingBidsListViewModel.updateShouldShowBid(false)
+                            //Log.i("bid details", "should show bid is set to false")
+                            productOfferingBidDetailsViewModel.updateShouldShowBid(false)
                         }
                     )
                 }
                 if (shouldDisplayImages) {
-                    ImagesDisplayScreen(viewModel = productOfferingBidsListViewModel)
+                    ImagesDisplayScreen(viewModel = productOfferingBidDetailsViewModel)
                 }
                 if (acceptBidStatus != 0) {
                     ShowAcceptBidStatus(status = acceptBidStatus,
-                        productOfferingBidsListViewModel = productOfferingBidsListViewModel)
+                        productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel)
                 }
             }
         }
-    }
+    //}
 }
 
 // 1 -> to confirm
@@ -122,55 +134,55 @@ fun ProductOfferingBidDetailsScreen(
 // 4 -> server error
 // 5 -> app error
 @Composable
-fun ShowAcceptBidStatus(status: Int, productOfferingBidsListViewModel: ProductOfferingBidsListViewModel) {
+fun ShowAcceptBidStatus(status: Int, productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
     when (status) {
-        1 -> { ConfirmAcceptBid(productOfferingBidsListViewModel = productOfferingBidsListViewModel) }
-        3 -> { AcceptBidSuccess(productOfferingBidsListViewModel = productOfferingBidsListViewModel) }
-        4 -> { AcceptBidServerError(productOfferingBidsListViewModel = productOfferingBidsListViewModel) }
-        5 -> { AcceptBidAppError(productOfferingBidsListViewModel = productOfferingBidsListViewModel) }
+        1 -> { ConfirmAcceptBid(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
+        3 -> { AcceptBidSuccess(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
+        4 -> { AcceptBidServerError(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
+        5 -> { AcceptBidAppError(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
     }
 }
 
 @Composable
-fun ConfirmAcceptBid(productOfferingBidsListViewModel: ProductOfferingBidsListViewModel) {
+fun ConfirmAcceptBid(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
     CustomDialog(
         title = "Accept Bid Confirmation",
         message = "By accepting the bid, the bidding process will be ended before time elapsed.",
         positiveText = "Confirm",
-        onDismiss = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidsListViewModel.updateAcceptBidStatus(2) }
+        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
+        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(2) }
     )
 }
 
 @Composable
-fun AcceptBidSuccess(productOfferingBidsListViewModel: ProductOfferingBidsListViewModel) {
+fun AcceptBidSuccess(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
     CustomDialog(
         title = "Accepted Bid",
         message = "The acceptance of the bid was sent to the server successfully.",
         positiveText = "OK",
-        onDismiss = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) }
+        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
+        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) }
     )
 }
 
 @Composable
-fun AcceptBidServerError(productOfferingBidsListViewModel: ProductOfferingBidsListViewModel) {
+fun AcceptBidServerError(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
     CustomDialog(
         title = "Accept Bid Error",
         message = "The acceptance couldn't be sent to the server.  There may be error in the server.  Please also make sure you have wifi.",
         positiveText = "OK",
-        onDismiss = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) }
+        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
+        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) }
     )
 }
 
 @Composable
-fun AcceptBidAppError(productOfferingBidsListViewModel: ProductOfferingBidsListViewModel) {
+fun AcceptBidAppError(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
     CustomDialog(
         title = "Accept Bid Error",
         message = "The acceptance couldn't be sent to the server.  There may be error in the server.  Please also make sure you have wifi.",
         positiveText = "OK",
-        onDismiss = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidsListViewModel.updateAcceptBidStatus(0) }
+        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
+        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) }
     )
 }

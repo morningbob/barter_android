@@ -25,11 +25,8 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     private val _product = MutableStateFlow<ProductOffering?>(null)
     val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
-
-    //private val _bidProductImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    //val bidProductImages : StateFlow<MutableList<ProductImage>> get() = _bidProductImages.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldShowBid = MutableStateFlow<Boolean>(false)
     val shouldShowBid : StateFlow<Boolean> get() = _shouldShowBid.asStateFlow()
@@ -53,9 +50,16 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     init {
         CoroutineScope(Dispatchers.IO).launch {
             LocalDatabaseManager.bidProductImages.collect() {
-                _imagesDisplay.value = it
+                if (it.isNotEmpty()) {
+                    Log.i("bid list vm", "images transferred for display")
+                    _imagesDisplay.value = it
+                }
             }
         }
+    }
+
+    fun updateImagesDisplay(images: List<ProductImage>) {
+        _imagesDisplay.value = images
     }
 
     fun updateBid(bid: Bid) {

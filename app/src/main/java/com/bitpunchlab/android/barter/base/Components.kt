@@ -509,14 +509,14 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
         }
 
         Text(
-            text = productName ?: "Not Available",
+            text = productName,
             fontSize = 20.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
                 .padding(top = 30.dp)
         )
         Text(
-            text = productCategory ?: "Not Available",
+            text = productCategory,
             fontSize = 20.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
@@ -524,7 +524,9 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
         )
         CustomButton(
             label = "Show All Images",
-            onClick = { viewModelUpdateShouldDisplayImages.call(viewModel, true) },
+            onClick = {
+                viewModelUpdateShouldDisplayImages.call(viewModel, true)
+            },
             modifier = Modifier
                 .padding(top = 25.dp)
         )

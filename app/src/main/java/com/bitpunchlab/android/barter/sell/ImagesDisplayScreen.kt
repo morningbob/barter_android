@@ -102,9 +102,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
             )
             Card(
                 modifier = Modifier
-                    //.fillMaxWidth()
                     .background(Color.Transparent),
-                //.padding(30.dp),
                 shape = RoundedCornerShape(20.dp),
                 elevation = 10.dp
             ) {
