@@ -31,6 +31,7 @@ import com.bitpunchlab.android.barter.base.BasicBidScreen
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
@@ -117,7 +118,11 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     )
                 }
                 if (shouldDisplayImages) {
-                    ImagesDisplayScreen(viewModel = productOfferingBidDetailsViewModel)
+                    //ImagesDisplayScreen(viewModel = productOfferingBidDetailsViewModel)
+                    ImagesDisplayDialog(
+                        images = productOfferingBidDetailsViewModel.imagesDisplay,
+                        onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) }
+                    )
                 }
                 if (acceptBidStatus != 0) {
                     ShowAcceptBidStatus(status = acceptBidStatus,

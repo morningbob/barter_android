@@ -18,8 +18,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -38,32 +42,41 @@ import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.CustomDropDown
 import com.bitpunchlab.android.barter.base.CustomTextField
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductBidding
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun BidFormScreen(navController: NavHostController,
-                  bidFormViewModel: BidFormViewModel,
-                  bidViewModel: BidViewModel
+fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() },
+    biddingStatus: Int, loadingAlpha: Float, resetStatus: () -> Unit,
+    processBidding: (product: ProductOffering, bid: Bid, images: List<ProductImage>) -> Unit,
+    updateBidError: (Int) -> Unit
 ) {
 
-    val product by ProductInfo.productChosen.collectAsState()
+    val product by LocalDatabaseManager.productChosen.collectAsState()
     val bidProductName by bidFormViewModel.bidProductName.collectAsState()
     val bidProductCategory by bidFormViewModel.bidProductCategory.collectAsState()
     val shouldExpandCategoryDropdown by bidFormViewModel.shouldExpandCategoryDropdown.collectAsState()
     val currentContext = LocalContext.current
     val shouldDisplayImages by bidFormViewModel.shouldDisplayImages.collectAsState()
-    val biddingStatus by bidViewModel.biddingStatus.collectAsState()
+    //val biddingStatus by bidViewModel.biddingStatus.collectAsState()
     val imagesDisplay by bidFormViewModel.imagesDisplay.collectAsState()
-    val loadingAlpha by bidViewModel.loadingAlpha.collectAsState()
+
+    var shouldDismiss by remember { mutableStateOf(false) }
+
+    //val loadingAlpha by bidViewModel.loadingAlpha.collectAsState()
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -157,7 +170,8 @@ fun BidFormScreen(navController: NavHostController,
                         val bid = bidFormViewModel.createBid()
                         if (product != null && bid != null) {
                             CoroutineScope(Dispatchers.IO).launch {
-                                bidViewModel.processBidding(product!!, bid, imagesDisplay)
+                                //bidViewModel.processBidding(product!!, bid, imagesDisplay)
+                                processBidding(product!!, bid, imagesDisplay)
                                 // I clear form here instead of after if clause
                                 // because I want to clear it after the processing has been done.
                                 bidFormViewModel.clearForm()
@@ -165,8 +179,9 @@ fun BidFormScreen(navController: NavHostController,
                         } else if (bid == null) {
                             Log.i("bid screen", "null product or bid")
                             // alert user that the info is invalid
-                            //bidFormViewModel.clearForm()
-                            bidViewModel.updateBiddingStatus(3)
+                            bidFormViewModel.clearForm()
+                            //bidViewModel.updateBiddingStatus(3)
+                            updateBidError(3)
                         }
                     },
                     modifier = Modifier
@@ -175,19 +190,26 @@ fun BidFormScreen(navController: NavHostController,
 
                 CustomButton(
                     label = "Cancel",
-                    onClick = { bidViewModel.updateShouldStartBid(false) },
+                    onClick = { shouldDismiss = true },
+                        //bidViewModel.updateShouldStartBid(false)
+                          //onDismiss.invoke()
                     modifier = Modifier
                         .padding(top = 20.dp)
                 )
                 if (shouldDisplayImages) {
-                    ImagesDisplayScreen(bidFormViewModel)
+                    //ImagesDisplayScreen(bidFormViewModel)
+                    ImagesDisplayDialog(
+                        images = bidFormViewModel.imagesDisplay,
+                        onDismiss = { bidFormViewModel.updateShouldDisplayImages(false) }
+                    )
                 }
 
                 if (biddingStatus != 0) {
-                    ShowBiddingStatus(status = biddingStatus, bidViewModel = bidViewModel)
+                    ShowBiddingStatus(
+                        status = biddingStatus,
+                        resetStatus = resetStatus
+                    )
                 }
-
-
             }
             Box(
                 contentAlignment = Alignment.Center,
@@ -203,40 +225,40 @@ fun BidFormScreen(navController: NavHostController,
 }
 
 @Composable
-fun ShowBiddingStatus(status: Int, bidViewModel: BidViewModel) {
+fun ShowBiddingStatus(status: Int, resetStatus: () -> Unit) {
     when (status) {
-        1 -> { BiddingFailureAlert(bidViewModel) }
-        2 -> { BiddingSuccessAlert(bidViewModel) }
-        3 -> { InvalidInfoAlert(bidViewModel) }
+        1 -> { BiddingFailureAlert(resetStatus) }
+        2 -> { BiddingSuccessAlert(resetStatus) }
+        3 -> { InvalidInfoAlert(resetStatus) }
     }
 }
 
 @Composable
-fun InvalidInfoAlert(bidViewModel: BidViewModel) {
+fun InvalidInfoAlert(resetStatus: () -> Unit) {
     CustomDialog(
         title = "Invalid Information",
         message = "Please make sure all the fields are filled.",
         positiveText = "OK",
-        onDismiss = { bidViewModel.updateBiddingStatus(0) },
-        onPositive = { bidViewModel.updateBiddingStatus(0) })
+        onDismiss = { resetStatus.invoke() },
+        onPositive = { resetStatus.invoke() })
 }
 
 @Composable
-fun BiddingSuccessAlert(bidViewModel: BidViewModel) {
+fun BiddingSuccessAlert(resetStatus: () -> Unit) {
     CustomDialog(
         title = "Bidding Success",
         message = "The bid was sent to the server successfully.",
         positiveText = "OK",
-        onDismiss = { bidViewModel.updateBiddingStatus(0) },
-        onPositive = { bidViewModel.updateBiddingStatus(0) })
+        onDismiss = { resetStatus.invoke() },
+        onPositive = { resetStatus.invoke() })
 }
 
 @Composable
-fun BiddingFailureAlert(bidViewModel: BidViewModel) {
+fun BiddingFailureAlert(resetStatus: () -> Unit) {
     CustomDialog(
         title = "Bidding Failure",
         message = "The bid couldn't be send to the server.  Please make sure you have wifi and try again later.",
         positiveText = "OK",
-        onDismiss = { bidViewModel.updateBiddingStatus(0) },
-        onPositive = { bidViewModel.updateBiddingStatus(0) })
+        onDismiss = { resetStatus.invoke() },
+        onPositive = { resetStatus.invoke() })
 }

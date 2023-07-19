@@ -33,11 +33,15 @@ import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.DialogButton
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ImageType
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.util.ProductImage
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -46,29 +50,20 @@ fun BidScreen(navController: NavHostController,
     bidViewModel: BidViewModel = remember { BidViewModel() }
 ) {
 
-    val product by ProductInfo.productChosen.collectAsState()
+    val product by LocalDatabaseManager.productChosen.collectAsState()
     val images by bidViewModel.imagesDisplay.collectAsState()
     val shouldDisplayImage by bidViewModel.shouldDisplayImages.collectAsState()
     val shouldPopBid by bidViewModel.shouldPopBid.collectAsState()
     val shouldStartBiding by bidViewModel.shouldStartBid.collectAsState()
-    //val bid by bidViewModel.bid.collectAsState()
-    //val shouldCancel by bidViewModel.shouldCancel.collectAsState()
-
-    val currentContext = LocalContext.current
-
-    LaunchedEffect(key1 = product) {
-        if (product != null) {
-            //bidViewModel.prepareImages(ImageType.PRODUCT_IMAGE, product!!.images, currentContext)
-        }
-    }
+    val biddingStatus by bidViewModel.biddingStatus.collectAsState()
+    val loadingAlpha by bidViewModel.loadingAlpha.collectAsState()
 
     LaunchedEffect(key1 = shouldPopBid) {
-        Log.i("bid screen, ", "detect should pop bid ${shouldPopBid}")
+        //Log.i("bid screen, ", "detect should pop bid ${shouldPopBid}")
         if (shouldPopBid) {
             navController.popBackStack()
         }
     }
-
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -84,7 +79,12 @@ fun BidScreen(navController: NavHostController,
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                BasicBidScreen(productName = product!!.name, productCategory = product!!.category, images = images, viewModel = bidViewModel)
+                BasicBidScreen(
+                    productName = product!!.name,
+                    productCategory = product!!.category,
+                    images = images,
+                    viewModel = bidViewModel
+                )
 
                 ChoiceButton(
                     title = "Bid",
@@ -106,60 +106,25 @@ fun BidScreen(navController: NavHostController,
                 // we don't navigate to the screen, instead we display it on the top on current screen
                 //
                 if (shouldDisplayImage) {
-                    ImagesDisplayScreen(bidViewModel)
+                    //ImagesDisplayScreen(bidViewModel)
+                    ImagesDisplayDialog(
+                        images = bidViewModel.imagesDisplay,
+                        onDismiss = { bidViewModel.updateShouldDisplayImages(false) }
+                    )
                 }
                 if (shouldStartBiding) {
-                    var bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() }
-                    BidFormScreen(navController, bidFormViewModel ,bidViewModel)
+                    //var bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() }
+                    BidFormScreen(
+                        biddingStatus = biddingStatus,
+                        loadingAlpha = loadingAlpha,
+                        resetStatus = { bidViewModel.updateBiddingStatus(0) },
+                        processBidding = { product, bid, images ->
+                            bidViewModel.processBidding(product, bid, images)
+                         },
+                        updateBidError = { bidViewModel.updateBiddingStatus(it) },
+                     )
                 }
             }
         }
     }
 }
-/*
-               Image(
-                   painter = painterResource(id = R.mipmap.hammer),
-                   contentDescription = "Bid's icon",
-                   modifier = Modifier
-                       .padding(top = 40.dp)
-                       .width(120.dp)
-               )
-               if (images.isNotEmpty()) {
-                   Image(
-                       bitmap = images[0].image.asImageBitmap(),
-                       contentDescription = "product's image",
-                       modifier = Modifier
-                           .padding(top = 30.dp)
-                           .width(200.dp)
-                   )
-               } else {
-                   Image(
-                       painter = painterResource(id = R.mipmap.imageplaceholder),
-                       contentDescription = "image placeholder",
-                       modifier = Modifier
-                           .padding(top = 30.dp)
-                           .width(200.dp)
-                   )
-               }
-               Text(
-                   text = product?.name ?: "Not Available",
-                   fontSize = 20.sp,
-                   color = BarterColor.textGreen,
-                   modifier = Modifier
-                       .padding(top = 30.dp)
-               )
-               Text(
-                   text = product?.category ?: "Not Available",
-                   fontSize = 20.sp,
-                   color = BarterColor.textGreen,
-                   modifier = Modifier
-                       .padding(top = 30.dp)
-               )
-               CustomButton(
-                   label = "Show All Images",
-                   onClick = { bidViewModel.updateShouldDisplayImages(true) },
-                   modifier = Modifier
-                       .padding(top = 25.dp)
-               )
-
-                */

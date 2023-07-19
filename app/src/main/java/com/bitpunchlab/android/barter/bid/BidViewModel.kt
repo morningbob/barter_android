@@ -109,6 +109,8 @@ class BidViewModel : ViewModel() {
             image.image
         }
 
+        Log.i("bid vm", "processing bid")
+
         //return CoroutineScope(Dispatchers.IO).launch {
          CoroutineScope(Dispatchers.IO).launch {
             //if (ProductBiddingInfo.product.value != null) {

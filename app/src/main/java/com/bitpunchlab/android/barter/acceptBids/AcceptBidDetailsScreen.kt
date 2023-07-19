@@ -32,6 +32,7 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicRecordScreen
 import com.bitpunchlab.android.barter.base.CustomButton
+import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -96,7 +97,11 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
             )
         }
         if (shouldDisplayImages) {
-            ImagesDisplayScreen(viewModel = acceptBidDetailsViewModel)
+            //ImagesDisplayScreen(viewModel = acceptBidDetailsViewModel)
+            ImagesDisplayDialog(
+                images = acceptBidDetailsViewModel.imagesDisplay,
+                onDismiss = { acceptBidDetailsViewModel.updateShouldDisplayImages(false) }
+            )
         }
     }
 }

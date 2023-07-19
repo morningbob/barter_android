@@ -12,6 +12,7 @@ import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +76,7 @@ class BidFormViewModel : ViewModel() {
         if (bidProductName.value != "" && bidProductCategory.value != Category.NOT_SET) {
             val bidProduct = ProductAsking(
                 productId = UUID.randomUUID().toString(),
-                productOfferingId = ProductInfo.productChosen.value?.productId!!,
+                productOfferingId = LocalDatabaseManager.productChosen.value?.productId!!,
                 name = bidProductName.value,
                 category = bidProductCategory.value.label,
                 images = listOf() // add the images later, need to upload then get url
@@ -86,8 +87,7 @@ class BidFormViewModel : ViewModel() {
                 bidUserId = FirebaseClient.userId.value,
                 bidProduct = bidProduct,
                 bidTime = getCurrentDateTime(),
-                bidProductId = ProductInfo.productChosen.value!!.productId,
-
+                bidProductId = LocalDatabaseManager.productChosen.value!!.productId,
             )
         }
         return null

@@ -137,7 +137,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 //ImagesDisplayScreen(sellViewModel)
                 ImagesDisplayDialog(
                     images = sellViewModel.imagesDisplay,
-                    shouldDismiss = false)
+                    onDismiss = { sellViewModel.updateShouldDisplayImages(false) })
             }
             if (processSellingStatus != 0) {
                 com.bitpunchlab.android.barter.sell.ProcessSellingStatus(

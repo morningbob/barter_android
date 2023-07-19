@@ -54,15 +54,15 @@ fun AskingProductScreen(navController: NavHostController,
         }
     }
 
-    LaunchedEffect(key1 = shouldDisplayImages) {
-        if (shouldDisplayImages) {
-            Log.i("asking product screen", "should display images detected true")
+    //LaunchedEffect(key1 = shouldDisplayImages) {
+        //if (shouldDisplayImages) {
+        //    Log.i("asking product screen", "should display images detected true")
             //displayImages = false
             //navController.navigate(ImagesDisplay.route)
-        } else {
-            Log.i("asking product screen", "should display images detected false")
-        }
-    }
+        //} else {
+        //    Log.i("asking product screen", "should display images detected false")
+        //}
+    //}
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -147,7 +147,11 @@ fun AskingProductScreen(navController: NavHostController,
                 ShowStatus(status = status, askingProductViewModel = askingProductViewModel)
             }
             if (shouldDisplayImages) {
-                ImagesDisplayScreen(viewModel = askingProductViewModel)
+                //ImagesDisplayScreen(viewModel = askingProductViewModel)
+                ImagesDisplayDialog(
+                    images = askingProductViewModel.imagesDisplay,
+                    onDismiss = { askingProductViewModel.updateShouldDisplayImages(false) }
+                )
             }
         }
     }

@@ -185,7 +185,6 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                     ) {
 
                         items(images.value ?: listOf(), { image -> image.id }) { item ->
-                            //item {
                             // remember updated state will renew whenever there is
                             // recomposition, so , if an item is deleted, another
                             // item's position changed, the remember will remember the

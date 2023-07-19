@@ -56,6 +56,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
+import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ImageType
@@ -250,7 +251,11 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                 }
 
                 if (shouldDisplayImages) {
-                    ImagesDisplayScreen(productDetailsViewModel)
+                    //ImagesDisplayScreen(productDetailsViewModel)
+                    ImagesDisplayDialog(
+                        images = productDetailsViewModel.imagesDisplay,
+                        onDismiss = { productDetailsViewModel.updateShouldDisplayImages(false) }
+                    )
                 }
                 Box(
                     contentAlignment = Alignment.Center,
