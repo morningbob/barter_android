@@ -41,9 +41,11 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
     acceptBidDetailsViewModel: AcceptBidDetailsViewModel = remember {
         AcceptBidDetailsViewModel() }) {
 
-    val bidWithDetails by AcceptBidInfo.acceptBid.collectAsState()
+    //val bidWithDetails by AcceptBidInfo.acceptBid.collectAsState()
     val shouldPopSelf by acceptBidDetailsViewModel.shouldPopSelf.collectAsState()
     val shouldDisplayImages by acceptBidDetailsViewModel.shouldDisplayImages.collectAsState()
+    val productOfferingImages by acceptBidDetailsViewModel.productOfferingImages.collectAsState()
+    val productInExchangeImages by acceptBidDetailsViewModel.productInExchangeImages.collectAsState()
 
     LaunchedEffect(key1 = shouldPopSelf) {
         if (shouldPopSelf) {
@@ -80,10 +82,12 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
             }
 
             BasicRecordScreen(
-                bidWithDetails = bidWithDetails!!,
-                viewModel = acceptBidDetailsViewModel,
                 modifier = Modifier
-                    .padding(top = 40.dp)
+                    .padding(top = 40.dp),
+                productOfferingImages = productOfferingImages,
+                productInExchangeImages = productInExchangeImages,
+                prepareImages = { acceptBidDetailsViewModel.prepareImagesDisplay(it) },
+                updateShouldDisplayImages = { acceptBidDetailsViewModel.updateShouldDisplayImages(it) }
             )
 
             CustomButton(

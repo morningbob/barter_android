@@ -182,8 +182,12 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
             productName = productName,
             productCategory = productCategory,
             shouldExpandCat = shouldExpandCat,
-            viewModel = sellViewModel,
-            pickImageLauncher
+            pickImageLauncher = pickImageLauncher,
+            updateName = { name: String -> sellViewModel.updateName(name) },
+            updateExpandCat = { expand: Boolean -> sellViewModel.updateShouldExpandCategory(expand) },
+            updateCat = { cat: Category -> sellViewModel.updateCategory(cat) },
+            prepareImages = { sellViewModel.prepareImagesDisplay() },
+            updateShouldDisplayImages = { display: Boolean -> sellViewModel.updateShouldDisplayImages(display) }
         )
 
             Row(
@@ -248,6 +252,143 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
     }
 }
 
+@Composable
+fun BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
+                     pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
+                     updateName: (String) -> Unit,
+                     updateExpandCat: (Boolean) -> Unit,
+                     updateCat: (Category) -> Unit,
+                     prepareImages: () -> Unit,
+                     updateShouldDisplayImages: (Boolean) -> Unit
+
+) {
+    Column() {
+        CustomTextField(
+            label = "Product name",
+            textValue = productName,
+            onChange = {
+                //viewModelUpdateName.call(viewModel, it)
+               updateName(it)
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
+            horizontalArrangement = Arrangement.Start
+
+        ) {
+            CustomTextField(
+                label = "Category",
+                textValue = productCategory.label,
+                onChange = {},
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+            )
+
+            CustomDropDown(
+                title = "Category",
+                shouldExpand = shouldExpandCat,
+                onClickButton = {
+                    updateExpandCat(!shouldExpandCat)
+
+                    //viewModelUpdateShouldExpandCategory.call(viewModel, !shouldExpandCat)
+                    //sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
+                },
+                onClickItem =  {
+                    updateCat(it)
+                    updateExpandCat(false)
+                    //viewModelUpdateCategory.call(viewModel, it)
+                    //viewModelUpdateShouldExpandCategory.call(viewModel, false)
+                },
+                onDismiss = {  },
+                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp)
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp),
+
+            ) {
+            CustomButton(
+                label = "Images",
+                onClick = {
+                    prepareImages()
+                    updateShouldDisplayImages(true)
+                    //Log.i("base product form", "set should display image true")
+                    //viewModelPrepareImagesDisplay.call(viewModel)
+                    //viewModelUpdateShouldDisplayImages.call(viewModel, true)
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.5f),
+
+                )
+            ChoiceButton(
+                title = "Upload",
+                onClick = { pickImageLauncher.launch("image/*") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, bottom = 20.dp)
+            )
+        }
+    }
+}
+
+
+
+@Composable
+fun ProcessSellingStatus(status: Int, sellViewModel: SellViewModel) {
+    when (status) {
+        2 -> {
+            ProcessSellingSuccessDialog(sellViewModel)
+        }
+        1 -> {
+            ProcessSellingFailureDialog(sellViewModel)
+        }
+        3 -> {
+            ProcessSellingInvalidFieldDialog(sellViewModel)
+        }
+    }
+}
+
+@Composable
+fun ProcessSellingSuccessDialog(sellViewModel: SellViewModel) {
+    CustomDialog(
+        title = "Selling Confirmation",
+        message = "The product was successfully sent to the server.  It will be available to all the users who read the products offering list.",
+        positiveText = "OK",
+        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
+        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+}
+
+@Composable
+fun ProcessSellingFailureDialog(sellViewModel: SellViewModel) {
+    CustomDialog(
+        title = "Selling Failed",
+        message = "There is error sending the product's information to the server.  Please make sure you have wifi and try again later.",
+        positiveText = "OK",
+        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
+        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+}
+
+@Composable
+fun ProcessSellingInvalidFieldDialog(sellViewModel: SellViewModel) {
+    CustomDialog(
+        title = "Invalid Fields",
+        message = "Please make sure to fill in product name, category and duration information.",
+        positiveText = "OK",
+        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
+        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+}
+/*
 @Composable
 fun <T: Any> BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
     viewModel: T, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
@@ -333,51 +474,8 @@ fun <T: Any> BaseProductForm(productName: String, productCategory: Category, sho
     }
 }
 
-@Composable
-fun ProcessSellingStatus(status: Int, sellViewModel: SellViewModel) {
-    when (status) {
-        2 -> {
-            ProcessSellingSuccessDialog(sellViewModel)
-        }
-        1 -> {
-            ProcessSellingFailureDialog(sellViewModel)
-        }
-        3 -> {
-            ProcessSellingInvalidFieldDialog(sellViewModel)
-        }
-    }
-}
-
-@Composable
-fun ProcessSellingSuccessDialog(sellViewModel: SellViewModel) {
-    CustomDialog(
-        title = "Selling Confirmation",
-        message = "The product was successfully sent to the server.  It will be available to all the users who read the products offering list.",
-        positiveText = "OK",
-        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
-        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
-}
-
-@Composable
-fun ProcessSellingFailureDialog(sellViewModel: SellViewModel) {
-    CustomDialog(
-        title = "Selling Failed",
-        message = "There is error sending the product's information to the server.  Please make sure you have wifi and try again later.",
-        positiveText = "OK",
-        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
-        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
-}
-
-@Composable
-fun ProcessSellingInvalidFieldDialog(sellViewModel: SellViewModel) {
-    CustomDialog(
-        title = "Invalid Fields",
-        message = "Please make sure to fill in product name, category and duration information.",
-        positiveText = "OK",
-        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
-        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
-}
-
+ */
+ */
 
 
 

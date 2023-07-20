@@ -83,7 +83,7 @@ fun BidScreen(navController: NavHostController,
                     productName = product!!.name,
                     productCategory = product!!.category,
                     images = images,
-                    viewModel = bidViewModel
+                    updateShouldDisplayImages = { should -> bidViewModel.updateShouldDisplayImages(should) }
                 )
 
                 ChoiceButton(

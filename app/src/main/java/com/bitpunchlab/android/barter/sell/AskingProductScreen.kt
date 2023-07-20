@@ -26,6 +26,7 @@ import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 
@@ -110,9 +111,14 @@ fun AskingProductScreen(navController: NavHostController,
                     productName = productName,
                     productCategory = productCategory,
                     shouldExpandCat = shouldExpandCategory,
-                    viewModel = askingProductViewModel,
-                    pickImageLauncher
+                    pickImageLauncher = pickImageLauncher,
+                    updateName = { name: String -> sellViewModel.updateName(name) },
+                    updateExpandCat = { expand: Boolean -> sellViewModel.updateShouldExpandCategory(expand) },
+                    updateCat = { cat: Category -> sellViewModel.updateCategory(cat) },
+                    prepareImages = { sellViewModel.prepareImagesDisplay() },
+                    updateShouldDisplayImages = { display: Boolean -> sellViewModel.updateShouldDisplayImages(display) }
                 )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

@@ -471,10 +471,11 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 }
 
 @Composable
-fun <T : Any> BasicBidScreen(productName: String, productCategory: String, images: List<ProductImage>, viewModel: T) {
+fun BasicBidScreen(productName: String, productCategory: String, images: List<ProductImage>,
+    updateShouldDisplayImages: (Boolean) -> Unit) {
 
-    val viewModelMembers = viewModel::class.members
-    val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
+    //val viewModelMembers = viewModel::class.members
+    //val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
 
     Column(
         modifier = Modifier
@@ -525,7 +526,8 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
         CustomButton(
             label = "Show All Images",
             onClick = {
-                viewModelUpdateShouldDisplayImages.call(viewModel, true)
+                //viewModelUpdateShouldDisplayImages.call(viewModel, true)
+                updateShouldDisplayImages(true)
             },
             modifier = Modifier
                 .padding(top = 25.dp)
@@ -534,7 +536,169 @@ fun <T : Any> BasicBidScreen(productName: String, productCategory: String, image
 }
 
 @Composable
-fun <T> BasicRecordScreen(bidWithDetails: BidWithDetails, viewModel: T, modifier: Modifier = Modifier) {
+fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List<ProductImage>,
+    productInExchangeImages: List<ProductImage>, prepareImages: (List<ProductImage>) -> Unit,
+    updateShouldDisplayImages: (Boolean) -> Unit) {
+    Column(
+        modifier = Modifier
+            .then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Image(
+            painter = painterResource(id = R.mipmap.recorddetails),
+            contentDescription = "record details icon",
+            modifier = Modifier
+                .width(120.dp)
+        )
+        Text(
+            text = "Product offered:",
+            color = Color.Black,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(top = 15.dp)
+        )
+        if (productOfferingImages.isNotEmpty()) {
+            Image(
+                bitmap = productOfferingImages[0].image.asImageBitmap(),
+                contentDescription = "first product image",
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(top = 20.dp)
+            )
+            CustomButton(
+                label = "View Images",
+                onClick = {
+                    prepareImages(productOfferingImages)
+                    updateShouldDisplayImages(true)
+                    //prepareImagesDisplay.invoke(viewModel, productOfferingImages)
+                    //updateShouldDisplayImages.invoke(viewModel, true)
+                },
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            )
+        } else {
+            Text(
+                text = "Image not available",
+                color = BarterColor.textGreen,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 15.dp)
+            )
+        }
+        Text(
+            text = "Product in exchange:",
+            color = Color.Black,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(top = 15.dp)
+        )
+        if (productInExchangeImages.isNotEmpty()) {
+            Image(
+                bitmap = productInExchangeImages[0].image.asImageBitmap(),
+                contentDescription = "first product image",
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(top = 20.dp)
+            )
+            CustomButton(
+                label = "View Images",
+                onClick = {
+                    prepareImages(productInExchangeImages)
+                    updateShouldDisplayImages(true)
+                    //prepareImagesDisplay.invoke(viewModel, productInExchangeImages)
+                    //updateShouldDisplayImages.invoke(viewModel, true)
+                },
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            )
+        } else {
+            Text(
+                text = "Image not available",
+                color = BarterColor.textGreen,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(top = 15.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
+    Row(
+        modifier = Modifier
+            //.fillMaxWidth()
+            .height(80.dp)
+            .padding()
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Image(
+            painter = painterResource(id = iconId),
+            contentDescription = title,
+            modifier = Modifier
+                .width(80.dp)
+                .padding(end = 20.dp)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+
+        ) {
+            Text(
+                text = title,
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Bold,
+                color = BarterColor.textGreen,
+                modifier = Modifier,
+                //.padding(start = 30.dp, end = 30.dp),
+                textAlign = TextAlign.Start
+            )
+        }
+    }
+}
+
+@Composable
+fun LoadedImageOrPlaceholder(imageUrls: List<String>, contentDes: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .then(modifier)
+            //.fillMaxWidth(),
+        //horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        if (imageUrls.isNotEmpty()) {
+            val bitmap = LoadImage(url = imageUrls[0])
+            if (bitmap.value != null) {
+                Image(
+                    bitmap = bitmap.value!!.asImageBitmap(),
+                    contentDescription = contentDes,
+                    modifier = Modifier
+                        //.then(modifier)
+                )
+            } else {
+                PlaceholderImage()
+            }
+        } else {
+            PlaceholderImage()
+        }
+    }
+}
+
+@Composable
+fun PlaceholderImage() {
+    Image(
+        painter = painterResource(id = R.mipmap.imageplaceholder),
+        contentDescription = "placeholder image",
+    )
+}
+/*
+@Composable
+fun <T> BasicRecordScree(bidWithDetails: BidWithDetails, viewModel: T, modifier: Modifier = Modifier) {
 
     val viewModelCollection = viewModel!!::class.members
 
@@ -636,76 +800,6 @@ fun <T> BasicRecordScreen(bidWithDetails: BidWithDetails, viewModel: T, modifier
     }
 }
 
-@Composable
-fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
-    Row(
-        modifier = Modifier
-            //.fillMaxWidth()
-            .height(80.dp)
-            .padding()
-            .then(modifier),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Image(
-            painter = painterResource(id = iconId),
-            contentDescription = title,
-            modifier = Modifier
-                .width(80.dp)
-                .padding(end = 20.dp)
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center
-
-        ) {
-            Text(
-                text = title,
-                fontSize = 23.sp,
-                fontWeight = FontWeight.Bold,
-                color = BarterColor.textGreen,
-                modifier = Modifier,
-                //.padding(start = 30.dp, end = 30.dp),
-                textAlign = TextAlign.Start
-            )
-        }
-    }
-}
-
-@Composable
-fun LoadedImageOrPlaceholder(imageUrls: List<String>, contentDes: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = Modifier
-            .then(modifier)
-            //.fillMaxWidth(),
-        //horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        if (imageUrls.isNotEmpty()) {
-            val bitmap = LoadImage(url = imageUrls[0])
-            if (bitmap.value != null) {
-                Image(
-                    bitmap = bitmap.value!!.asImageBitmap(),
-                    contentDescription = contentDes,
-                    modifier = Modifier
-                        //.then(modifier)
-                )
-            } else {
-                PlaceholderImage()
-            }
-        } else {
-            PlaceholderImage()
-        }
-    }
-}
-
-@Composable
-fun PlaceholderImage() {
-    Image(
-        painter = painterResource(id = R.mipmap.imageplaceholder),
-        contentDescription = "placeholder image",
-    )
-}
+ */
 
 
