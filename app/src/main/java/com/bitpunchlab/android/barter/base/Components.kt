@@ -474,9 +474,6 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 fun BasicBidScreen(productName: String, productCategory: String, images: List<ProductImage>,
     updateShouldDisplayImages: (Boolean) -> Unit) {
 
-    //val viewModelMembers = viewModel::class.members
-    //val viewModelUpdateShouldDisplayImages = viewModelMembers.first { it.name == "updateShouldDisplayImages" }
-
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -526,7 +523,6 @@ fun BasicBidScreen(productName: String, productCategory: String, images: List<Pr
         CustomButton(
             label = "Show All Images",
             onClick = {
-                //viewModelUpdateShouldDisplayImages.call(viewModel, true)
                 updateShouldDisplayImages(true)
             },
             modifier = Modifier
@@ -544,13 +540,15 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+/*
         Image(
             painter = painterResource(id = R.mipmap.recorddetails),
             contentDescription = "record details icon",
             modifier = Modifier
                 .width(120.dp)
         )
+
+ */
         Text(
             text = "Product offered:",
             color = Color.Black,
@@ -571,8 +569,6 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 onClick = {
                     prepareImages(productOfferingImages)
                     updateShouldDisplayImages(true)
-                    //prepareImagesDisplay.invoke(viewModel, productOfferingImages)
-                    //updateShouldDisplayImages.invoke(viewModel, true)
                 },
                 modifier = Modifier
                     .padding(top = 20.dp)

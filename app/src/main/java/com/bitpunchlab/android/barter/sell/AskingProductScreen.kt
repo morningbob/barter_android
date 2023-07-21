@@ -1,7 +1,6 @@
 package com.bitpunchlab.android.barter.sell
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -12,22 +11,20 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.bitpunchlab.android.barter.ImagesDisplay
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomDialog
+import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
-import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -40,6 +37,11 @@ fun AskingProductScreen(navController: NavHostController,
     val productName by askingProductViewModel.productName.collectAsState()
     val shouldExpandCategory by askingProductViewModel.shouldExpandCategory.collectAsState()
     val productCategory by askingProductViewModel.productCategory.collectAsState()
+    val productImages by askingProductViewModel.askingProductsImages.collectAsState()
+    val numOfImages = remember {
+        mutableStateOf(0)
+    }
+    numOfImages.value = productImages.size
 
     val screenContext = LocalContext.current
     var popCurrent by remember { mutableStateOf(false) }
@@ -48,29 +50,21 @@ fun AskingProductScreen(navController: NavHostController,
 
     val shouldDisplayImages by askingProductViewModel.shouldDisplayImages.collectAsState()
 
+    val deleteImageStatus by askingProductViewModel.deleteImageStatus.collectAsState()
+
     LaunchedEffect(key1 = popCurrent) {
         if (popCurrent) {
-            Log.i("asking product screen", "popping current")
+            //Log.i("asking product screen", "popping current")
             navController.popBackStack()
         }
     }
-
-    //LaunchedEffect(key1 = shouldDisplayImages) {
-        //if (shouldDisplayImages) {
-        //    Log.i("asking product screen", "should display images detected true")
-            //displayImages = false
-            //navController.navigate(ImagesDisplay.route)
-        //} else {
-        //    Log.i("asking product screen", "should display images detected false")
-        //}
-    //}
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             val bitmap = RetrievePhotoHelper.getBitmap(uri, screenContext)
             bitmap?.let {
-                Log.i("launcher", "got bitmap")
+                //Log.i("launcher", "got bitmap")
                         askingProductViewModel.updateAskingImages(it)
             }
         }
@@ -112,11 +106,12 @@ fun AskingProductScreen(navController: NavHostController,
                     productCategory = productCategory,
                     shouldExpandCat = shouldExpandCategory,
                     pickImageLauncher = pickImageLauncher,
-                    updateName = { name: String -> sellViewModel.updateName(name) },
-                    updateExpandCat = { expand: Boolean -> sellViewModel.updateShouldExpandCategory(expand) },
-                    updateCat = { cat: Category -> sellViewModel.updateCategory(cat) },
+                    updateName = { name: String -> askingProductViewModel.updateName(name) },
+                    updateExpandCat = { expand: Boolean -> askingProductViewModel.updateShouldExpandCategory(expand) },
+                    updateCat = { cat: Category -> askingProductViewModel.updateCategory(cat) },
+                    numOfImages = productImages.size,
                     prepareImages = { sellViewModel.prepareImagesDisplay() },
-                    updateShouldDisplayImages = { display: Boolean -> sellViewModel.updateShouldDisplayImages(display) }
+                    updateShouldDisplayImages = { display: Boolean -> askingProductViewModel.updateShouldDisplayImages(display) }
                 )
 
                 Row(
@@ -153,10 +148,11 @@ fun AskingProductScreen(navController: NavHostController,
                 ShowStatus(status = status, askingProductViewModel = askingProductViewModel)
             }
             if (shouldDisplayImages) {
-                //ImagesDisplayScreen(viewModel = askingProductViewModel)
                 ImagesDisplayDialog(
                     images = askingProductViewModel.imagesDisplay,
-                    onDismiss = { askingProductViewModel.updateShouldDisplayImages(false) }
+                    onDismiss = { askingProductViewModel.updateShouldDisplayImages(false) },
+                    deleteStatus = deleteImageStatus,
+                    updateDeleteStatus = { askingProductViewModel.updateDeleteImageStatus(it) }
                 )
             }
         }

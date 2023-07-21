@@ -16,9 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,10 +28,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomButton
@@ -41,14 +37,9 @@ import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.CustomDropDown
 import com.bitpunchlab.android.barter.base.CustomTextField
-import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
-import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
+import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
@@ -62,7 +53,7 @@ import kotlinx.coroutines.launch
 fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() },
     biddingStatus: Int, loadingAlpha: Float, resetStatus: () -> Unit,
     processBidding: (product: ProductOffering, bid: Bid, images: List<ProductImage>) -> Unit,
-    updateBidError: (Int) -> Unit
+    updateBidError: (Int) -> Unit, updateShouldStartBidding: (Boolean) -> Unit
 ) {
 
     val product by LocalDatabaseManager.productChosen.collectAsState()
@@ -71,12 +62,12 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
     val shouldExpandCategoryDropdown by bidFormViewModel.shouldExpandCategoryDropdown.collectAsState()
     val currentContext = LocalContext.current
     val shouldDisplayImages by bidFormViewModel.shouldDisplayImages.collectAsState()
-    //val biddingStatus by bidViewModel.biddingStatus.collectAsState()
     val imagesDisplay by bidFormViewModel.imagesDisplay.collectAsState()
-
-    var shouldDismiss by remember { mutableStateOf(false) }
-
-    //val loadingAlpha by bidViewModel.loadingAlpha.collectAsState()
+    //val numOfImages = remember {
+    //    mutableStateOf(0)
+    //}
+    //numOfImages.value = imagesDisplay.size
+    val deleteImageStatus by bidFormViewModel.deleteImageStatus.collectAsState()
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -142,7 +133,10 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         title = "Category",
                         shouldExpand = shouldExpandCategoryDropdown,
                         onClickButton = { bidFormViewModel.updateShouldExpandCategoryDropdown(true) },
-                        onClickItem = { bidFormViewModel.updateBidProductCategory(it) },
+                        onClickItem = {
+                            bidFormViewModel.updateBidProductCategory(it)
+                            bidFormViewModel.updateShouldExpandCategoryDropdown(false)
+                          },
                         onDismiss = { bidFormViewModel.updateShouldExpandCategoryDropdown(false) },
                         items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                         modifier = Modifier
@@ -150,57 +144,71 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                             .padding(start = 25.dp)
                     )
                 }
-                CustomButton(
-                    label = "Upload Image",
-                    onClick = { pickImageLauncher.launch("image/*") },
+                Row(
+                    verticalAlignment = Alignment.Top,
                     modifier = Modifier
-                        .padding(top = 20.dp)
-                )
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
 
-                CustomButton(
-                    label = "View Images",
-                    onClick = { bidFormViewModel.updateShouldDisplayImages(true) },
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                )
+                    ) {
+                    CustomButton(
+                        label = "Images  ${imagesDisplay.size}",
+                        onClick = { bidFormViewModel.updateShouldDisplayImages(true) },
 
-                ChoiceButton(
-                    title = "Send",
-                    onClick = {
-                        val bid = bidFormViewModel.createBid()
-                        if (product != null && bid != null) {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                //bidViewModel.processBidding(product!!, bid, imagesDisplay)
-                                processBidding(product!!, bid, imagesDisplay)
-                                // I clear form here instead of after if clause
-                                // because I want to clear it after the processing has been done.
-                                bidFormViewModel.clearForm()
-                            }
-                        } else if (bid == null) {
-                            Log.i("bid screen", "null product or bid")
-                            // alert user that the info is invalid
-                            bidFormViewModel.clearForm()
-                            //bidViewModel.updateBiddingStatus(3)
-                            updateBidError(3)
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(top = 20.dp)
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
                     )
+                    ChoiceButton(
+                        title = "Upload",
+                        onClick = { pickImageLauncher.launch("image/*") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp)
+                    )
+                }
 
-                CustomButton(
-                    label = "Cancel",
-                    onClick = { shouldDismiss = true },
-                        //bidViewModel.updateShouldStartBid(false)
-                          //onDismiss.invoke()
+                Row(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(top = 20.dp)
-                )
+                ) {
+                    ChoiceButton(
+                        title = "Send",
+                        onClick = {
+                            val bid = bidFormViewModel.createBid()
+                            if (product != null && bid != null) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    processBidding(product!!, bid, imagesDisplay)
+                                    // I clear form here instead of after if clause
+                                    // because I want to clear it after the processing has been done.
+                                    bidFormViewModel.clearForm()
+                                }
+                            } else if (bid == null) {
+                                Log.i("bid screen", "null product or bid")
+                                // alert user that the info is invalid
+                                bidFormViewModel.clearForm()
+                                updateBidError(3)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                    )
+                    ChoiceButton(
+                        title = "Cancel",
+                        onClick = { updateShouldStartBidding(false) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp, bottom = 100.dp)
+                    )
+                }
+
+
                 if (shouldDisplayImages) {
-                    //ImagesDisplayScreen(bidFormViewModel)
                     ImagesDisplayDialog(
                         images = bidFormViewModel.imagesDisplay,
-                        onDismiss = { bidFormViewModel.updateShouldDisplayImages(false) }
+                        onDismiss = { bidFormViewModel.updateShouldDisplayImages(false) },
+                        deleteStatus = deleteImageStatus,
+                        updateDeleteStatus = { bidFormViewModel.updateDeleteImageStatus(it) }
                     )
                 }
 
@@ -262,3 +270,52 @@ fun BiddingFailureAlert(resetStatus: () -> Unit) {
         onDismiss = { resetStatus.invoke() },
         onPositive = { resetStatus.invoke() })
 }
+/*
+                CustomButton(
+                    label = "Upload Image",
+                    onClick = { pickImageLauncher.launch("image/*") },
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                )
+
+                CustomButton(
+                    label = "View Images  ${imagesDisplay.size}",
+                    onClick = { bidFormViewModel.updateShouldDisplayImages(true) },
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                )
+
+                 */
+                 /*
+                ChoiceButton(
+                    title = "Send",
+                    onClick = {
+                        val bid = bidFormViewModel.createBid()
+                        if (product != null && bid != null) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                //bidViewModel.processBidding(product!!, bid, imagesDisplay)
+                                processBidding(product!!, bid, imagesDisplay)
+                                // I clear form here instead of after if clause
+                                // because I want to clear it after the processing has been done.
+                                bidFormViewModel.clearForm()
+                            }
+                        } else if (bid == null) {
+                            Log.i("bid screen", "null product or bid")
+                            // alert user that the info is invalid
+                            bidFormViewModel.clearForm()
+                            //bidViewModel.updateBiddingStatus(3)
+                            updateBidError(3)
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                    )
+
+                CustomButton(
+                    label = "Cancel",
+                    onClick = { updateShouldStartBidding(false) },
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                )
+
+ */

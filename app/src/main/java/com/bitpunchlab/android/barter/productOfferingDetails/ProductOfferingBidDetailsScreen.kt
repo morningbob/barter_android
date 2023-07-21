@@ -1,6 +1,5 @@
 package com.bitpunchlab.android.barter.productOfferingDetails
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,16 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDialog
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
-import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
+import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 
@@ -45,10 +40,10 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
     val chosenBid by LocalDatabaseManager.bidChosen.collectAsState()
     val imagesDisplay by LocalDatabaseManager.bidProductImages.collectAsState()
     //Log.i("bid detail screen", "updated images")
-    //productOfferingBidsListViewModel.updateImagesDisplay(imagesDisplay)
     val shouldDisplayImages by productOfferingBidDetailsViewModel.shouldDisplayImages.collectAsState()
     val acceptBidStatus by productOfferingBidDetailsViewModel.acceptBidStatus.collectAsState()
     val shouldShowBid by productOfferingBidDetailsViewModel.shouldShowBid.collectAsState()
+    val deleteImageStatus by productOfferingBidDetailsViewModel.deleteImageStatus.collectAsState()
 
     LaunchedEffect(key1 = shouldShowBid) {
         if (shouldShowBid) {
@@ -59,10 +54,6 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
     //Log.i("bid details", "chosen bid $chosenBid")
     //Log.i("bid details", "should show bid ${shouldShowBid}")
 
-    //Dialog(
-    //    onDismissRequest = {  },
-    //    properties = DialogProperties(usePlatformDefaultWidth = false)
-    //) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -100,7 +91,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                         productName = chosenBid!!.bidProduct.name,
                         productCategory = chosenBid!!.bidProduct.category,
                         images = imagesDisplay,
-                        viewModel = productOfferingBidDetailsViewModel
+                        updateShouldDisplayImages = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(it) }
                     )
                     // confirm before execute
                     CustomButton(
@@ -118,10 +109,9 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     )
                 }
                 if (shouldDisplayImages) {
-                    //ImagesDisplayScreen(viewModel = productOfferingBidDetailsViewModel)
                     ImagesDisplayDialog(
                         images = productOfferingBidDetailsViewModel.imagesDisplay,
-                        onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) }
+                        onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) },
                     )
                 }
                 if (acceptBidStatus != 0) {
@@ -130,7 +120,6 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                 }
             }
         }
-    //}
 }
 
 // 1 -> to confirm

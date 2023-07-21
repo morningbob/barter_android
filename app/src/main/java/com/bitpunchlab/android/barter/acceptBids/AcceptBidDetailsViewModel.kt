@@ -32,6 +32,9 @@ class AcceptBidDetailsViewModel : ViewModel() {
     private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
     val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
+    private val _deleteImageStatus = MutableStateFlow(0)
+    val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             AcceptBidInfo.acceptBid.collect() { bidWithDetails ->
@@ -99,5 +102,9 @@ class AcceptBidDetailsViewModel : ViewModel() {
         //val newList = imagesDisplay.value.toMutableList()
         //newList.remove(image)
         //_imagesDisplay.value = newList
+    }
+
+    fun updateDeleteImageStatus(status: Int) {
+        _deleteImageStatus.value = status
     }
 }

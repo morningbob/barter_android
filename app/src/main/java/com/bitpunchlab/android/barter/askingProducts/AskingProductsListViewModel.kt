@@ -13,14 +13,14 @@ class AskingProductsListViewModel : ViewModel() {
     val _shouldDismiss = MutableStateFlow<Boolean>(false)
     val shouldDismiss : StateFlow<Boolean> get() = _shouldDismiss.asStateFlow()
 
-    private val _askingProducts = MutableStateFlow<List<ProductAsking>>(listOf())
-    val askingProducts : StateFlow<List<ProductAsking>> get() = _askingProducts.asStateFlow()
+    //private val _askingProducts = MutableStateFlow<List<ProductAsking>>(listOf())
+    //val askingProducts : StateFlow<List<ProductAsking>> get() = _askingProducts.asStateFlow()
 
     fun updateShouldDismiss(should: Boolean) {
         _shouldDismiss.value = should
     }
 
     fun updateAskingProducts(asking: List<ProductAsking>) {
-        _askingProducts.value = asking
+        //_askingProducts.value = asking
     }
 }

@@ -46,6 +46,9 @@ class BidViewModel : ViewModel() {
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
+    private val _deleteImageStatus = MutableStateFlow(0)
+    val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             ProductInfo.productChosen.collect() { product ->
@@ -100,6 +103,10 @@ class BidViewModel : ViewModel() {
         //val newList = imagesDisplay.value.toMutableList()
         //newList.remove(image)
         //_imagesDisplay.value = newList
+    }
+
+    fun updateDeleteImageStatus(status: Int) {
+        _deleteImageStatus.value = status
     }
 
     fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImage>)  {

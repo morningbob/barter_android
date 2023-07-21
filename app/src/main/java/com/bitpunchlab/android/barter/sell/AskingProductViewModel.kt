@@ -55,6 +55,9 @@ class AskingProductViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
+    private val _deleteImageStatus = MutableStateFlow(0)
+    val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
     fun updateShouldExpandCategory(should: Boolean) {
         _shouldExpandCategory.value = should
     }
@@ -71,12 +74,12 @@ class AskingProductViewModel : ViewModel() {
         val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
         val newList = askingProductImages.value.toMutableList()
         newList.add(productImage)
-        Log.i("sellVM", "added one bitmap")
+        //Log.i("sellVM", "added one bitmap")
         _askingProductImages.value = newList
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
-        Log.i("askingVM", "updating should display images $should")
+        //Log.i("askingVM", "updating should display images $should")
         _shouldDisplayImages.value = should
     }
 
@@ -103,8 +106,8 @@ class AskingProductViewModel : ViewModel() {
                 productOfferingId = ""
             )
 
-            AskingProductInfo.askingProducts.add(newProduct)
-            AskingProductInfo.askingProductsImages.add(askingProductImages.value)
+            AskingProductInfo.addAskingProduct(newProduct)
+            AskingProductInfo.addAskingImages(askingProductImages.value)
 
             // clean up
             clearForm()
@@ -132,6 +135,10 @@ class AskingProductViewModel : ViewModel() {
         _imagesDisplay.value = newList
     }
 
+
+    fun updateDeleteImageStatus(status: Int) {
+        _deleteImageStatus.value = status
+    }
     private fun clearForm() {
         _productName.value = ""
         _productCategory.value = Category.NOT_SET

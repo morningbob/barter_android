@@ -71,12 +71,16 @@ class SellViewModel : ViewModel() {
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
+    private val _deleteImageStatus = MutableStateFlow(0)
+    val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.userId.collect() {
                 userId.value = it
             }
         }
+
     }
 
     fun updateShouldExpandCategory(should: Boolean) {
@@ -107,6 +111,10 @@ class SellViewModel : ViewModel() {
         _productImages.value = newList
     }
 
+    fun updateDeleteImageStatus(status: Int) {
+        _deleteImageStatus.value = status
+    }
+
     fun updateAskingImages(bitmap: Bitmap) {
         val newList = askingProductImages.value.toMutableList()
         newList.add(bitmap)
@@ -129,15 +137,15 @@ class SellViewModel : ViewModel() {
     }
 
     fun prepareAskingProducts() {
-        ProductInfo.updateAskingProducts(AskingProductInfo.askingProducts)
-        ProductInfo.updateAskingImages(AskingProductInfo.askingProductsImages)
+        ProductInfo.updateAskingProducts(AskingProductInfo.askingProducts.value)
+        ProductInfo.updateAskingImages(AskingProductInfo.askingImages.value)
     }
 
     fun onSendClicked() {
         // validate inputs
         // here, I don't make images required
         if (productName.value != "" && productCategory.value != Category.NOT_SET &&
-                AskingProductInfo.askingProducts.isNotEmpty() &&
+                AskingProductInfo.askingProducts.value.isNotEmpty() &&
              sellingDuration.value != SellingDuration.NOT_SET) {
             _loadingAlpha.value = 100f
             CoroutineScope(Dispatchers.IO).launch {
@@ -181,7 +189,7 @@ class SellViewModel : ViewModel() {
         // since when we created them in asking product screen,
         // we don't have this id yet
         // for the images' url, we will update them in firebase client
-        for (each in AskingProductInfo.askingProducts) {
+        for (each in AskingProductInfo.askingProducts.value) {
             val newProduct = each.copy(productOfferingId = productOffering.productId)
             updatedAskingProducts.add(newProduct)
         }
@@ -189,7 +197,7 @@ class SellViewModel : ViewModel() {
         return CoroutineScope(Dispatchers.IO).async {
             Log.i("process selling", "got images size: ${productImages.value.size}")
             FirebaseClient.processSelling(productOffering, productImages.value,
-                updatedAskingProducts, AskingProductInfo.askingProductsImages)
+                updatedAskingProducts, AskingProductInfo.askingImages.value)
         }.await()
     }
 
@@ -218,7 +226,7 @@ class SellViewModel : ViewModel() {
         _sellingDuration.value = SellingDuration.NOT_SET
         _productImages.value = listOf()
         _askingProductImages.value = listOf()
-        AskingProductInfo.askingProducts = mutableListOf<ProductAsking>()
-        AskingProductInfo.askingProductsImages = mutableListOf()
+        AskingProductInfo.updateAskingProducts(mutableListOf<ProductAsking>())
+        AskingProductInfo.updateAskingImages(mutableListOf())
     }
 }

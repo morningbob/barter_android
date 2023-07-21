@@ -45,6 +45,9 @@ class BidFormViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
+    private val _deleteImageStatus = MutableStateFlow(0)
+    val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
     fun updateBidProductName(name: String) {
         _bidProductName.value = name
     }
@@ -59,7 +62,10 @@ class BidFormViewModel : ViewModel() {
 
     fun updateImagesDisplay(bitmap: Bitmap) {
         val productImage = ProductImage(UUID.randomUUID().toString(), bitmap)
-        _imagesDisplay.value.add(productImage)
+        val newList = imagesDisplay.value.toMutableList()
+        newList.add(productImage)
+
+        _imagesDisplay.value = newList
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -81,7 +87,7 @@ class BidFormViewModel : ViewModel() {
                 category = bidProductCategory.value.label,
                 images = listOf() // add the images later, need to upload then get url
             )
-            Log.i("bid formVM", "created bid")
+            //Log.i("bid formVM", "created bid")
             return Bid(bidId = UUID.randomUUID().toString(),
                 bidUserName = FirebaseClient.currentUserFirebase.value!!.name,
                 bidUserId = FirebaseClient.userId.value,
@@ -100,10 +106,16 @@ class BidFormViewModel : ViewModel() {
         //_imagesDisplay.value = newList
     }
 
+    fun updateDeleteImageStatus(status: Int) {
+        _deleteImageStatus.value = status
+    }
+
     fun clearForm() {
         _bidProductName.value = ""
         _bidProductCategory.value = Category.NOT_SET
     }
+
+
 }
 /*
             val bidProduct1 = ProductBidding(

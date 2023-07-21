@@ -1,30 +1,16 @@
-package com.bitpunchlab.android.barter.sell
+package com.bitpunchlab.android.barter.base
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.rememberDismissState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,12 +25,58 @@ import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import java.util.*
 
+@OptIn(ExperimentalMaterialApi::class)
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> Unit, ) {
-    
-    var imageToShow by remember { mutableStateOf<ProductImage?>(null) }
+fun <T> ImagesDisplayScreen(viewModel: T) {
+
+    val viewModelCollection = viewModel!!::class.members
+
+    // we focus on the list of images, instead of the product offering object or the asking
+    // product object, so, it can display images of both objects.
+
+    var images: MutableStateFlow<List<ProductImage>?>
+
+    val field = viewModel.javaClass.getDeclaredField("_imagesDisplay")
+    field.isAccessible = true
+    images = field.get(viewModel) as MutableStateFlow<List<ProductImage>?>
+
+    val viewModelShouldPopImages = viewModel.javaClass.getDeclaredField("_shouldPopImages")
+    viewModelShouldPopImages.isAccessible = true
+    val shouldPopImages = (viewModelShouldPopImages.get(viewModel) as MutableStateFlow<Boolean>).collectAsState()
+
+    val viewModelUpdateShouldPopImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldPopImages" }
+    viewModelUpdateShouldPopImages.isAccessible = true
+    val viewModelUpdateShouldDisplayImages = viewModel.javaClass.declaredMethods.first { it.name == "updateShouldDisplayImages" }
+    viewModelUpdateShouldDisplayImages.isAccessible = true
+    val viewModelDeleteImages = viewModel.javaClass.declaredMethods.first { it.name == "deleteImage" }
+    viewModelDeleteImages.isAccessible = true
+
+    var shouldDisplayFullImage by remember { mutableStateOf(false) }
+    var imageToShow : ProductImage? by remember { mutableStateOf(null) }
+
+    var shouldShowConfirmDelete by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = shouldPopImages.value) {
+        //Log.i("images launched effect", "should pop images changed ${shouldPopImages.value}")
+        if (shouldPopImages.value) {
+            viewModelUpdateShouldPopImages.invoke(viewModel, false)
+        }
+    }
+
+    @Composable
+    fun ConfirmDeleteDialog(image: ProductImage) {
+        CustomDialog(
+            title = "Remove Confirmation",
+            message = "Are you sure to remove the image?",
+            positiveText = "Delete",
+            negativeText = "Cancel",
+            onDismiss = { shouldShowConfirmDelete = false },
+            onPositive = { Log.i("confirm delete", "confirmed") },
+            onNegative = { Log.i("confirm delete", "cancelled") } )
+    }
 
     @Composable
     fun showImage(image: ProductImage) {
@@ -70,7 +102,7 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
                         .background(Color.Gray)
                         .padding(15.dp)
                         .clickable {
-                            //shouldShowConfirmDelete = true
+                            shouldShowConfirmDelete = true
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -91,9 +123,9 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
                         color = BarterColor.lightGreen
                     )
                 }
-                //if (shouldShowConfirmDelete) {
-                //    ConfirmDeleteDialog(image)
-                //}
+                if (shouldShowConfirmDelete) {
+                    ConfirmDeleteDialog(image)
+                }
             }
         }
 
@@ -126,36 +158,29 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
                         modifier = Modifier
                             .width(40.dp)
                             .clickable {
-                                onDismiss.invoke()
-                                //viewModelUpdateShouldPopImages.invoke(viewModel, true)
-                                //viewModelUpdateShouldDisplayImages.invoke(viewModel, false)
+                                viewModelUpdateShouldPopImages.invoke(viewModel, true)
+                                viewModelUpdateShouldDisplayImages.invoke(viewModel, false)
                             },
                     )
                 }
-
-                //if (shouldDisplayFullImage && imageToShow != null) {
-                if (imageToShow != null) {
+                if (shouldDisplayFullImage && imageToShow != null) {
                     showImage(image = imageToShow!!)
                 } else {
-                //    showImage(image = imageToShow!!)
-                //} else {
                     LazyColumn(
                         contentPadding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
-                        verticalArrangement = Arrangement.spacedBy(30.dp),
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
                         modifier = Modifier
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
 
-                        items(images.value, { image -> image.id }) { item ->
-                            //item {
+                        items(images.value ?: listOf(), { image -> image.id }) { item ->
                             // remember updated state will renew whenever there is
                             // recomposition, so , if an item is deleted, another
                             // item's position changed, the remember will remember the
                             // new position.
                             val currentItem by rememberUpdatedState(item)
-                            /*
                             val dismissState = rememberDismissState(
                                 confirmStateChange = {
                                     // delete the item in view model
@@ -163,8 +188,6 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
                                     true
                                 }
                             )
-
-                             */
                             Image(
                                 bitmap = item.image.asImageBitmap(),
                                 contentDescription = "product image",
@@ -173,7 +196,7 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
                                     .clickable {
                                         //showImage(item)
                                         imageToShow = item
-                                        //shouldDisplayFullImage = true
+                                        shouldDisplayFullImage = true
                                     },
                             )
 
@@ -181,8 +204,48 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
 
                     }  // end of lazy column
                 }
-
             } // end of column
         } // end of surface
     } // end of dialog
 }
+/*
+
+
+inline fun <reified T: Any> getValue(name: String): MutableStateFlow<Boolean> {
+    return T::class.java.getDeclaredField(name).get(null) as MutableStateFlow<Boolean>
+}
+/*
+                            SwipeToDismiss(
+                                state = dismissState,
+                                background = {
+                                    val direction =
+                                        dismissState.dismissDirection ?: return@SwipeToDismiss
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.Red)
+                                    )
+                                },
+                                dismissThresholds = { direction ->
+                                    FractionalThreshold(if (direction == DismissDirection.StartToEnd) 0.25f else 0.5f)
+                                },
+                                directions = setOf(
+                                    DismissDirection.StartToEnd,
+                                    DismissDirection.EndToStart
+                                ),
+
+                                dismissContent = {
+                                    Card(
+                                        elevation = animateDpAsState(
+                                            if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                                        ).value
+                                    ) {
+
+                                        // Layout here
+                                    }
+                                }
+                            )
+
+                             */
+
+ */

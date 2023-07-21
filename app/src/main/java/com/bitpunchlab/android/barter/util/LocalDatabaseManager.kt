@@ -1,20 +1,16 @@
 package com.bitpunchlab.android.barter.util
 
-import android.util.Log
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.UUID
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
@@ -39,6 +40,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _shouldBid = MutableStateFlow<Boolean>(false)
     val shouldBid : StateFlow<Boolean> get() = _shouldBid.asStateFlow()
 
+    // 1 is failed, 2 is succeeded, 3 is invalid info
+    private val _biddingStatus = MutableStateFlow<Int>(0)
+    val biddingStatus : StateFlow<Int> get() = _biddingStatus.asStateFlow()
+
     // when user clicks view product images, or view asking product images
     // we retrieve the images and put it here
     // so the images display screen can retrieve it here
@@ -61,6 +66,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     private val _deleteProductStatus = MutableStateFlow<Int>(0)
     val deleteProductStatus : StateFlow<Int> get() = _deleteProductStatus.asStateFlow()
+
+    private val _deleteImageStatus = MutableStateFlow(0)
+    val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
 
     init {
         // this is to prepare the images to be shown in image display screen
@@ -90,6 +98,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 //ProductInfo
             }
         }
+    }
+
+    fun updateBiddingStatus(status: Int) {
+        _biddingStatus.value = status
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -147,12 +159,37 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         //_imagesDisplay.value = newList
     }
 
+    fun updateDeleteImageStatus(status: Int) {
+        _deleteImageStatus.value = status
+    }
+
     // show images as soon as it is loaded
     fun prepareAskingProducts() {
         ProductInfo.productChosen.value?.let {
             Log.i("product details vM", "product is not null")
             ProductInfo.productOfferingWithProductsAsking.value?.let {
                 ProductInfo.updateAskingProducts(it.askingProducts)
+            }
+        }
+    }
+
+    fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImage>)  {
+        _loadingAlpha.value = 100f
+
+        val imagesBitmap = images.map { image ->
+            image.image
+        }
+
+        //Log.i("bid vm", "processing bid")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.i("bidVM", "process bidding")
+            if (FirebaseClient.processBidding(product, bid, imagesBitmap)) {
+                _biddingStatus.value = 2
+                _loadingAlpha.value = 0f
+            } else {
+                _biddingStatus.value = 1
+                _loadingAlpha.value = 0f
             }
         }
     }

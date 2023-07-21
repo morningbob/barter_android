@@ -1,11 +1,9 @@
 package com.bitpunchlab.android.barter.transactionRecords
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -27,9 +25,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.CustomButton
-import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
+import com.bitpunchlab.android.barter.base.ImagesDisplayScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.util.ProductImage
 
 @Composable
 fun RecordDetailsScreen(navController: NavHostController,

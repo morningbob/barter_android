@@ -1,18 +1,14 @@
 package com.bitpunchlab.android.barter.bid
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,28 +16,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
-import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomButton
-import com.bitpunchlab.android.barter.base.DialogButton
-import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.sell.ImagesDisplayDialog
-import com.bitpunchlab.android.barter.sell.ImagesDisplayScreen
+import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.util.ImageType
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -57,6 +40,7 @@ fun BidScreen(navController: NavHostController,
     val shouldStartBiding by bidViewModel.shouldStartBid.collectAsState()
     val biddingStatus by bidViewModel.biddingStatus.collectAsState()
     val loadingAlpha by bidViewModel.loadingAlpha.collectAsState()
+    val deleteImageStatus by bidViewModel.deleteImageStatus.collectAsState()
 
     LaunchedEffect(key1 = shouldPopBid) {
         //Log.i("bid screen, ", "detect should pop bid ${shouldPopBid}")
@@ -109,7 +93,9 @@ fun BidScreen(navController: NavHostController,
                     //ImagesDisplayScreen(bidViewModel)
                     ImagesDisplayDialog(
                         images = bidViewModel.imagesDisplay,
-                        onDismiss = { bidViewModel.updateShouldDisplayImages(false) }
+                        onDismiss = { bidViewModel.updateShouldDisplayImages(false) },
+                        deleteStatus = deleteImageStatus,
+                        updateDeleteStatus = { bidViewModel.updateDeleteImageStatus(it) }
                     )
                 }
                 if (shouldStartBiding) {
@@ -122,6 +108,7 @@ fun BidScreen(navController: NavHostController,
                             bidViewModel.processBidding(product, bid, images)
                          },
                         updateBidError = { bidViewModel.updateBiddingStatus(it) },
+                        updateShouldStartBidding = { bidViewModel.updateShouldStartBid(it) }
                      )
                 }
             }

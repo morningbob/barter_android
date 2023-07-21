@@ -54,15 +54,7 @@ object ProductInfo {
         _userMode.value = mode
     }
 
-    fun updateProductOfferingWithProductsAsking(product: ProductOfferingAndProductsAsking) {
-        //Log.i("Product info", "products asking were set")
-        _productOfferingWithProductsAsking.value = product
-    }
 
-    fun updateProductOfferingWithBids(product: ProductOfferingAndBids) {
-        //Log.i("Product info", "bids were set")
-        _productOfferingWithBids.value = product
-    }
 
     fun resetProduct() {
         _userMode.value = UserMode.OWNER_MODE

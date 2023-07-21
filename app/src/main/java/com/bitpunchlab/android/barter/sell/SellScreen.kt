@@ -15,17 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskProduct
 import com.bitpunchlab.android.barter.AskingProductsList
-import com.bitpunchlab.android.barter.ImagesDisplay
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.*
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -37,6 +34,18 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val productCategory by sellViewModel.productCategory.collectAsState()
     val shouldExpandDuration by sellViewModel.shouldExpandDuration.collectAsState()
     val sellingDuration by sellViewModel.sellingDuration.collectAsState()
+    val productImages by sellViewModel.productImages.collectAsState()
+    val numOfImages = remember {
+        mutableStateOf(0)
+    }
+    numOfImages.value = productImages.size
+    val askingProducts by AskingProductInfo.askingProducts.collectAsState()
+    val numOfProducts = remember {
+        mutableStateOf(0)
+    }
+    numOfProducts.value = askingProducts.size
+    val deleteImageStatus by sellViewModel.deleteImageStatus.collectAsState()
+
     val shouldSetAskingProduct by sellViewModel.shouldSetProduct.collectAsState()
     val shouldDisplayImages by sellViewModel.shouldDisplayImages.collectAsState()
     val processSellingStatus by sellViewModel.processSellingStatus.collectAsState()
@@ -108,8 +117,10 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 // a form to get the product's detail
                 ProductForm(
                     productName, pickImageLauncher, shouldExpandCategory,
-                    productCategory, shouldExpandDuration, sellingDuration, sellViewModel,
+                    productCategory, numOfImages,
+                    shouldExpandDuration, sellingDuration, sellViewModel,
                     shouldSetAskingProduct,
+                    numOfProducts.value,
                     Modifier.padding(top = 25.dp), navController
                 )
 
@@ -134,10 +145,12 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 }
             }
             if (shouldDisplayImages) {
-                //ImagesDisplayScreen(sellViewModel)
                 ImagesDisplayDialog(
                     images = sellViewModel.imagesDisplay,
-                    onDismiss = { sellViewModel.updateShouldDisplayImages(false) })
+                    onDismiss = { sellViewModel.updateShouldDisplayImages(false) },
+                    deleteStatus = deleteImageStatus,
+                    updateDeleteStatus = { sellViewModel.updateDeleteImageStatus(it) }
+                )
             }
             if (processSellingStatus != 0) {
                 com.bitpunchlab.android.barter.sell.ProcessSellingStatus(
@@ -161,18 +174,19 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 // 
 @Composable
 fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
-                shouldExpandCat: Boolean, productCategory: Category,
+                shouldExpandCat: Boolean, productCategory: Category, numOfImages: MutableState<Int>,
                 shouldExpandDuration: Boolean, sellingDuration: SellingDuration,
                 sellViewModel: SellViewModel, shouldSetProduct: Boolean,
+                numOfProducts: Int,
                 modifier: Modifier = Modifier, navController: NavHostController) {
 
     LaunchedEffect(key1 = shouldSetProduct) {
         if (shouldSetProduct) {
-            Log.i("should set", "about to navigate")
+            //Log.i("should set", "about to navigate")
             sellViewModel.updateShouldSetProduct(false)
             navController.navigate(AskProduct.route)
         }
-        Log.i("should set", "is false")
+        //Log.i("should set", "is false")
     }
 
     Column(
@@ -187,6 +201,7 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
             updateExpandCat = { expand: Boolean -> sellViewModel.updateShouldExpandCategory(expand) },
             updateCat = { cat: Category -> sellViewModel.updateCategory(cat) },
             prepareImages = { sellViewModel.prepareImagesDisplay() },
+            numOfImages = numOfImages.value,
             updateShouldDisplayImages = { display: Boolean -> sellViewModel.updateShouldDisplayImages(display) }
         )
 
@@ -228,7 +243,7 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
 
             ) {
                 CustomButton(
-                    label = "Exchange Products",
+                    label = "Exchange Products  $numOfProducts",
                     onClick = {
                         // show a list of asking products that were already set
                         // we need to prepare the asking products list in ProductInfo's asking products
@@ -258,6 +273,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                      updateName: (String) -> Unit,
                      updateExpandCat: (Boolean) -> Unit,
                      updateCat: (Category) -> Unit,
+                     numOfImages: Int,
                      prepareImages: () -> Unit,
                      updateShouldDisplayImages: (Boolean) -> Unit
 
@@ -267,7 +283,6 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
             label = "Product name",
             textValue = productName,
             onChange = {
-                //viewModelUpdateName.call(viewModel, it)
                updateName(it)
             },
             modifier = Modifier.fillMaxWidth()
@@ -294,15 +309,10 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                 shouldExpand = shouldExpandCat,
                 onClickButton = {
                     updateExpandCat(!shouldExpandCat)
-
-                    //viewModelUpdateShouldExpandCategory.call(viewModel, !shouldExpandCat)
-                    //sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
                 },
                 onClickItem =  {
                     updateCat(it)
                     updateExpandCat(false)
-                    //viewModelUpdateCategory.call(viewModel, it)
-                    //viewModelUpdateShouldExpandCategory.call(viewModel, false)
                 },
                 onDismiss = {  },
                 items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
@@ -319,13 +329,10 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
 
             ) {
             CustomButton(
-                label = "Images",
+                label = "Images  ${numOfImages}",
                 onClick = {
                     prepareImages()
                     updateShouldDisplayImages(true)
-                    //Log.i("base product form", "set should display image true")
-                    //viewModelPrepareImagesDisplay.call(viewModel)
-                    //viewModelUpdateShouldDisplayImages.call(viewModel, true)
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.5f),
