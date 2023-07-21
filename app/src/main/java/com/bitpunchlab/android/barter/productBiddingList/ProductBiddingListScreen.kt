@@ -41,7 +41,6 @@ import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
-import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 

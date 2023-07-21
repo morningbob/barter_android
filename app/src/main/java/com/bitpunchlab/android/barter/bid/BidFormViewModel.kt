@@ -2,6 +2,8 @@ package com.bitpunchlab.android.barter.bid
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AskingHolder
@@ -32,8 +34,8 @@ class BidFormViewModel : ViewModel() {
     private val _bidProductCategory = MutableStateFlow(Category.NOT_SET)
     val bidProductCategory : StateFlow<Category> get() = _bidProductCategory.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImage>>(mutableStateListOf())
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldExpandCategoryDropdown = MutableStateFlow<Boolean>(false)
     val shouldExpandCategoryDropdown : StateFlow<Boolean>
@@ -62,10 +64,10 @@ class BidFormViewModel : ViewModel() {
 
     fun updateImagesDisplay(bitmap: Bitmap) {
         val productImage = ProductImage(UUID.randomUUID().toString(), bitmap)
-        val newList = imagesDisplay.value.toMutableList()
-        newList.add(productImage)
+        //val newList = imagesDisplay.value.toMutableList()
+        //newList.add(productImage)
 
-        _imagesDisplay.value = newList
+        _imagesDisplay.value.add(productImage)
     }
 
     fun updateShouldDisplayImages(should: Boolean) {

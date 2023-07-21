@@ -2,6 +2,9 @@ package com.bitpunchlab.android.barter.sell
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
@@ -39,8 +42,12 @@ class SellViewModel : ViewModel() {
     private val _sellingDuration = MutableStateFlow(SellingDuration.NOT_SET)
     val sellingDuration : StateFlow<SellingDuration> get() = _sellingDuration.asStateFlow()
 
-    private val _productImages = MutableStateFlow<List<ProductImage>>(listOf())
-    val productImages : StateFlow<List<ProductImage>> get() = _productImages.asStateFlow()
+    // we use SnapshotStateList because I want the removal of the image to be reflected
+    // in lazy column
+    private val _productImages = MutableStateFlow<SnapshotStateList<ProductImage>>(
+        mutableStateListOf()
+    )
+    val productImages : StateFlow<SnapshotStateList<ProductImage>> get() = _productImages.asStateFlow()
 
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
@@ -105,7 +112,7 @@ class SellViewModel : ViewModel() {
 
     fun updateProductImages(image: Bitmap) {
         val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
-        val newList = productImages.value.toMutableList()
+        val newList = productImages.value.toMutableStateList()
         newList.add(productImage)
         //Log.i("sellVM", "added one bitmap")
         _productImages.value = newList
@@ -210,10 +217,7 @@ class SellViewModel : ViewModel() {
     }
 
     fun deleteImage(image: ProductImage) {
-        Log.i("askingVM", "got image")
-        val newList = imagesDisplay.value.toMutableList()
-        newList.remove(image)
-        _imagesDisplay.value = newList
+        _productImages.value.remove(image)
     }
 
     fun updateProcessSellingStatus(status: Int) {
@@ -224,7 +228,7 @@ class SellViewModel : ViewModel() {
         _productName.value = ""
         _productCategory.value = Category.NOT_SET
         _sellingDuration.value = SellingDuration.NOT_SET
-        _productImages.value = listOf()
+        _productImages.value = mutableStateListOf()
         _askingProductImages.value = listOf()
         AskingProductInfo.updateAskingProducts(mutableListOf<ProductAsking>())
         AskingProductInfo.updateAskingImages(mutableListOf())

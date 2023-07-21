@@ -15,8 +15,6 @@ import androidx.navigation.compose.rememberNavController
 import com.bitpunchlab.android.barter.acceptBids.AcceptBidDetailsScreen
 import com.bitpunchlab.android.barter.acceptBids.AcceptBidsListScreen
 import com.bitpunchlab.android.barter.askingProducts.AskingProductsListScreen
-import com.bitpunchlab.android.barter.bid.BidFormScreen
-import com.bitpunchlab.android.barter.bid.BidScreen
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient

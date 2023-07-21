@@ -1,6 +1,9 @@
 package com.bitpunchlab.android.barter.acceptBids
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -29,8 +32,10 @@ class AcceptBidDetailsViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImage>>(
+        mutableStateListOf()
+    )
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
@@ -94,7 +99,7 @@ class AcceptBidDetailsViewModel : ViewModel() {
     }
 
     fun prepareImagesDisplay(images: List<ProductImage>) {
-        _imagesDisplay.value = images
+        _imagesDisplay.value = images.toMutableStateList()
     }
 
     fun deleteImage(image: ProductImage) {

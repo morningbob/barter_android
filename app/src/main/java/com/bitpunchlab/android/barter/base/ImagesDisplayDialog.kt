@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,9 +44,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> Unit,
+fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDismiss: () -> Unit,
     deleteStatus: Int? = null,
-    updateDeleteStatus: ((Int) -> Unit)? = null) {
+    updateDeleteStatus: ((Int) -> Unit)? = null, deleteImage: ((ProductImage) -> Unit)? = null) {
     
     var imageToShow by remember { mutableStateOf<ProductImage?>(null) }
 
@@ -98,11 +99,11 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
                         )
                     }
                 }
-
             }
-            deleteStatus?.let {
-                if (it != 0) {
-                    ConfirmDeleteDialog(updateDeleteStatus!!)
+            if (deleteStatus != null && deleteImage != null) {
+                if (deleteStatus != 0) {
+                    ConfirmDeleteDialog(updateDeleteStatus!!, image, deleteImage
+                    ) { imageToShow = null }
                 }
             }
         }
@@ -189,15 +190,24 @@ fun ImagesDisplayDialog(images: StateFlow<List<ProductImage>>, onDismiss: () -> 
     } // end of dialog
 }
 
+// 1 : confirm delete
+// 2 : deletion success
+// 3 : deletion failed
 @Composable
-fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit) {
+fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit, imageToBeDeleted: ProductImage,
+    deleteImage: (ProductImage) -> Unit, removeShow: () -> Unit) {
     CustomDialog(
         title = "Remove Confirmation",
         message = "Are you sure to remove the image?",
         positiveText = "Delete",
         negativeText = "Cancel",
         onDismiss = { updateDeleteStatus(0) },
-        onPositive = { updateDeleteStatus(2) },
+        onPositive = {
+            deleteImage(imageToBeDeleted)
+            updateDeleteStatus(0)
+            //onDismiss.invoke()
+            removeShow.invoke()
+         },
         onNegative = { updateDeleteStatus(0) }
     )
 }

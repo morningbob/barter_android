@@ -146,10 +146,11 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             }
             if (shouldDisplayImages) {
                 ImagesDisplayDialog(
-                    images = sellViewModel.imagesDisplay,
+                    images = sellViewModel.productImages,
                     onDismiss = { sellViewModel.updateShouldDisplayImages(false) },
                     deleteStatus = deleteImageStatus,
-                    updateDeleteStatus = { sellViewModel.updateDeleteImageStatus(it) }
+                    updateDeleteStatus = { sellViewModel.updateDeleteImageStatus(it)},
+                    deleteImage = { sellViewModel.deleteImage(it) }
                 )
             }
             if (processSellingStatus != 0) {

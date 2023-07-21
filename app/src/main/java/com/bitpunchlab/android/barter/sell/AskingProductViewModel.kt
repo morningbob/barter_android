@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
@@ -28,8 +30,8 @@ class AskingProductViewModel : ViewModel() {
     private val _productCategory = MutableStateFlow(Category.NOT_SET)
     val productCategory : StateFlow<Category> get() = _productCategory.asStateFlow()
 
-    private val _askingProductImages = MutableStateFlow<List<ProductImage>>(mutableListOf())
-    private val askingProductImages : StateFlow<List<ProductImage>> get() = _askingProductImages.asStateFlow()
+    private val _askingProductImages = MutableStateFlow<SnapshotStateList<ProductImage>>(mutableStateListOf())
+    val askingProductImages : StateFlow<SnapshotStateList<ProductImage>> get() = _askingProductImages.asStateFlow()
 
     private val _status = MutableStateFlow(0)
     val status : StateFlow<Int> get() = _status.asStateFlow()
@@ -37,8 +39,8 @@ class AskingProductViewModel : ViewModel() {
     private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
     val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
 
-    private val _askingProductsImages = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
-    val askingProductsImages : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages.asStateFlow()
+    private val _askingProductsImages = MutableStateFlow<SnapshotStateList<SnapshotStateList<Bitmap>>>(mutableStateListOf())
+    val askingProductsImages : StateFlow<SnapshotStateList<SnapshotStateList<Bitmap>>> get() = _askingProductsImages.asStateFlow()
 
     private val _askingProductsImages1 = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
     val askingProductsImages1 : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages1.asStateFlow()
@@ -72,10 +74,10 @@ class AskingProductViewModel : ViewModel() {
 
     fun updateAskingImages(image: Bitmap) {
         val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
-        val newList = askingProductImages.value.toMutableList()
-        newList.add(productImage)
+        //val newList = askingProductImages.value.toMutableList()
+        //newList.add(productImage)
         //Log.i("sellVM", "added one bitmap")
-        _askingProductImages.value = newList
+        _askingProductImages.value.add(productImage)
     }
 
     fun updateShouldDisplayImages(should: Boolean) {
@@ -116,9 +118,6 @@ class AskingProductViewModel : ViewModel() {
         }
     }
 
-    fun cancelUpdate() {
-        _update.value = false
-    }
 
     fun updateStatus(status: Int) {
         _status.value = status
@@ -142,7 +141,7 @@ class AskingProductViewModel : ViewModel() {
     private fun clearForm() {
         _productName.value = ""
         _productCategory.value = Category.NOT_SET
-        _askingProductImages.value = listOf()
+        _askingProductImages.value = mutableStateListOf()
         _shouldExpandCategory.value = false
     }
 }

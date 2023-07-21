@@ -1,6 +1,9 @@
 package com.bitpunchlab.android.barter.productOfferingDetails
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
@@ -49,11 +52,11 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     // so the images display screen can retrieve it here
     // that way, we can display both product images and asking product images
     // both in one images display screen
-    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImage>>(mutableStateListOf())
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImage>> get() = _imagesDisplay.asStateFlow()
 
-    private val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productImages : StateFlow<MutableList<ProductImage>> get() = _productImages.asStateFlow()
+    //private val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    //val productImages : StateFlow<MutableList<ProductImage>> get() = _productImages.asStateFlow()
 
     private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
@@ -74,7 +77,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         // this is to prepare the images to be shown in image display screen
         CoroutineScope(Dispatchers.IO).launch {
             LocalDatabaseManager.sellerProductImages.collect() {
-                _imagesDisplay.value = it
+                _imagesDisplay.value = it.toMutableStateList()
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
@@ -112,9 +115,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _shouldPopImages.value = should
     }
 
-    fun updateImages(images: MutableList<ProductImage>) {
-        _imagesDisplay.value = images
-    }
+    //fun updateImages(images: MutableList<ProductImage>) {
+    //    _imagesDisplay.value = images
+    //}
 
     fun updateShouldDisplayAskingProducts(should: Boolean) {
         _shouldDisplayAskingProducts.value = should

@@ -149,7 +149,7 @@ fun AskingProductScreen(navController: NavHostController,
             }
             if (shouldDisplayImages) {
                 ImagesDisplayDialog(
-                    images = askingProductViewModel.imagesDisplay,
+                    images = askingProductViewModel.askingProductImages,
                     onDismiss = { askingProductViewModel.updateShouldDisplayImages(false) },
                     deleteStatus = deleteImageStatus,
                     updateDeleteStatus = { askingProductViewModel.updateDeleteImageStatus(it) }
