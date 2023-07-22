@@ -5,10 +5,7 @@ import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.BidAndAcceptBid
-import com.bitpunchlab.android.barter.models.ProductAndAcceptBid
 import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
@@ -72,13 +69,15 @@ interface BarterDao {
 
     //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
     //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
-
+/*
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductsBidding(vararg productBidding: ProductBidding)
 
     @Query("SELECT * from products_bidding")
     fun getAllProductsBidding() : Flow<List<ProductBidding>>
 
+
+ */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBids(vararg bid: Bid)
 /*
@@ -88,11 +87,14 @@ interface BarterDao {
     @Query("SELECT * FROM accept_bids")
     fun getAllAcceptedBids() : Flow<List<AcceptBid>>
 */
-    @Query("SELECT * FROM products_bidding WHERE :id = productOfferingForBid LIMIT 1")
-    fun getProductBiddingById(id: String) : ProductBidding
+    //@Query("SELECT * FROM products_bidding WHERE :id = productOfferingForBid LIMIT 1")
+    //fun getProductBiddingById(id: String) : ProductBidding
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductsAsking(vararg productAsking: ProductAsking)
+
+    @Delete
+    suspend fun deleteProductAsking(vararg productAsking: ProductAsking)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAcceptBids(vararg bid: AcceptBid)

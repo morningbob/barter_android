@@ -8,15 +8,14 @@ import androidx.room.TypeConverters
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import kotlinx.coroutines.InternalCoroutinesApi
 
 
-@Database(entities = [User::class, ProductOffering::class, ProductBidding::class,
+@Database(entities = [User::class, ProductOffering::class,
                      ProductAsking::class, Bid::class, AcceptBid::class]
-, version = 23, exportSchema = false)
+, version = 24, exportSchema = false)
 
 @TypeConverters(Converters::class)
 abstract class BarterDatabase : RoomDatabase() {

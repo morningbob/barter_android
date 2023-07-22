@@ -1,18 +1,14 @@
 package com.bitpunchlab.android.barter.util
 
-import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
-import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AskingHolder
-import com.bitpunchlab.android.barter.models.AskingProductsHolder
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 
@@ -130,66 +126,6 @@ fun convertProductAskingFirebaseToProductAsking(productAskingFirebase: ProductAs
         productOfferingId = productAskingFirebase.productOfferingId
     )
 }
-
-fun convertProductBiddingFirebaseToProductBidding(productFirebase: ProductBiddingFirebase) : ProductBidding {
-
-    val imagesList = sortElements(productFirebase.images)
-    val bidsFirebaseList = sortElements(productFirebase.bids)
-    val bidsList = bidsFirebaseList.map { bidFirebase ->
-        convertBidFirebaseToBid(bidFirebase)
-    }
-    val askingProducts = sortElements(productFirebase.askingProducts)
-    val askingList = askingProducts.map { asking ->
-        convertProductAskingFirebaseToProductAsking(asking)
-    }
-
-    return ProductBidding(
-        productBidId = productFirebase.id,
-        productOfferingForBid = productFirebase.productOfferingId,
-        productName = productFirebase.name,
-        ownerName = productFirebase.ownerName,
-        productCategory = productFirebase.category,
-        biddingDateCreated = productFirebase.dateCreated,
-        biddingDuration = productFirebase.duration,
-        productImages = imagesList,
-        bidsHolder = BidsHolder(bidsList),
-        biddingAskingProducts = AskingHolder(askingList)
-    )
-}
-
-fun convertProductBiddingToProductBiddingFirebase(productBidding: ProductBidding)
-    : ProductBiddingFirebase {
-
-    val imagesMap = HashMap<String, String>()
-    for (i in 0..productBidding.productImages.size - 1) {
-        imagesMap.put(i.toString(), productBidding.productImages[i])
-    }
-
-    val bidsMap = HashMap<String, BidFirebase>()
-    for (i in 0..productBidding.bidsHolder.bids.size - 1) {
-        bidsMap.put(i.toString(), convertBidToBidFirebase(productBidding.bidsHolder.bids[i], ))
-    }
-    productBidding.bidsHolder.bids
-
-    val askingMap = HashMap<String, ProductAskingFirebase>()
-    for (i in 0..productBidding.biddingAskingProducts.askingList.size - 1) {
-        askingMap.put(i.toString(), convertProductAskingToFirebase(productBidding.biddingAskingProducts.askingList[i]))
-    }
-
-    return ProductBiddingFirebase(
-        productId = productBidding.productBidId,
-        offeringId = productBidding.productOfferingForBid,
-        productName = productBidding.productName,
-        ownerN = productBidding.ownerName,
-        productCategory = productBidding.productCategory,
-        date = productBidding.biddingDateCreated,
-        dur = productBidding.biddingDuration,
-        productImages = imagesMap,
-        bid = bidsMap,
-        asking = askingMap
-    )
-}
-
 fun convertBidFirebaseToBid(bidFirebase: BidFirebase) : Bid {
 
     var bidProduct : ProductAsking? = null

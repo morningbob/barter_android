@@ -191,6 +191,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                     CustomButton(
                                         label = "Products Asked",
                                         onClick = {
+                                            ProductInfo.updateUserMode(userMode)
                                             productDetailsViewModel.prepareAskingProducts()
                                             productDetailsViewModel.updateShouldDisplayAskingProducts(
                                                 true
@@ -232,14 +233,22 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                     }
                 }
 
-                if (shouldDisplayImages) {
+                if (shouldDisplayImages && userMode == UserMode.OWNER_MODE) {
                     ImagesDisplayDialog(
                         images = productDetailsViewModel.imagesDisplay,
                         onDismiss = { productDetailsViewModel.updateShouldDisplayImages(false) },
-                        //deleteStatus = deleteImageStatus,
-                        //updateDeleteStatus = { productDetailsViewModel.updateDeleteImageStatus(it) }
+                        deleteStatus = deleteImageStatus,
+                        updateDeleteStatus = { productDetailsViewModel.updateDeleteImageStatus(it) },
+                        deleteImage = {
+                            productDetailsViewModel.deleteProductImage(it)
+                        },
+                        triggerImageUpdate = { productDetailsViewModel.updateTriggerImageUpdate(it) }
                     )
-
+                } else if (shouldDisplayImages) {
+                    ImagesDisplayDialog(
+                        images = productDetailsViewModel.imagesDisplay,
+                        onDismiss = { productDetailsViewModel.updateShouldDisplayImages(false) },
+                    )
                 }
                 Box(
                     contentAlignment = Alignment.Center,

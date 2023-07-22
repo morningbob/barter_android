@@ -1,5 +1,8 @@
 package com.bitpunchlab.android.barter.productsOfferingList
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
@@ -32,8 +35,10 @@ object ProductInfo {
 
     // asking product are Product Asking objects
     // it can be from the product the user offers, or the product the user bids
-    private val _askingProducts = MutableStateFlow<List<ProductAsking>>(listOf())
-    val askingProducts : StateFlow<List<ProductAsking>> get() = _askingProducts.asStateFlow()
+    private val _askingProducts = MutableStateFlow<SnapshotStateList<ProductAsking>>(
+        mutableStateListOf()
+    )
+    val askingProducts : StateFlow<SnapshotStateList<ProductAsking>> get() = _askingProducts.asStateFlow()
 
     private val _askingImages = MutableStateFlow<List<List<ProductImage>>>(listOf())
     val askingImages : StateFlow<List<List<ProductImage>>> get() = _askingImages.asStateFlow()
@@ -43,7 +48,7 @@ object ProductInfo {
     }
 
     fun updateAskingProducts(products: List<ProductAsking>) {
-        _askingProducts.value = products
+        _askingProducts.value = products.toMutableStateList()
     }
 
     fun updateAskingImages(images: List<List<ProductImage>>) {
@@ -54,7 +59,9 @@ object ProductInfo {
         _userMode.value = mode
     }
 
-
+    fun deleteAskingProduct(product: ProductAsking) {
+        askingProducts.value.remove(product)
+    }
 
     fun resetProduct() {
         _userMode.value = UserMode.OWNER_MODE

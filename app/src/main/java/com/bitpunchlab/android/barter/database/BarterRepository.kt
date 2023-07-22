@@ -4,7 +4,6 @@ import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
@@ -52,6 +51,12 @@ object BarterRepository {
         }
     }
 
+    fun deleteProductsAsking(products: List<ProductAsking>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.deleteProductAsking(*products.toTypedArray())
+        }
+    }
+
     suspend fun getUserProductsOffering(id: String): List<UserAndProductOffering>? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getUserAndProductsOffering(id)
@@ -61,7 +66,7 @@ object BarterRepository {
     //suspend fun getAskingProducts(id: String) : Flow<List<ProductOffering>>? {
     //    return database?.barterDao?.getAskingProducts(id)
     //}
-
+/*
     fun insertProductsBidding(productsBidding: List<ProductBidding>) {
         CoroutineScope(Dispatchers.IO).launch {
             database?.barterDao?.insertProductsBidding(*productsBidding.toTypedArray())
@@ -74,6 +79,8 @@ object BarterRepository {
         }.await()
     }
 
+
+ */
     suspend fun getProductOfferingWithProductsAsking(id: String):
             Flow<List<ProductOfferingAndProductsAsking>>? =
         CoroutineScope(Dispatchers.IO).async {

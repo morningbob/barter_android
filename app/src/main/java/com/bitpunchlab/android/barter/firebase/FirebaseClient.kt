@@ -23,7 +23,6 @@ import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
 import com.bitpunchlab.android.barter.util.convertProductAskingFirebaseToProductAsking
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
-import com.bitpunchlab.android.barter.util.convertProductBiddingFirebaseToProductBidding
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser

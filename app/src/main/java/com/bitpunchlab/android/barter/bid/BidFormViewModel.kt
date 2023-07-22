@@ -10,9 +10,6 @@ import com.bitpunchlab.android.barter.models.AskingHolder
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
-import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -102,10 +99,7 @@ class BidFormViewModel : ViewModel() {
     }
 
     fun deleteImage(image: ProductImage) {
-        //Log.i("askingVM", "got image")
-        //val newList = imagesDisplay.value.toMutableList()
-        //newList.remove(image)
-        //_imagesDisplay.value = newList
+        _imagesDisplay.value.remove(image)
     }
 
     fun updateDeleteImageStatus(status: Int) {

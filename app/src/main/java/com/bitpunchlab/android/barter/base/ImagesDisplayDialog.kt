@@ -40,15 +40,22 @@ import androidx.compose.ui.window.DialogProperties
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.util.UserMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDismiss: () -> Unit,
+fun ImagesDisplayDialog(
+    images: StateFlow<SnapshotStateList<ProductImage>>, onDismiss: () -> Unit,
     deleteStatus: Int? = null,
-    updateDeleteStatus: ((Int) -> Unit)? = null, deleteImage: ((ProductImage) -> Unit)? = null) {
+    updateDeleteStatus: ((Int) -> Unit)? = null, deleteImage: ((ProductImage) -> Unit)? = null,
+    triggerImageUpdate: ((Boolean) -> Unit)? = null
+) {
     
     var imageToShow by remember { mutableStateOf<ProductImage?>(null) }
+    var shouldTriggerImageUpdate by remember {
+        mutableStateOf(false)
+    }
 
     @Composable
     fun showImage(image: ProductImage, deleteStatus: Int?) {
@@ -102,8 +109,10 @@ fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDi
             }
             if (deleteStatus != null && deleteImage != null) {
                 if (deleteStatus != 0) {
-                    ConfirmDeleteDialog(updateDeleteStatus!!, image, deleteImage
-                    ) { imageToShow = null }
+                    ConfirmDeleteDialog(updateDeleteStatus!!, image, deleteImage,
+                        { imageToShow = null },
+                        { shouldTriggerImageUpdate = it }
+                    )
                 }
             }
         }
@@ -125,6 +134,8 @@ fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDi
                     .fillMaxSize()
                     .background(BarterColor.lightGreen)
             ) {
+                // when the user exit the images list, we send the info to the view model to
+                // indicate if there should be an image update.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -137,6 +148,9 @@ fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDi
                         modifier = Modifier
                             .width(40.dp)
                             .clickable {
+                                triggerImageUpdate?.let {
+                                    it(shouldTriggerImageUpdate)
+                                }
                                 onDismiss.invoke()
                             },
                     )
@@ -155,21 +169,6 @@ fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDi
                     ) {
 
                         items(images.value, { image -> image.id }) { item ->
-                            // remember updated state will renew whenever there is
-                            // recomposition, so , if an item is deleted, another
-                            // item's position changed, the remember will remember the
-                            // new position.
-                            val currentItem by rememberUpdatedState(item)
-                            /*
-                            val dismissState = rememberDismissState(
-                                confirmStateChange = {
-                                    // delete the item in view model
-                                    viewModelDeleteImages.invoke(viewModel, currentItem)
-                                    true
-                                }
-                            )
-
-                             */
                             Image(
                                 bitmap = item.image.asImageBitmap(),
                                 contentDescription = "product image",
@@ -179,23 +178,20 @@ fun ImagesDisplayDialog(images: StateFlow<SnapshotStateList<ProductImage>>, onDi
                                         imageToShow = item
                                     },
                             )
-
                         }
-
                     }  // end of lazy column
                 }
-
             } // end of column
         } // end of surface
     } // end of dialog
 }
-
+// should trigger update post true to indicate the images list is changed
 // 1 : confirm delete
 // 2 : deletion success
 // 3 : deletion failed
 @Composable
 fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit, imageToBeDeleted: ProductImage,
-    deleteImage: (ProductImage) -> Unit, removeShow: () -> Unit) {
+    deleteImage: (ProductImage) -> Unit, removeShow: () -> Unit, shouldTriggerUpdate: (Boolean) -> Unit) {
     CustomDialog(
         title = "Remove Confirmation",
         message = "Are you sure to remove the image?",
@@ -203,9 +199,9 @@ fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit, imageToBeDeleted: Pro
         negativeText = "Cancel",
         onDismiss = { updateDeleteStatus(0) },
         onPositive = {
+            shouldTriggerUpdate(true)
             deleteImage(imageToBeDeleted)
             updateDeleteStatus(0)
-            //onDismiss.invoke()
             removeShow.invoke()
          },
         onNegative = { updateDeleteStatus(0) }

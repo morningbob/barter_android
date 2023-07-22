@@ -21,6 +21,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,10 +36,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.ChoiceButton
+import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.util.UserMode
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
 
 // so the list is used by both the temporary asking products, and the asking products from
@@ -53,10 +59,17 @@ fun AskingProductsListScreen(navController: NavHostController,
         AskingProductsListViewModel()
     }
 ) {
+    val userMode by ProductInfo.userMode.collectAsState()
     val askingProducts by ProductInfo.askingProducts.collectAsState()
     val askingImages by ProductInfo.askingImages.collectAsState()
     val shouldDismiss by askingProductsListViewModel.shouldDismiss.collectAsState()
     //Log.i("asking products list", "no of asking products ${product?.askingProducts?.size}")
+
+    val deleteProductStatus by askingProductsListViewModel.deleteProductStatus.collectAsState()
+
+    var productToBeDeleted : ProductAsking? by remember {
+        mutableStateOf(null)
+    }
 
     LaunchedEffect(key1 = shouldDismiss) {
         if (shouldDismiss) {
@@ -155,9 +168,76 @@ fun AskingProductsListScreen(navController: NavHostController,
                             modifier = Modifier
                                 .padding(top = 20.dp)
                         )
+                        if (userMode == UserMode.OWNER_MODE) {
+                            ChoiceButton(
+                                title = "Delete",
+                                onClick = {
+                                    productToBeDeleted = product
+                                    askingProductsListViewModel.updateDeleteProductStatus(1)
+                                },
+                                modifier = Modifier
+                                    .padding(top = 20.dp)
+                            )
+                        }
                     }
                 }
             }
+            if (deleteProductStatus != 0 && productToBeDeleted != null) {
+                ShowDeleteStatus(
+                    status = deleteProductStatus,
+                    updateDeleteStatus = { askingProductsListViewModel.updateDeleteProductStatus(it) },
+                    productToBeDeleted = productToBeDeleted!!,
+                    deleteProduct = {
+                        ProductInfo.deleteAskingProduct(productToBeDeleted!!)
+                        LocalDatabaseManager.deleteProductAskingLocalDatabase(productToBeDeleted!!)
+                    }
+                )
+            }
         }
     }
+}
+
+@Composable fun ShowDeleteStatus(status: Int, updateDeleteStatus: (Int) -> Unit, productToBeDeleted: ProductAsking,
+                                 deleteProduct: (ProductAsking) -> Unit) {
+    when (status) {
+        1 -> ConfirmDeleteProductDialog(
+            updateDeleteStatus = updateDeleteStatus,
+            productToBeDeleted = productToBeDeleted,
+            deleteProduct = deleteProduct
+        )
+        2 -> DeleteProductSuccessDialog(updateDeleteStatus = updateDeleteStatus)
+    }
+}
+
+// 1 : confirm delete
+// 2 : deletion success
+// 3 : deletion failed
+@Composable
+fun ConfirmDeleteProductDialog(updateDeleteStatus: (Int) -> Unit, productToBeDeleted: ProductAsking,
+                        deleteProduct: (ProductAsking) -> Unit) {
+    CustomDialog(
+        title = "Remove Confirmation",
+        message = "Are you sure to remove the product?",
+        positiveText = "Delete",
+        negativeText = "Cancel",
+        onDismiss = { updateDeleteStatus(0) },
+        onPositive = {
+            deleteProduct(productToBeDeleted)
+            updateDeleteStatus(0)
+        },
+        onNegative = { updateDeleteStatus(0) }
+    )
+}
+
+@Composable
+fun DeleteProductSuccessDialog(updateDeleteStatus: (Int) -> Unit) {
+    CustomDialog(
+        title = "Deletion Success",
+        message = "The product was deleted",
+        positiveText = "OK",
+        onDismiss = { updateDeleteStatus(0) },
+        onPositive = {
+            updateDeleteStatus(0)
+        },
+    )
 }

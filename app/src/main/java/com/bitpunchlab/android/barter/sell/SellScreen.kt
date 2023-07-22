@@ -150,7 +150,8 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                     onDismiss = { sellViewModel.updateShouldDisplayImages(false) },
                     deleteStatus = deleteImageStatus,
                     updateDeleteStatus = { sellViewModel.updateDeleteImageStatus(it)},
-                    deleteImage = { sellViewModel.deleteImage(it) }
+                    deleteImage = { sellViewModel.deleteImage(it) },
+                    //triggerImageUpdate = { sellViewModel.updateTriggerImageUpdate(true) }
                 )
             }
             if (processSellingStatus != 0) {

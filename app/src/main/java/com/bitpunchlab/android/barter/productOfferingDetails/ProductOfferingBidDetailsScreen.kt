@@ -39,20 +39,16 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
         }) {
     val chosenBid by LocalDatabaseManager.bidChosen.collectAsState()
     val imagesDisplay by LocalDatabaseManager.bidProductImages.collectAsState()
-    //Log.i("bid detail screen", "updated images")
     val shouldDisplayImages by productOfferingBidDetailsViewModel.shouldDisplayImages.collectAsState()
     val acceptBidStatus by productOfferingBidDetailsViewModel.acceptBidStatus.collectAsState()
     val shouldShowBid by productOfferingBidDetailsViewModel.shouldShowBid.collectAsState()
     val deleteImageStatus by productOfferingBidDetailsViewModel.deleteImageStatus.collectAsState()
 
     LaunchedEffect(key1 = shouldShowBid) {
-        if (shouldShowBid) {
+        if (!shouldShowBid) {
             navController.popBackStack()
         }
     }
-
-    //Log.i("bid details", "chosen bid $chosenBid")
-    //Log.i("bid details", "should show bid ${shouldShowBid}")
 
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(

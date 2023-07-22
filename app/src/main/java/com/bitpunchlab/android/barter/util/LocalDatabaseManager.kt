@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.util
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
@@ -172,5 +173,13 @@ object LocalDatabaseManager {
 
     fun updateBidChosen(bid: Bid) {
         _bidChosen.value = bid
+    }
+
+    fun deleteProductAskingLocalDatabase(productAsking: ProductAsking) {
+        BarterRepository.deleteProductsAsking(listOf(productAsking))
+    }
+
+    fun deleteImageLocalDatabase(image: ProductImage) {
+
     }
 }

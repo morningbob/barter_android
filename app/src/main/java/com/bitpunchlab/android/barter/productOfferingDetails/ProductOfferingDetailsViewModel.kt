@@ -9,10 +9,10 @@ import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductImage
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +25,8 @@ import java.util.UUID
 // we prepare it even before users click on view bids
 class ProductOfferingDetailsViewModel() : ViewModel() {
 
-    private val _product = MutableStateFlow<ProductOffering?>(null)
-    val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
+    //private val _product = MutableStateFlow<ProductOffering?>(null)
+    //val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -58,8 +58,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     //private val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     //val productImages : StateFlow<MutableList<ProductImage>> get() = _productImages.asStateFlow()
 
-    private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
+    //private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
+    //val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
 
     private val _loadingAlpha = MutableStateFlow<Float>(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
@@ -72,6 +72,9 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
+    private val _triggerImageUpdate = MutableStateFlow(false)
+    val triggerImageUpdate : StateFlow<Boolean> get() = _triggerImageUpdate.asStateFlow()
 
     init {
         // this is to prepare the images to be shown in image display screen
@@ -97,10 +100,13 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            LocalDatabaseManager.productOfferingWithBids.collect() {
-                //ProductInfo
+            triggerImageUpdate.collect() {
+                if (it) {
+
+                }
             }
         }
+
     }
 
     fun updateBiddingStatus(status: Int) {
@@ -114,11 +120,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     fun updateShouldPopImages(should: Boolean) {
         _shouldPopImages.value = should
     }
-
-    //fun updateImages(images: MutableList<ProductImage>) {
-    //    _imagesDisplay.value = images
-    //}
-
     fun updateShouldDisplayAskingProducts(should: Boolean) {
         _shouldDisplayAskingProducts.value = should
     }
@@ -154,12 +155,12 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         }
     }
 
+    fun updateTriggerImageUpdate(trigger: Boolean) {
+        _triggerImageUpdate.value = trigger
+    }
 
-    fun deleteImage(image: ProductImage) {
-        Log.i("askingVM", "got image")
-        //val newList = imagesDisplay.value.toMutableList()
-        //newList.remove(image)
-        //_imagesDisplay.value = newList
+    fun deleteProductImage(image: ProductImage) {
+        _imagesDisplay.value.remove(image)
     }
 
     fun updateDeleteImageStatus(status: Int) {
@@ -169,7 +170,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     // show images as soon as it is loaded
     fun prepareAskingProducts() {
         ProductInfo.productChosen.value?.let {
-            Log.i("product details vM", "product is not null")
+            //Log.i("product details vM", "product is not null")
             ProductInfo.productOfferingWithProductsAsking.value?.let {
                 ProductInfo.updateAskingProducts(it.askingProducts)
             }
@@ -183,10 +184,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
             image.image
         }
 
-        //Log.i("bid vm", "processing bid")
-
         CoroutineScope(Dispatchers.IO).launch {
-            Log.i("bidVM", "process bidding")
+            //Log.i("bidVM", "process bidding")
             if (FirebaseClient.processBidding(product, bid, imagesBitmap)) {
                 _biddingStatus.value = 2
                 _loadingAlpha.value = 0f
@@ -195,6 +194,21 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 _loadingAlpha.value = 0f
             }
         }
+    }
+
+    // the
+    private fun updateImagesList() {
+        // we convert product images to imageUrls
+    }
+
+    private fun convertProductsImageToImageList(image: ProductImage) {
+        //ProductInfo.productChosen.value?.images?.filterNot { }
+    }
+
+    private fun deleteImageFromProductOffering(image: ProductImage) {
+        // parse
+
+        ProductInfo.productChosen.value?.copy()
     }
 }
 /*

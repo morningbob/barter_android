@@ -63,10 +63,6 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
     val currentContext = LocalContext.current
     val shouldDisplayImages by bidFormViewModel.shouldDisplayImages.collectAsState()
     val imagesDisplay by bidFormViewModel.imagesDisplay.collectAsState()
-    //val numOfImages = remember {
-    //    mutableStateOf(0)
-    //}
-    //numOfImages.value = imagesDisplay.size
     val deleteImageStatus by bidFormViewModel.deleteImageStatus.collectAsState()
 
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -184,7 +180,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                                     bidFormViewModel.clearForm()
                                 }
                             } else if (bid == null) {
-                                Log.i("bid screen", "null product or bid")
+                                //Log.i("bid screen", "null product or bid")
                                 // alert user that the info is invalid
                                 bidFormViewModel.clearForm()
                                 updateBidError(3)
@@ -208,7 +204,8 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         images = bidFormViewModel.imagesDisplay,
                         onDismiss = { bidFormViewModel.updateShouldDisplayImages(false) },
                         deleteStatus = deleteImageStatus,
-                        updateDeleteStatus = { bidFormViewModel.updateDeleteImageStatus(it) }
+                        updateDeleteStatus = { bidFormViewModel.updateDeleteImageStatus(it) },
+                        deleteImage = { bidFormViewModel.deleteImage(it) }
                     )
                 }
 

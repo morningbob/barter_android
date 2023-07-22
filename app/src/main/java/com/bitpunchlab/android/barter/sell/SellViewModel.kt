@@ -81,6 +81,9 @@ class SellViewModel : ViewModel() {
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
 
+    //private val _triggerImageUpdate = MutableStateFlow(false)
+    //val triggerImageUpdate : StateFlow<Boolean> get() = _triggerImageUpdate.asStateFlow()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.userId.collect() {
@@ -88,6 +91,13 @@ class SellViewModel : ViewModel() {
             }
         }
 
+        //CoroutineScope(Dispatchers.IO).launch {
+        //    triggerImageUpdate.collect() {
+        //        if (it) {
+
+        //        }
+        //    }
+        //}
     }
 
     fun updateShouldExpandCategory(should: Boolean) {
@@ -142,6 +152,10 @@ class SellViewModel : ViewModel() {
     fun updateShouldShowAsking(should: Boolean) {
         _shouldShowAsking.value = should
     }
+
+    //fun updateTriggerImageUpdate(trigger: Boolean) {
+    //    _triggerImageUpdate.value = trigger
+    //}
 
     fun prepareAskingProducts() {
         ProductInfo.updateAskingProducts(AskingProductInfo.askingProducts.value)

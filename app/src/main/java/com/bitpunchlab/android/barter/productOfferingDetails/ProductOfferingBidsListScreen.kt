@@ -54,9 +54,7 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
 
     val product by LocalDatabaseManager.productOfferingWithBids.collectAsState()
 
-    //val bids = BidInfo.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
-    //val chosenBid by productOfferingBidsListViewModel.bid.collectAsState()
     val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
 
     //Log.i("bids list", "no bid in product offering: ${product?.bids?.size}")
@@ -99,14 +97,13 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                     modifier = Modifier
                         .fillMaxSize()
                         .background(BarterColor.lightGreen)
-                        .padding(start = 40.dp, end = 40.dp, top = 30.dp)
+                        .padding(start = 40.dp, end = 40.dp, top = 5.dp)
 
                 ) {
                     items(product!!.bids, { bid -> bid.bidId }) { bid ->
                         BidRow(
                             bid = bid,
                             onClick = {
-                                //productOfferingBidsListViewModel.updateBid(it)
                                 LocalDatabaseManager.updateBidChosen(it)
                                 productOfferingBidsListViewModel.updateShouldShowBid(true)
                             },
@@ -115,10 +112,6 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                 }
 
             }
-            //if (shouldShowBid) {
-                //Log.i("bids list", "navigate to bid details")
-            //    ProductOfferingBidDetailsScreen(productOfferingBidsListViewModel)
-            //}
         }
     }
 }
@@ -178,25 +171,3 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
 
     }
 }
-/*
-                    if (bid.bidProduct != null && bid.bidProduct.productImages.isNotEmpty()) {
-                        val bitmap = LoadImage(url = bid.bidProduct.productImages[0])
-                        bitmap.value?.let {
-                            Image(
-                                bitmap = bitmap.value!!.asImageBitmap(),
-                                contentDescription = "product's image",
-                                modifier = Modifier
-                                    .width(80.dp)
-                                    .padding(top = 20.dp, bottom = 20.dp)
-                            )
-                        }
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.mipmap.imageplaceholder),
-                            contentDescription = "image placeholder",
-                            modifier = Modifier
-                                .width(80.dp)
-                        )
-                    }
-
-                     */

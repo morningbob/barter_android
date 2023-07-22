@@ -108,10 +108,7 @@ fun parseDateTime(dateTimeString: String) : LocalDateTime? {
     return dateTime
 }
 
-data class ProductImage(
-    var id : String,
-    var image: Bitmap
-)
+
 
 data class SortHelpObject<T>(
     var key : Int,

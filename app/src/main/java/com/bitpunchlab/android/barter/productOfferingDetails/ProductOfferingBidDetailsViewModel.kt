@@ -29,7 +29,7 @@ class ProductOfferingBidDetailsViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
-    private val _shouldShowBid = MutableStateFlow<Boolean>(false)
+    private val _shouldShowBid = MutableStateFlow<Boolean>(true)
     val shouldShowBid : StateFlow<Boolean> get() = _shouldShowBid.asStateFlow()
 
     private val _acceptBidStatus = MutableStateFlow<Int>(0)

@@ -128,10 +128,7 @@ class AskingProductViewModel : ViewModel() {
     }
 
     fun deleteImage(image: ProductImage) {
-        Log.i("askingVM", "got image")
-        val newList = imagesDisplay.value.toMutableList()
-        newList.remove(image)
-        _imagesDisplay.value = newList
+        _askingProductImages.value.remove(image)
     }
 
 

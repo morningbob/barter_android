@@ -80,7 +80,7 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
                 iconId = R.mipmap.recorddetails,
                 title = "Transaction Details",
                 modifier = Modifier
-                    .padding(top = 15.dp)
+                    .padding(top = 0.dp)
             )
 
             BasicRecordScreen(

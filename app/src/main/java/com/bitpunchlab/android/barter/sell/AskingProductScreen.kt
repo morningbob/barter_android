@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.sell
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -37,11 +38,8 @@ fun AskingProductScreen(navController: NavHostController,
     val productName by askingProductViewModel.productName.collectAsState()
     val shouldExpandCategory by askingProductViewModel.shouldExpandCategory.collectAsState()
     val productCategory by askingProductViewModel.productCategory.collectAsState()
-    val productImages by askingProductViewModel.askingProductsImages.collectAsState()
-    val numOfImages = remember {
-        mutableStateOf(0)
-    }
-    numOfImages.value = productImages.size
+    val productImages by askingProductViewModel.askingProductImages.collectAsState()
+    //Log.i("asking pd screen", "product images size is: ${productImages.size}")
 
     val screenContext = LocalContext.current
     var popCurrent by remember { mutableStateOf(false) }
@@ -152,7 +150,8 @@ fun AskingProductScreen(navController: NavHostController,
                     images = askingProductViewModel.askingProductImages,
                     onDismiss = { askingProductViewModel.updateShouldDisplayImages(false) },
                     deleteStatus = deleteImageStatus,
-                    updateDeleteStatus = { askingProductViewModel.updateDeleteImageStatus(it) }
+                    updateDeleteStatus = { askingProductViewModel.updateDeleteImageStatus(it) },
+                    deleteImage = { askingProductViewModel.deleteImage(it) }
                 )
             }
         }

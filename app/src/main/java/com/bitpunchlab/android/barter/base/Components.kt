@@ -39,12 +39,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
-import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.BidWithDetails
-import com.bitpunchlab.android.barter.models.ProductAsking
-import com.bitpunchlab.android.barter.models.ProductBidding
 import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.productBiddingList.ProductBiddingInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ProductImage
@@ -484,7 +479,7 @@ fun BasicBidScreen(productName: String, productCategory: String, images: List<Pr
             painter = painterResource(id = R.mipmap.hammer),
             contentDescription = "Bid's icon",
             modifier = Modifier
-                .padding(top = 40.dp)
+                .padding(top = 5.dp)
                 .width(120.dp)
         )
 
