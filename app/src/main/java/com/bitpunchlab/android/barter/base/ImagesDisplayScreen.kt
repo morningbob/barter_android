@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
@@ -37,11 +37,11 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
     // we focus on the list of images, instead of the product offering object or the asking
     // product object, so, it can display images of both objects.
 
-    var images: MutableStateFlow<List<ProductImage>?>
+    var images: MutableStateFlow<List<ProductImageToDisplay>?>
 
     val field = viewModel.javaClass.getDeclaredField("_imagesDisplay")
     field.isAccessible = true
-    images = field.get(viewModel) as MutableStateFlow<List<ProductImage>?>
+    images = field.get(viewModel) as MutableStateFlow<List<ProductImageToDisplay>?>
 
     val viewModelShouldPopImages = viewModel.javaClass.getDeclaredField("_shouldPopImages")
     viewModelShouldPopImages.isAccessible = true
@@ -55,7 +55,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
     viewModelDeleteImages.isAccessible = true
 
     var shouldDisplayFullImage by remember { mutableStateOf(false) }
-    var imageToShow : ProductImage? by remember { mutableStateOf(null) }
+    var imageToShow : ProductImageToDisplay? by remember { mutableStateOf(null) }
 
     var shouldShowConfirmDelete by remember { mutableStateOf(false) }
 
@@ -67,7 +67,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
     }
 
     @Composable
-    fun ConfirmDeleteDialog(image: ProductImage) {
+    fun ConfirmDeleteDialog(image: ProductImageToDisplay) {
         CustomDialog(
             title = "Remove Confirmation",
             message = "Are you sure to remove the image?",
@@ -79,7 +79,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
     }
 
     @Composable
-    fun showImage(image: ProductImage) {
+    fun showImage(image: ProductImageToDisplay) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),

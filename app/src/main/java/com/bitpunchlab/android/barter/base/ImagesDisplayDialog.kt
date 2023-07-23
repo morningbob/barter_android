@@ -38,27 +38,27 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.UserMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun ImagesDisplayDialog(
-    images: StateFlow<SnapshotStateList<ProductImage>>, onDismiss: () -> Unit,
+    images: StateFlow<SnapshotStateList<ProductImageToDisplay>>, onDismiss: () -> Unit,
     deleteStatus: Int? = null,
-    updateDeleteStatus: ((Int) -> Unit)? = null, deleteImage: ((ProductImage) -> Unit)? = null,
+    updateDeleteStatus: ((Int) -> Unit)? = null, deleteImage: ((ProductImageToDisplay) -> Unit)? = null,
     triggerImageUpdate: ((Boolean) -> Unit)? = null
 ) {
     
-    var imageToShow by remember { mutableStateOf<ProductImage?>(null) }
+    var imageToShow by remember { mutableStateOf<ProductImageToDisplay?>(null) }
     var shouldTriggerImageUpdate by remember {
         mutableStateOf(false)
     }
 
     @Composable
-    fun showImage(image: ProductImage, deleteStatus: Int?) {
+    fun showImage(image: ProductImageToDisplay, deleteStatus: Int?) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -190,8 +190,8 @@ fun ImagesDisplayDialog(
 // 2 : deletion success
 // 3 : deletion failed
 @Composable
-fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit, imageToBeDeleted: ProductImage,
-    deleteImage: (ProductImage) -> Unit, removeShow: () -> Unit, shouldTriggerUpdate: (Boolean) -> Unit) {
+fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit, imageToBeDeleted: ProductImageToDisplay,
+    deleteImage: (ProductImageToDisplay) -> Unit, removeShow: () -> Unit, shouldTriggerUpdate: (Boolean) -> Unit) {
     CustomDialog(
         title = "Remove Confirmation",
         message = "Are you sure to remove the image?",

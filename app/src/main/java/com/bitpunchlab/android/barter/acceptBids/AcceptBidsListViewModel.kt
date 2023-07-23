@@ -7,8 +7,8 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.BidAndAcceptBid
 import com.bitpunchlab.android.barter.models.BidWithDetails
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.util.ImageHandler
-import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -48,8 +48,8 @@ class AcceptBidsListViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     init {
         //_bidsDetail.value = acceptedBidsDetail.value
@@ -117,7 +117,7 @@ class AcceptBidsListViewModel : ViewModel() {
         _shouldPopImages.value = should
     }
 
-    fun prepareImagesDisplay(images: List<ProductImage>) {
+    fun prepareImagesDisplay(images: List<ProductImageToDisplay>) {
         _imagesDisplay.value = images
     }
 

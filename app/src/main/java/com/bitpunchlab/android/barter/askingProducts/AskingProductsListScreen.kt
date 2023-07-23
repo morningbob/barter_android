@@ -43,7 +43,6 @@ import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.UserMode
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
 

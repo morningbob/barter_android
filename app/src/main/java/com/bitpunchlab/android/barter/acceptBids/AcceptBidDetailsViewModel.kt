@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.util.ImageHandler
-import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +17,11 @@ import java.util.UUID
 
 class AcceptBidDetailsViewModel : ViewModel() {
 
-    private val _productOfferingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productOfferingImages : StateFlow<MutableList<ProductImage>> get() = _productOfferingImages.asStateFlow()
+    private val _productOfferingImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val productOfferingImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _productOfferingImages.asStateFlow()
 
-    private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productInExchangeImages : StateFlow<MutableList<ProductImage>> get() = _productInExchangeImages.asStateFlow()
+    private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val productInExchangeImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _productInExchangeImages.asStateFlow()
 
     val _shouldPopSelf = MutableStateFlow<Boolean>(false)
     val shouldPopSelf : StateFlow<Boolean> get() = _shouldPopSelf.asStateFlow()
@@ -32,10 +32,10 @@ class AcceptBidDetailsViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImage>>(
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(
         mutableStateListOf()
     )
-    val imagesDisplay : StateFlow<SnapshotStateList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
@@ -56,18 +56,20 @@ class AcceptBidDetailsViewModel : ViewModel() {
     private suspend fun retrieveImages(productImageList: List<String>, exchangedImageList: List<String>) {
         for (i in 0..productImageList.size - 1) {
             _productOfferingImages.value.add(
-                ProductImage(
+                ProductImageToDisplay(
                     UUID.randomUUID().toString(),
-                    ImageHandler.createPlaceholderImage()
+                    ImageHandler.createPlaceholderImage(),
+                    ""
                 )
             )
         }
 
         for (i in 0..exchangedImageList.size - 1) {
             _productInExchangeImages.value.add(
-                ProductImage(
+                ProductImageToDisplay(
                     UUID.randomUUID().toString(),
-                    ImageHandler.createPlaceholderImage()
+                    ImageHandler.createPlaceholderImage(),
+                    ""
                 )
             )
         }
@@ -98,11 +100,11 @@ class AcceptBidDetailsViewModel : ViewModel() {
         _shouldPopImages.value = should
     }
 
-    fun prepareImagesDisplay(images: List<ProductImage>) {
+    fun prepareImagesDisplay(images: List<ProductImageToDisplay>) {
         _imagesDisplay.value = images.toMutableStateList()
     }
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
         //Log.i("askingVM", "got image")
         //val newList = imagesDisplay.value.toMutableList()
         //newList.remove(image)

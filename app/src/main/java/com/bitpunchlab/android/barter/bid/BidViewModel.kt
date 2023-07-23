@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +21,8 @@ class BidViewModel : ViewModel() {
     private val _bid = MutableStateFlow<Bid?>(null)
     val bid : StateFlow<Bid?> get() = _bid.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val imagesDisplay : StateFlow<MutableList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val imagesDisplay : StateFlow<MutableList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     // 1 is failed, 2 is succeeded, 3 is invalid info
     private val _biddingStatus = MutableStateFlow<Int>(0)
@@ -55,9 +55,10 @@ class BidViewModel : ViewModel() {
                 product?.let {
                     for (i in 0..product.images.size - 1) {
                         _imagesDisplay.value.add(
-                            ProductImage(
+                            ProductImageToDisplay(
                                 UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
+                                ImageHandler.createPlaceholderImage(),
+                                ""
                             )
                         )
                     }
@@ -98,7 +99,7 @@ class BidViewModel : ViewModel() {
         _biddingStatus.value = status
     }
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
         //Log.i("askingVM", "got image")
         //val newList = imagesDisplay.value.toMutableList()
         //newList.remove(image)
@@ -109,7 +110,7 @@ class BidViewModel : ViewModel() {
         _deleteImageStatus.value = status
     }
 
-    fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImage>)  {
+    fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImageToDisplay>)  {
         _loadingAlpha.value = 100f
 
         val imagesBitmap = images.map { image ->

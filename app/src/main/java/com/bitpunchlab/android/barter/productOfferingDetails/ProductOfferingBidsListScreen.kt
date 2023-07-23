@@ -41,7 +41,6 @@ import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.loadImage
 import java.util.UUID
 

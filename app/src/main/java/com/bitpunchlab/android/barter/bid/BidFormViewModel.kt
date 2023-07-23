@@ -10,9 +10,9 @@ import com.bitpunchlab.android.barter.models.AskingHolder
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,8 +31,8 @@ class BidFormViewModel : ViewModel() {
     private val _bidProductCategory = MutableStateFlow(Category.NOT_SET)
     val bidProductCategory : StateFlow<Category> get() = _bidProductCategory.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImage>>(mutableStateListOf())
-    val imagesDisplay : StateFlow<SnapshotStateList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldExpandCategoryDropdown = MutableStateFlow<Boolean>(false)
     val shouldExpandCategoryDropdown : StateFlow<Boolean>
@@ -60,7 +60,7 @@ class BidFormViewModel : ViewModel() {
     }
 
     fun updateImagesDisplay(bitmap: Bitmap) {
-        val productImage = ProductImage(UUID.randomUUID().toString(), bitmap)
+        val productImage = ProductImageToDisplay(UUID.randomUUID().toString(), bitmap, "")
         //val newList = imagesDisplay.value.toMutableList()
         //newList.add(productImage)
 
@@ -98,7 +98,7 @@ class BidFormViewModel : ViewModel() {
         return null
     }
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
         _imagesDisplay.value.remove(image)
     }
 

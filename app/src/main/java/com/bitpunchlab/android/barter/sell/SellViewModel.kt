@@ -8,11 +8,11 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.CoroutineScope
@@ -44,10 +44,10 @@ class SellViewModel : ViewModel() {
 
     // we use SnapshotStateList because I want the removal of the image to be reflected
     // in lazy column
-    private val _productImages = MutableStateFlow<SnapshotStateList<ProductImage>>(
+    private val _productImages = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(
         mutableStateListOf()
     )
-    val productImages : StateFlow<SnapshotStateList<ProductImage>> get() = _productImages.asStateFlow()
+    val productImages : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _productImages.asStateFlow()
 
     private val _askingProductImages = MutableStateFlow<List<Bitmap>>(listOf())
     val askingProductImages : StateFlow<List<Bitmap>> get() = _askingProductImages.asStateFlow()
@@ -58,8 +58,8 @@ class SellViewModel : ViewModel() {
     private val _shouldSetProduct = MutableStateFlow(false)
     val shouldSetProduct : StateFlow<Boolean> get() = _shouldSetProduct.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -121,7 +121,7 @@ class SellViewModel : ViewModel() {
     }
 
     fun updateProductImages(image: Bitmap) {
-        val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
+        val productImage = ProductImageToDisplay(id = UUID.randomUUID().toString(), image = image, url = "")
         val newList = productImages.value.toMutableStateList()
         newList.add(productImage)
         //Log.i("sellVM", "added one bitmap")
@@ -230,7 +230,7 @@ class SellViewModel : ViewModel() {
         _shouldPopImages.value = should
     }
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
         _productImages.value.remove(image)
     }
 

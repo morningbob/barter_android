@@ -1,13 +1,21 @@
 package com.bitpunchlab.android.barter
 
+import android.Manifest
+import android.app.Instrumentation.ActivityResult
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,6 +48,19 @@ import com.bitpunchlab.android.barter.util.UserMode
 import kotlinx.coroutines.InternalCoroutinesApi
 
 class MainActivity : ComponentActivity() {
+
+    var readPermissionGranted = false
+    var writePermissionGranted = false
+
+    private var permissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        isGranted : Boolean ->
+        if (isGranted) {
+            Log.i("main activity", "requested permissions and granted")
+        } else {
+            Log.i("main activity", "requested permissions and not granted")
+        }
+    }
+
     @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +84,36 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // check if the app has read and write external permissions, or the api is 29 or above
+    private fun updateOrRequestPermissions() {
+        val hasReadPermission = ContextCompat.checkSelfPermission(
+            ImageHandler.currentContext!!,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+        val hasWritePermssion = ContextCompat.checkSelfPermission(
+            ImageHandler.currentContext!!,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val minSdk29 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+        readPermissionGranted = hasReadPermission
+        writePermissionGranted = hasWritePermssion || minSdk29
+
+        val permissionsToRequest = mutableListOf<String>()
+        if (!writePermissionGranted) {
+            permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (!readPermissionGranted) {
+            permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            permissionsLauncher.launch(permissionsToRequest.toTypedArray())
+        }
+
     }
 }
 

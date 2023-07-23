@@ -9,9 +9,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,8 +30,8 @@ class AskingProductViewModel : ViewModel() {
     private val _productCategory = MutableStateFlow(Category.NOT_SET)
     val productCategory : StateFlow<Category> get() = _productCategory.asStateFlow()
 
-    private val _askingProductImages = MutableStateFlow<SnapshotStateList<ProductImage>>(mutableStateListOf())
-    val askingProductImages : StateFlow<SnapshotStateList<ProductImage>> get() = _askingProductImages.asStateFlow()
+    private val _askingProductImages = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val askingProductImages : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _askingProductImages.asStateFlow()
 
     private val _status = MutableStateFlow(0)
     val status : StateFlow<Int> get() = _status.asStateFlow()
@@ -48,8 +48,8 @@ class AskingProductViewModel : ViewModel() {
     private val _update = MutableStateFlow(false)
     val update : StateFlow<Boolean> get() = _update.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -73,7 +73,7 @@ class AskingProductViewModel : ViewModel() {
     }
 
     fun updateAskingImages(image: Bitmap) {
-        val productImage = ProductImage(id = UUID.randomUUID().toString(), image = image)
+        val productImage = ProductImageToDisplay(id = UUID.randomUUID().toString(), image = image, "")
         //val newList = askingProductImages.value.toMutableList()
         //newList.add(productImage)
         //Log.i("sellVM", "added one bitmap")
@@ -127,7 +127,7 @@ class AskingProductViewModel : ViewModel() {
         return !(productName.value == "" || productCategory.value == Category.NOT_SET)
     }
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
         _askingProductImages.value.remove(image)
     }
 

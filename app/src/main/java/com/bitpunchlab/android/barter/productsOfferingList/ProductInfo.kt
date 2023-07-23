@@ -4,10 +4,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.UserMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,8 +40,8 @@ object ProductInfo {
     )
     val askingProducts : StateFlow<SnapshotStateList<ProductAsking>> get() = _askingProducts.asStateFlow()
 
-    private val _askingImages = MutableStateFlow<List<List<ProductImage>>>(listOf())
-    val askingImages : StateFlow<List<List<ProductImage>>> get() = _askingImages.asStateFlow()
+    private val _askingImages = MutableStateFlow<List<List<ProductImageToDisplay>>>(listOf())
+    val askingImages : StateFlow<List<List<ProductImageToDisplay>>> get() = _askingImages.asStateFlow()
 
     fun updateProductChosen(product: ProductOffering?) {
         _productChosen.value = product
@@ -51,7 +51,7 @@ object ProductInfo {
         _askingProducts.value = products.toMutableStateList()
     }
 
-    fun updateAskingImages(images: List<List<ProductImage>>) {
+    fun updateAskingImages(images: List<List<ProductImageToDisplay>>) {
         _askingImages.value = images
     }
 

@@ -13,11 +13,11 @@ import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
@@ -343,8 +343,8 @@ object FirebaseClient {
     }
 
     suspend fun processSelling(productOffering: ProductOffering,
-                               productImages: List<ProductImage>,
-        askingProducts: List<ProductAsking>, askingProductImages: List<List<ProductImage>>) : Boolean {
+                               productImages: List<ProductImageToDisplay>,
+        askingProducts: List<ProductAsking>, askingProductImages: List<List<ProductImageToDisplay>>) : Boolean {
 
         val pairResult =
             uploadImagesAndGetDownloadUrl(productOffering, askingProducts, askingProductImages, productImages)
@@ -386,8 +386,8 @@ object FirebaseClient {
 
     private suspend fun uploadImagesAndGetDownloadUrl(productOffering: ProductOffering,
                                                       listOfAskingProducts: List<ProductAsking>,
-                                                      askingProductImages: List<List<ProductImage>>,
-                                                      productImages: List<ProductImage>) =
+                                                      askingProductImages: List<List<ProductImageToDisplay>>,
+                                                      productImages: List<ProductImageToDisplay>) =
         suspendCancellableCoroutine<Pair<ProductOffering, List<ProductAsking>>> { cancellableContinuation ->
             Log.i("upload", "started")
             CoroutineScope(Dispatchers.IO).launch {
@@ -415,7 +415,7 @@ object FirebaseClient {
             }
     }
     private suspend fun processEachProduct(productId: String,
-        productImages: List<ProductImage>) : Pair<List<String>, List<String>> {
+        productImages: List<ProductImageToDisplay>) : Pair<List<String>, List<String>> {
         Log.i("process each product", "started")
         val downloadUrlList = mutableListOf<String>()
         val imageFilenames = mutableListOf<String>()

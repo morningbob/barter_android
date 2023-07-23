@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +25,8 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     private val _product = MutableStateFlow<ProductOffering?>(null)
     val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldShowBid = MutableStateFlow<Boolean>(false)
     val shouldShowBid : StateFlow<Boolean> get() = _shouldShowBid.asStateFlow()
@@ -58,7 +58,7 @@ class ProductOfferingBidsListViewModel : ViewModel() {
         }
     }
 
-    fun updateImagesDisplay(images: List<ProductImage>) {
+    fun updateImagesDisplay(images: List<ProductImageToDisplay>) {
         _imagesDisplay.value = images
     }
 
@@ -91,7 +91,7 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     }
 
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
         Log.i("askingVM", "got image")
         //val newList = imagesDisplay.value.toMutableList()
         //newList.remove(image)

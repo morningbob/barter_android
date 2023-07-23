@@ -4,6 +4,7 @@ import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
@@ -33,11 +34,11 @@ object LocalDatabaseManager {
     private val _productChosen = MutableStateFlow<ProductOffering?>(null)
     val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
 
-    private var _sellerProductImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val sellerProductImages : StateFlow<MutableList<ProductImage>> get() = _sellerProductImages.asStateFlow()
+    private var _sellerProductImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val sellerProductImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _sellerProductImages.asStateFlow()
 
-    private var _askingProductImages = MutableStateFlow<MutableList<MutableList<ProductImage>>>(mutableListOf())
-    val askingProductImages : StateFlow<MutableList<MutableList<ProductImage>>> get() = _askingProductImages.asStateFlow()
+    private var _askingProductImages = MutableStateFlow<MutableList<MutableList<ProductImageToDisplay>>>(mutableListOf())
+    val askingProductImages : StateFlow<MutableList<MutableList<ProductImageToDisplay>>> get() = _askingProductImages.asStateFlow()
 
     private val _productOfferingWithProductsAsking = MutableStateFlow<ProductOfferingAndProductsAsking?>(null)
     val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductsAsking?>
@@ -50,8 +51,8 @@ object LocalDatabaseManager {
     private val _bidChosen = MutableStateFlow<Bid?>(null)
     val bidChosen : StateFlow<Bid?> get() = _bidChosen.asStateFlow()
 
-    private var _bidProductImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val bidProductImages : StateFlow<MutableList<ProductImage>> get() = _bidProductImages.asStateFlow()
+    private var _bidProductImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val bidProductImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _bidProductImages.asStateFlow()
 
     init {
         prepare()
@@ -83,9 +84,10 @@ object LocalDatabaseManager {
                     // also, for mutable list to set the result at particular index
                     for (i in 0..productOffering.images.size - 1) {
                         _sellerProductImages.value.add(
-                            ProductImage(
+                            ProductImageToDisplay(
                                 UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
+                                ImageHandler.createPlaceholderImage(),
+                                ""
                             )
                         )
                     }
@@ -107,9 +109,10 @@ object LocalDatabaseManager {
                                     _askingProductImages.value.add(mutableListOf())
                                     for (j in 0..it[0].askingProducts[i].images.size - 1) {
                                         _askingProductImages.value[i].add(
-                                            ProductImage(
+                                            ProductImageToDisplay(
                                                 UUID.randomUUID().toString(),
-                                                ImageHandler.createPlaceholderImage()
+                                                ImageHandler.createPlaceholderImage(),
+                                                ""
                                             )
                                         )
                                     }
@@ -139,9 +142,10 @@ object LocalDatabaseManager {
                 it?.let {
                     for (i in 0..it.bidProduct.images.size - 1) {
                         _bidProductImages.value.add(
-                            ProductImage(
+                            ProductImageToDisplay(
                                 UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
+                                ImageHandler.createPlaceholderImage(),
+                                ""
                             )
                         )
                     }
@@ -179,7 +183,7 @@ object LocalDatabaseManager {
         BarterRepository.deleteProductsAsking(listOf(productAsking))
     }
 
-    fun deleteImageLocalDatabase(image: ProductImage) {
+    fun deleteImageLocalDatabase(image: ProductImageToDisplay) {
 
     }
 }

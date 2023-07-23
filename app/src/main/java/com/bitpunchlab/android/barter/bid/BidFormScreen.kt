@@ -40,10 +40,10 @@ import com.bitpunchlab.android.barter.base.CustomTextField
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() },
     biddingStatus: Int, loadingAlpha: Float, resetStatus: () -> Unit,
-    processBidding: (product: ProductOffering, bid: Bid, images: List<ProductImage>) -> Unit,
+    processBidding: (product: ProductOffering, bid: Bid, images: List<ProductImageToDisplay>) -> Unit,
     updateBidError: (Int) -> Unit, updateShouldStartBidding: (Boolean) -> Unit
 ) {
 

@@ -9,7 +9,7 @@ import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.ProductImage
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
@@ -52,8 +52,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     // so the images display screen can retrieve it here
     // that way, we can display both product images and asking product images
     // both in one images display screen
-    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImage>>(mutableStateListOf())
-    val imagesDisplay : StateFlow<SnapshotStateList<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     //private val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
     //val productImages : StateFlow<MutableList<ProductImage>> get() = _productImages.asStateFlow()
@@ -159,7 +159,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _triggerImageUpdate.value = trigger
     }
 
-    fun deleteProductImage(image: ProductImage) {
+    fun deleteProductImage(image: ProductImageToDisplay) {
         _imagesDisplay.value.remove(image)
     }
 
@@ -177,7 +177,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         }
     }
 
-    fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImage>)  {
+    fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImageToDisplay>)  {
         _loadingAlpha.value = 100f
 
         val imagesBitmap = images.map { image ->
@@ -201,11 +201,11 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         // we convert product images to imageUrls
     }
 
-    private fun convertProductsImageToImageList(image: ProductImage) {
+    private fun convertProductsImageToImageList(image: ProductImageToDisplay) {
         //ProductInfo.productChosen.value?.images?.filterNot { }
     }
 
-    private fun deleteImageFromProductOffering(image: ProductImage) {
+    private fun deleteImageFromProductOffering(image: ProductImageToDisplay) {
         // parse
 
         ProductInfo.productChosen.value?.copy()

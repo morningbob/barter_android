@@ -2,8 +2,8 @@ package com.bitpunchlab.android.barter.models
 
 import android.graphics.Bitmap
 
-data class ProductImage(
+data class ProductImageToDisplay(
     val id : String,
     val image: Bitmap,
-    val url : String
+    var url : String
 )

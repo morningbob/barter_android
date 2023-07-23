@@ -39,10 +39,10 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
-import com.bitpunchlab.android.barter.util.ProductImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bitpunchlab.android.barter.util.parseDateTime
 import com.bumptech.glide.Glide
@@ -466,7 +466,7 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 }
 
 @Composable
-fun BasicBidScreen(productName: String, productCategory: String, images: List<ProductImage>,
+fun BasicBidScreen(productName: String, productCategory: String, images: List<ProductImageToDisplay>,
     updateShouldDisplayImages: (Boolean) -> Unit) {
 
     Column(
@@ -527,8 +527,8 @@ fun BasicBidScreen(productName: String, productCategory: String, images: List<Pr
 }
 
 @Composable
-fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List<ProductImage>,
-    productInExchangeImages: List<ProductImage>, prepareImages: (List<ProductImage>) -> Unit,
+fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List<ProductImageToDisplay>,
+    productInExchangeImages: List<ProductImageToDisplay>, prepareImages: (List<ProductImageToDisplay>) -> Unit,
     updateShouldDisplayImages: (Boolean) -> Unit) {
     Column(
         modifier = Modifier

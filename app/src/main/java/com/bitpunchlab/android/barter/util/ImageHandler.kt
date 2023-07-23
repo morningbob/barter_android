@@ -1,11 +1,17 @@
 package com.bitpunchlab.android.barter.util
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.os.Build
+import android.os.Environment
+import androidx.core.content.ContextCompat
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -18,6 +24,10 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
+import java.io.File
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 
 // the image loader is so important for the app to display images
 // keeping a context in it while the app is active
@@ -26,6 +36,12 @@ object ImageHandler {
 
     @SuppressLint("StaticFieldLeak")
     var currentContext : Context? = null
+
+
+
+    //private var permissionsLauncher = currentContext.applicationContext.reg
+
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun loadImage(url: String) =
@@ -50,19 +66,38 @@ object ImageHandler {
 
     // since we need to get responses from the other coroutines,
     // we use channel flow instead of flow
-    suspend fun loadedImagesFlow(imagesUrl: List<String>) : Flow<Pair<Int, ProductImage>> = channelFlow {
+    suspend fun loadedImagesFlow(imagesUrl: List<String>) : Flow<Pair<Int, ProductImageToDisplay>> = channelFlow {
         for (i in 0..imagesUrl.size - 1) {
             // so before we load the image, we show the placeholder image
 
             CoroutineScope(Dispatchers.IO).launch {
                 loadImage(imagesUrl[i])?.let {
-                    send(Pair(i, ProductImage(i.toString(), it)))
+                    send(Pair(i, ProductImageToDisplay(i.toString(), it, "")))
                 }
             }
         }
         // this is required to keep the channel opened
         awaitClose()
     }
+
+    suspend fun saveImageLocally() {
+        val appSpecificExternalDir = File(currentContext!!.getExternalFilesDir(null), "")
+    }
+
+    // Checks if a volume containing external storage is available
+    // for read and write.
+    fun isExternalStorageWritable(): Boolean {
+        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    }
+
+    // Checks if a volume containing external storage is available to at least read.
+    fun isExternalStorageReadable(): Boolean {
+        return Environment.getExternalStorageState() in
+                setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
+    }
+
+
+
 
     fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
         val baos = ByteArrayOutputStream()

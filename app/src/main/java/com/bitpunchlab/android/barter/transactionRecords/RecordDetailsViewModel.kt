@@ -1,18 +1,18 @@
 package com.bitpunchlab.android.barter.transactionRecords
 
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.util.ProductImage
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class RecordDetailsViewModel : ViewModel() {
 
-    private val _productOfferingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productOfferingImages : StateFlow<MutableList<ProductImage>> get() = _productOfferingImages.asStateFlow()
+    private val _productOfferingImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val productOfferingImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _productOfferingImages.asStateFlow()
 
-    private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    val productInExchangeImages : StateFlow<MutableList<ProductImage>> get() = _productInExchangeImages.asStateFlow()
+    private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
+    val productInExchangeImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _productInExchangeImages.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
@@ -20,8 +20,8 @@ class RecordDetailsViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImage>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImage>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
+    val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     init {
         /*
@@ -82,11 +82,11 @@ class RecordDetailsViewModel : ViewModel() {
         _shouldPopImages.value = should
     }
 
-    fun prepareImagesDisplay(images: List<ProductImage>) {
+    fun prepareImagesDisplay(images: List<ProductImageToDisplay>) {
         _imagesDisplay.value = images
     }
 
-    fun deleteImage(image: ProductImage) {
+    fun deleteImage(image: ProductImageToDisplay) {
 
     }
 }
