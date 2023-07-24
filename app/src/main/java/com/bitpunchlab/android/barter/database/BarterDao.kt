@@ -6,6 +6,7 @@ import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
@@ -66,6 +67,12 @@ interface BarterDao {
     @Transaction
     @Query("SELECT * FROM products_offering WHERE :id = productId")
     fun getProductOfferingAndBidsAsList(id: String) : List<ProductOfferingAndBids>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProductImages(vararg image: ProductImageToDisplay)
+
+    @Query("SELECT * FROM images_table WHERE :url == imageUrlCloud")
+    suspend fun getProductImage(url: String) : List<ProductImageToDisplay>
 
     //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
     //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>

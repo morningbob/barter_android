@@ -33,36 +33,7 @@ class ProductsOfferingListViewModel : ViewModel() {
 
     }
 
-
-
     fun updateShouldDisplayProductDetails(should: Boolean) {
         _shouldDisplayDetails.value = should
     }
 }
-/*
-suspend fun getAllProductsOffering(database: BarterDatabase, id: String) {
-        val userList = BarterRepository.getUserProductsOffering(id) ?: listOf()
-        if (userList.isNotEmpty()) {
-            _productsOffering.value = userList[0].productsOffering
-        }
-    }
- */
-/*
-        CoroutineScope(Dispatchers.IO).launch {
-            ProductInfo.userMode.collect() {
-                //CoroutineScope(Dispatchers.IO).launch {
-                if (it == UserMode.OWNER_MODE) {
-                    FirebaseClient.userId.collect() { id ->
-                        getAllProductsOffering(FirebaseClient.localDatabase!!, id)
-                    }
-                } else {
-                    BarterRepository.getAllProductOffering()?.collect() {
-                        Log.i("product offering list vm", "no of products retrieved ${it.size}")
-                        _productsOffering.value = it
-                    }
-                }
-            }
-
-        }
-
-         */

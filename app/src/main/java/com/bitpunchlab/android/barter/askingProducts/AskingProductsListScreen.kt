@@ -132,7 +132,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                         } else if (askingImages.isNotEmpty()) {
                             if (askingImages[index].isNotEmpty()) {
                                 Image(
-                                    bitmap = askingImages[index][0].image.asImageBitmap(),
+                                    bitmap = askingImages[index][0].image!!.asImageBitmap(),
                                     contentDescription = "product's image",
                                     modifier = Modifier
                                         .width(200.dp)

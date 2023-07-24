@@ -68,7 +68,7 @@ fun RecordDetailsScreen(navController: NavHostController,
                 )
                 if (productOfferingImages.isNotEmpty()) {
                     Image(
-                        bitmap = productOfferingImages[0].image.asImageBitmap(),
+                        bitmap = productOfferingImages[0].image!!.asImageBitmap(),
                         contentDescription = "first product image",
                         modifier = Modifier
                             .width(200.dp)
@@ -101,7 +101,7 @@ fun RecordDetailsScreen(navController: NavHostController,
                 )
                 if (productInExchangeImages.isNotEmpty()) {
                     Image(
-                        bitmap = productInExchangeImages[0].image.asImageBitmap(),
+                        bitmap = productInExchangeImages[0].image!!.asImageBitmap(),
                         contentDescription = "first product image",
                         modifier = Modifier
                             .width(200.dp)

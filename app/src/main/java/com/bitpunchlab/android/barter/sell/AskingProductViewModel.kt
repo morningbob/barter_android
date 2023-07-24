@@ -73,7 +73,7 @@ class AskingProductViewModel : ViewModel() {
     }
 
     fun updateAskingImages(image: Bitmap) {
-        val productImage = ProductImageToDisplay(id = UUID.randomUUID().toString(), image = image, "")
+        val productImage = ProductImageToDisplay(imageId = UUID.randomUUID().toString(), image = image, "")
         //val newList = askingProductImages.value.toMutableList()
         //newList.add(productImage)
         //Log.i("sellVM", "added one bitmap")

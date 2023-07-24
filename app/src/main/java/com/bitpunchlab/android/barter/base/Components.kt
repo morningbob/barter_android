@@ -485,7 +485,7 @@ fun BasicBidScreen(productName: String, productCategory: String, images: List<Pr
 
         if (images.isNotEmpty()) {
             Image(
-                bitmap = images[0].image.asImageBitmap(),
+                bitmap = images[0].image!!.asImageBitmap(),
                 contentDescription = "product's image",
                 modifier = Modifier
                     .padding(top = 30.dp)
@@ -553,7 +553,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
         )
         if (productOfferingImages.isNotEmpty()) {
             Image(
-                bitmap = productOfferingImages[0].image.asImageBitmap(),
+                bitmap = productOfferingImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
                 modifier = Modifier
                     .width(200.dp)
@@ -586,7 +586,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
         )
         if (productInExchangeImages.isNotEmpty()) {
             Image(
-                bitmap = productInExchangeImages[0].image.asImageBitmap(),
+                bitmap = productInExchangeImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
                 modifier = Modifier
                     .width(200.dp)

@@ -65,7 +65,7 @@ fun ImagesDisplayDialog(
             Alignment.Center
         ) {
             Image(
-                bitmap = image.image.asImageBitmap(),
+                bitmap = image.image!!.asImageBitmap(),
                 contentDescription = "A product image",
                 modifier = Modifier
                     .width(400.dp)
@@ -168,9 +168,9 @@ fun ImagesDisplayDialog(
 
                     ) {
 
-                        items(images.value, { image -> image.id }) { item ->
+                        items(images.value, { image -> image.imageId }) { item ->
                             Image(
-                                bitmap = item.image.asImageBitmap(),
+                                bitmap = item.image!!.asImageBitmap(),
                                 contentDescription = "product image",
                                 modifier = Modifier
                                     .fillMaxWidth(0.8f)

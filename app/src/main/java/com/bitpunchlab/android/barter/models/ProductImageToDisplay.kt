@@ -1,9 +1,14 @@
 package com.bitpunchlab.android.barter.models
 
 import android.graphics.Bitmap
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 
-data class ProductImageToDisplay(
-    val id : String,
-    val image: Bitmap,
-    var url : String
+@Entity(tableName = "images_table")
+data class ProductImageToDisplay @JvmOverloads constructor(
+    @PrimaryKey val imageId : String,
+    @Ignore var image: Bitmap? = null,
+    val imageUrlCloud : String,
+    var imageUrlLocal : String? = null
 )

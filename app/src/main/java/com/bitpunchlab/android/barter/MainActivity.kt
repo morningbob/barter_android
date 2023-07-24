@@ -2,12 +2,14 @@ package com.bitpunchlab.android.barter
 
 import android.Manifest
 import android.app.Instrumentation.ActivityResult
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,13 +54,21 @@ class MainActivity : ComponentActivity() {
     var readPermissionGranted = false
     var writePermissionGranted = false
 
-    private var permissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        isGranted : Boolean ->
-        if (isGranted) {
-            Log.i("main activity", "requested permissions and granted")
-        } else {
-            Log.i("main activity", "requested permissions and not granted")
-        }
+    private var permissionsLauncher  = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            resultMap ->
+            resultMap.map { (key, value) ->
+                when (key) {
+                    Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                        readPermissionGranted = true
+                        Log.i("main activity", "read permission granted")
+                    }
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                        writePermissionGranted = true
+                        Log.i("main activity", "write permission granted")
+                    }
+                    else -> 0
+                }
+            }
     }
 
     @OptIn(InternalCoroutinesApi::class)
@@ -77,23 +87,25 @@ class MainActivity : ComponentActivity() {
                         .get(MainViewModel::class.java)
                     val sellViewModel = ViewModelProvider(this)
                         .get(SellViewModel::class.java)
+                    ImageHandler.currentContext = applicationContext
                     FirebaseClient.localDatabase = BarterDatabase.getInstance(applicationContext)
                     BarterRepository.database = BarterDatabase.getInstance(applicationContext)
-                    ImageHandler.currentContext = applicationContext
+
                     BarterNavigation(mainViewModel, sellViewModel)
                 }
             }
         }
+        updateOrRequestPermissions(applicationContext)
     }
 
     // check if the app has read and write external permissions, or the api is 29 or above
-    private fun updateOrRequestPermissions() {
+    private fun updateOrRequestPermissions(context: Context) {
         val hasReadPermission = ContextCompat.checkSelfPermission(
-            ImageHandler.currentContext!!,
+            context,
             Manifest.permission.READ_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
         val hasWritePermssion = ContextCompat.checkSelfPermission(
-            ImageHandler.currentContext!!,
+            context,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
 
@@ -105,12 +117,15 @@ class MainActivity : ComponentActivity() {
         val permissionsToRequest = mutableListOf<String>()
         if (!writePermissionGranted) {
             permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            Log.i("main activity", "added write permission request")
         }
         if (!readPermissionGranted) {
             permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            Log.i("main activity", "added read permission request")
         }
 
         if (permissionsToRequest.isNotEmpty()) {
+            Log.i("main activity", "requesting permission ${permissionsToRequest.size}")
             permissionsLauncher.launch(permissionsToRequest.toTypedArray())
         }
 
@@ -152,9 +167,6 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         composable(ProductOfferingBidsList.route) {
             ProductOfferingBidsListScreen(navController)
         }
-        //composable(Bid.route) {
-        //    BidScreen(navController)
-        //}
         composable(BidDetails.route) {
             ProductOfferingBidDetailsScreen(navController)
         }
@@ -175,3 +187,12 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
     }
 }
+/*
+        isGranted : Boolean ->
+        if (isGranted) {
+            Log.i("main activity", "requested permissions and granted")
+        } else {
+            Log.i("main activity", "requested permissions and not granted")
+        }
+
+         */

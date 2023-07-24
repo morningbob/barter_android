@@ -114,7 +114,7 @@ class BidViewModel : ViewModel() {
         _loadingAlpha.value = 100f
 
         val imagesBitmap = images.map { image ->
-            image.image
+            image.image!!
         }
 
         Log.i("bid vm", "processing bid")

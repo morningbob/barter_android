@@ -86,7 +86,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
             Alignment.Center
         ) {
             Image(
-                bitmap = image.image.asImageBitmap(),
+                bitmap = image.image!!.asImageBitmap(),
                 contentDescription = "A product image",
                 modifier = Modifier
                     .width(400.dp)
@@ -175,7 +175,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
 
                     ) {
 
-                        items(images.value ?: listOf(), { image -> image.id }) { item ->
+                        items(images.value ?: listOf(), { image -> image.imageId }) { item ->
                             // remember updated state will renew whenever there is
                             // recomposition, so , if an item is deleted, another
                             // item's position changed, the remember will remember the
@@ -189,7 +189,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                                 }
                             )
                             Image(
-                                bitmap = item.image.asImageBitmap(),
+                                bitmap = item.image!!.asImageBitmap(),
                                 contentDescription = "product image",
                                 modifier = Modifier
                                     .fillMaxWidth(0.8f)

@@ -2,13 +2,17 @@ package com.bitpunchlab.android.barter.util
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
@@ -28,6 +32,8 @@ import java.io.File
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import kotlinx.coroutines.async
+import java.io.IOException
 
 // the image loader is so important for the app to display images
 // keeping a context in it while the app is active
@@ -36,12 +42,6 @@ object ImageHandler {
 
     @SuppressLint("StaticFieldLeak")
     var currentContext : Context? = null
-
-
-
-    //private var permissionsLauncher = currentContext.applicationContext.reg
-
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun loadImage(url: String) =
@@ -70,33 +70,71 @@ object ImageHandler {
         for (i in 0..imagesUrl.size - 1) {
             // so before we load the image, we show the placeholder image
 
+            send(Pair(i, ProductImageToDisplay(i.toString(), loadImageFromCloud(imagesUrl[i]), "")))
+            /*
             CoroutineScope(Dispatchers.IO).launch {
                 loadImage(imagesUrl[i])?.let {
                     send(Pair(i, ProductImageToDisplay(i.toString(), it, "")))
                 }
             }
+
+             */
         }
         // this is required to keep the channel opened
         awaitClose()
     }
 
-    suspend fun saveImageLocally() {
-        val appSpecificExternalDir = File(currentContext!!.getExternalFilesDir(null), "")
+    suspend fun loadImageFromCloud(url: String) : Bitmap? {
+        return CoroutineScope(Dispatchers.IO).async {
+            loadImage(url)
+        }.await()
     }
 
-    // Checks if a volume containing external storage is available
-    // for read and write.
-    fun isExternalStorageWritable(): Boolean {
-        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    suspend fun saveImageExternalStorage(displayName: String, bitmap: Bitmap) : Uri? {
+        //val appSpecificExternalDir = File(currentContext!!.getExternalFilesDir(null), "")
+
+        val imageCollection = sdk29AndUp {
+            // this location allows all apps to access the image
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } ?: MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "$displayName.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.WIDTH, bitmap.width)
+            put(MediaStore.Images.Media.HEIGHT, bitmap.height)
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+         try {
+            val uri = currentContext!!.contentResolver.insert(imageCollection, contentValues)
+             uri?.let {
+                 currentContext!!.contentResolver.openOutputStream(it).use { outputStream ->
+                     if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)) {
+                         throw IOException("couldn't save image")
+                     }
+                 } ?: throw IOException("failed to create media store entry")
+
+                 Log.i("image handler", "saved image successfully.")
+
+                 contentValues.clear()
+                 contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                 currentContext!!.contentResolver.update(uri, contentValues, null, null)
+                 return it
+             }
+             return null
+            //true
+        } catch (e: IOException) {
+            e.printStackTrace()
+            //false
+             return null
+        }
     }
 
-    // Checks if a volume containing external storage is available to at least read.
-    fun isExternalStorageReadable(): Boolean {
-        return Environment.getExternalStorageState() in
-                setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
+    fun retrieveImageExternalStorage(uri: String) : ProductImageToDisplay? {
+
+        return null
     }
-
-
 
 
     fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
@@ -135,5 +173,16 @@ object ImageHandler {
 
     }
 
+// Checks if a volume containing external storage is available
+    // for read and write.
+    fun isExternalStorageWritable(): Boolean {
+        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    }
+
+    // Checks if a volume containing external storage is available to at least read.
+    fun isExternalStorageReadable(): Boolean {
+        return Environment.getExternalStorageState() in
+                setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
+    }
 
  */

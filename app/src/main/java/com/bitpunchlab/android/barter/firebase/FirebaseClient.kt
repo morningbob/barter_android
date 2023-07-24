@@ -18,6 +18,8 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.util.ImageHandler
+import com.bitpunchlab.android.barter.util.ProductOfferingDecomposed
 import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
@@ -82,7 +84,6 @@ object FirebaseClient {
                         prepareProductsOffering()
                         prepareProductsInUserForLocalDatabase(currentUser)
                         prepareOpenTransactions(currentUser)
-                        //prepareProductsBiddingForLocalDatabase()
                         prepareTransactionRecords(currentUser)
                     }
                // }
@@ -198,7 +199,8 @@ object FirebaseClient {
            retrieveProductsOfferingFirebase()
         }.await()
 
-        val (products, askingProducts, bids) = decomposeProductOfferingFirebase(productsFirebase)
+        val (products, askingProducts, bids) =
+            decomposeProductOfferingFirebase(productsFirebase)
 
         BarterRepository.insertProductsOffering(products)
         BarterRepository.insertProductsAsking(askingProducts)
@@ -237,24 +239,28 @@ object FirebaseClient {
         // here the productsOffering in the user firebase object
         // has the full product offering object stored in it
         // asking products
-        val products = userFirebase.productsOffering.map { (key, product) ->
+        val products = userFirebase.productsOffering.map {
+                (key, product) ->
             product
         }
 
-        val tripleResult = decomposeProductOfferingFirebase(products)
-        val (productsOffering, askingProducts, bids) = tripleResult
+        val decomposed = decomposeProductOfferingFirebase(products)
 
-        Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
-        Log.i("prepare product offering", "no of bids ${bids.size}")
-        BarterRepository.insertProductsOffering(productsOffering)
-        BarterRepository.insertProductsAsking(askingProducts)
-        BarterRepository.insertBids(bids)
+        //Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
+        //Log.i("prepare product offering", "no of bids ${bids.size}")
+        BarterRepository.insertProductsOffering(decomposed.productsOffering)
+        BarterRepository.insertProductsAsking(decomposed.askingProducts)
+        BarterRepository.insertBids(decomposed.bids)
+        BarterRepository.insertImages(decomposed.images)
     }
 
     private fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
-        Triple<List<ProductOffering>, List<ProductAsking>, List<Bid>> {
+        ProductOfferingDecomposed
+    {
+        //Triple<List<ProductOffering>, List<ProductAsking>, List<Bid>> {
         val askingProducts = mutableListOf<ProductAsking>()
         val bids = mutableListOf<Bid>()
+        val productImages = mutableListOf<ProductImageToDisplay>()
         val productsOffering = productsOfferingFirebase.map {
                 product ->
             product.askingProducts.map { (askingKey, asking) ->
@@ -263,9 +269,56 @@ object FirebaseClient {
             product.currentBids.map { (bidKey, bid) ->
                 bids.add(convertBidFirebaseToBid(bid))
             }
+            // before we create a new product image,
+            // we try to retrieve the image locally by the imageUrlCloud
+            // if we get back the product image, we do nothing
+            // if not, we create a new product image
+            // retrieve the image from cloud storage
+            // and save locally, we got the local uri and save it in product image's imageUrlLocal
+            product.images.map { (imageKey, imageUrl) ->
+                // now, for every image, launch a scope to wait for the result
+                Log.i("decompose product offering", "processing each image in a product")
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result = CoroutineScope(Dispatchers.IO).async {
+                        Log.i("decompose product offering", "try to retrieve image locally")
+                        retrieveImageLocally(imageUrl)
+                    }.await()
+                    if (result.isNullOrEmpty()) {
+                        Log.i("decompose product offering", "result is null")
+                        // retrieve the image from cloud storage
+                        val image = ImageHandler.loadImageFromCloud(imageUrl)
+                        image?.let { bitmap ->
+                            Log.i("decompose product offering", "got image")
+                            val localUrl = ImageHandler.saveImageExternalStorage(imageUrl, bitmap)
+                            localUrl?.let {
+                                Log.i("decompose product offering", "got localUrl ${it}")
+                                productImages.add(
+                                    ProductImageToDisplay(
+                                        imageId = UUID.randomUUID().toString(),
+                                        imageUrlCloud = imageUrl,
+                                        imageUrlLocal = it.toString()
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             convertProductFirebaseToProduct(product)
         }
-        return Triple(productsOffering, askingProducts, bids)
+        return ProductOfferingDecomposed(
+            productsOffering = productsOffering,
+            askingProducts = askingProducts,
+            bids = bids,
+            images = productImages
+        )
+        //return Triple(productsOffering, askingProducts, bids)
+    }
+
+    private suspend fun retrieveImageLocally(imageUrl: String) : List<ProductImageToDisplay>? {
+        return CoroutineScope(Dispatchers.IO).async {
+            BarterRepository.getImage(imageUrl)
+        }.await()
     }
 
     // the bids that users bidding, the bids that users accepted
@@ -420,7 +473,7 @@ object FirebaseClient {
         val downloadUrlList = mutableListOf<String>()
         val imageFilenames = mutableListOf<String>()
 
-        val images = productImages.map { it.image }
+        val images = productImages.map { it.image!! }
 
         val pairProductResult = uploadImages(
             productId = productId,
@@ -429,10 +482,10 @@ object FirebaseClient {
         downloadUrlList.addAll(pairProductResult.first)
         imageFilenames.addAll(pairProductResult.second)
 
-        Log.i(
-            "process selling",
-            "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
-        )
+        //Log.i(
+        //    "process selling",
+        //    "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
+        //)
 
         return Pair(downloadUrlList, imageFilenames)
     }

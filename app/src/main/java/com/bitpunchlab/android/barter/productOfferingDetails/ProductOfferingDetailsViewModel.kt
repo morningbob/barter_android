@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.util.ImageHandler
-import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
@@ -55,12 +53,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
     val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
-    //private val _productImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    //val productImages : StateFlow<MutableList<ProductImage>> get() = _productImages.asStateFlow()
-
-    //private val _askingImages = MutableStateFlow<MutableList<ProductImage>>(mutableListOf())
-    //val askingImages : StateFlow<MutableList<ProductImage>> get() = _askingImages.asStateFlow()
-
     private val _loadingAlpha = MutableStateFlow<Float>(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
@@ -84,7 +76,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
-            //LocalDatabaseManager.
             LocalDatabaseManager.productOfferingWithProductsAsking.collect() {
                 it?.let {
                     ProductInfo.updateAskingProducts(it.askingProducts)
@@ -181,11 +172,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _loadingAlpha.value = 100f
 
         val imagesBitmap = images.map { image ->
-            image.image
+            image.image!!
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            //Log.i("bidVM", "process bidding")
             if (FirebaseClient.processBidding(product, bid, imagesBitmap)) {
                 _biddingStatus.value = 2
                 _loadingAlpha.value = 0f

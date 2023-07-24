@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.util
 
+import com.bitpunchlab.android.barter.BarterNavigation
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Bid
@@ -70,13 +71,16 @@ object LocalDatabaseManager {
                 FirebaseClient.userId.collect() { id ->
                     if (id != "") {
                         _userProductsOffering.value =
-                            BarterRepository.getUserProductsOffering(id)!![0].productsOffering
+                            BarterRepository.getUserProductsOffering(id)?.get(0)?.productsOffering
+                                ?: listOf()
                     }
 
                 }
             }
         }
         // get the bitmap of the images associated with the product
+        // we first try to retrieve the product image locally by the imageUrlCloud
+        // if we got null, we send a request to Cloud Storage
         CoroutineScope(Dispatchers.IO).launch {
             productChosen.collect() { productOffering ->
                 productOffering?.let {
@@ -87,10 +91,24 @@ object LocalDatabaseManager {
                             ProductImageToDisplay(
                                 UUID.randomUUID().toString(),
                                 ImageHandler.createPlaceholderImage(),
-                                ""
+                                // the placeholder phrase indicates that it is a placeholder
+                                // later if the image comes back is null, we'll change it to "download"
+                                "placeholder"
                             )
                         )
+                        // we try to retrieve the image from local database
+                        // and get the imageUrlLocal as uri
+                        // retrieve the image from uri
+                        // put it in the image field of the product image object
+                        // then replace the placeholder with it
+                        val imageList = BarterRepository.getImage(productOffering.images[i])
+                        if (!imageList.isNullOrEmpty()) {
+                            //_sellerProductImages.value[i] = imageList[0]
+                        }
                     }
+
+
+
 
                     CoroutineScope(Dispatchers.IO).launch {
                         ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
@@ -183,7 +201,6 @@ object LocalDatabaseManager {
         BarterRepository.deleteProductsAsking(listOf(productAsking))
     }
 
-    fun deleteImageLocalDatabase(image: ProductImageToDisplay) {
 
-    }
+
 }

@@ -1,9 +1,11 @@
 package com.bitpunchlab.android.barter.database
 
+import com.bitpunchlab.android.barter.askingProducts.ConfirmDeleteProductDialog
 import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductAsking
+import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
@@ -57,30 +59,24 @@ object BarterRepository {
         }
     }
 
+    fun insertImages(images: List<ProductImageToDisplay>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.insertProductImages(*images.toTypedArray())
+        }
+    }
+
+    suspend fun getImage(url: String) : List<ProductImageToDisplay>? {
+        return CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getProductImage(url)
+        }.await()
+    }
     suspend fun getUserProductsOffering(id: String): List<UserAndProductOffering>? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getUserAndProductsOffering(id)
         }.await()
     }
 
-    //suspend fun getAskingProducts(id: String) : Flow<List<ProductOffering>>? {
-    //    return database?.barterDao?.getAskingProducts(id)
-    //}
-/*
-    fun insertProductsBidding(productsBidding: List<ProductBidding>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            database?.barterDao?.insertProductsBidding(*productsBidding.toTypedArray())
-        }
-    }
 
-    suspend fun getAllProductsBidding(): Flow<List<ProductBidding>>? {
-        return CoroutineScope(Dispatchers.IO).async {
-            database?.barterDao?.getAllProductsBidding()
-        }.await()
-    }
-
-
- */
     suspend fun getProductOfferingWithProductsAsking(id: String):
             Flow<List<ProductOfferingAndProductsAsking>>? =
         CoroutineScope(Dispatchers.IO).async {
