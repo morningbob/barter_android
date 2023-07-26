@@ -23,9 +23,6 @@ import java.util.UUID
 // we prepare it even before users click on view bids
 class ProductOfferingDetailsViewModel() : ViewModel() {
 
-    //private val _product = MutableStateFlow<ProductOffering?>(null)
-    //val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
-
     private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
     val shouldDisplayImages : StateFlow<Boolean> get() = _shouldDisplayImages.asStateFlow()
 
@@ -72,7 +69,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         // this is to prepare the images to be shown in image display screen
         CoroutineScope(Dispatchers.IO).launch {
             LocalDatabaseManager.sellerProductImages.collect() {
-                _imagesDisplay.value = it.toMutableStateList()
+                _imagesDisplay.value = it
             }
         }
         CoroutineScope(Dispatchers.IO).launch {

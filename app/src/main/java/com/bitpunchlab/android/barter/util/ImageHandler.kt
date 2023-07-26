@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -32,6 +33,7 @@ import java.io.File
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import kotlinx.coroutines.async
 import java.io.IOException
 
@@ -82,6 +84,14 @@ object ImageHandler {
         }
         // this is required to keep the channel opened
         awaitClose()
+    }
+
+    suspend fun loadImageFromLocal(imageUrl: String) : Bitmap? {
+        currentContext?.let {
+            val source = ImageDecoder.createSource(currentContext!!.contentResolver, imageUrl.toUri())
+            return ImageDecoder.decodeBitmap(source)
+        }
+        return null
     }
 
     suspend fun loadImageFromCloud(url: String) : Bitmap? {

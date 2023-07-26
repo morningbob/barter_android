@@ -1,5 +1,10 @@
 package com.bitpunchlab.android.barter.util
 
+import android.graphics.Bitmap
+import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.bitpunchlab.android.barter.BarterNavigation
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
@@ -11,6 +16,7 @@ import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,8 +41,8 @@ object LocalDatabaseManager {
     private val _productChosen = MutableStateFlow<ProductOffering?>(null)
     val productChosen : StateFlow<ProductOffering?> get() = _productChosen.asStateFlow()
 
-    private var _sellerProductImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
-    val sellerProductImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _sellerProductImages.asStateFlow()
+    private var _sellerProductImages = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val sellerProductImages : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _sellerProductImages.asStateFlow()
 
     private var _askingProductImages = MutableStateFlow<MutableList<MutableList<ProductImageToDisplay>>>(mutableListOf())
     val askingProductImages : StateFlow<MutableList<MutableList<ProductImageToDisplay>>> get() = _askingProductImages.asStateFlow()
@@ -84,6 +90,7 @@ object LocalDatabaseManager {
         CoroutineScope(Dispatchers.IO).launch {
             productChosen.collect() { productOffering ->
                 productOffering?.let {
+                    _sellerProductImages.value = mutableStateListOf()
                     // preloaded with placeholder images,
                     // also, for mutable list to set the result at particular index
                     for (i in 0..productOffering.images.size - 1) {
@@ -101,20 +108,60 @@ object LocalDatabaseManager {
                         // retrieve the image from uri
                         // put it in the image field of the product image object
                         // then replace the placeholder with it
-                        val imageList = BarterRepository.getImage(productOffering.images[i])
-                        if (!imageList.isNullOrEmpty()) {
-                            //_sellerProductImages.value[i] = imageList[0]
+                        // coroutine scope here , so we can wait for if the image comes back
+                        CoroutineScope(Dispatchers.IO).launch {
+                            var productImage : ProductImageToDisplay? = null
+                            var imageLoaded : Bitmap? = null
+                            val imageList = BarterRepository.getImage(productOffering.images[i])
+                            // load it from cloud
+                            // and save it locally
+                            if (imageList.isNullOrEmpty()) {
+                                Log.i("database mgr", "can't retrieve image from local database")
+                                //_sellerProductImages.value[i] = imageList[0]
+                                imageLoaded = CoroutineScope(Dispatchers.IO).async {
+                                    ImageHandler.loadImageFromCloud(productOffering.images[i])
+                                }.await()
+
+                                imageLoaded?.let { image ->
+                                    Log.i("database mgr", "loaded image from cloud")
+                                    val url = CoroutineScope(Dispatchers.IO).async {
+                                        ImageHandler.saveImageExternalStorage(
+                                            productOffering.images[i],
+                                            imageLoaded
+                                        )
+                                    }.await()
+                                    url?.let {
+                                        Log.i("database mgr", "saved image to local")
+                                        productImage = ProductImageToDisplay(
+                                            image = image,
+                                            imageId = UUID.randomUUID().toString(),
+                                            imageUrlCloud = productOffering.images[i],
+                                            imageUrlLocal = it.toString()
+                                        )
+                                    }
+                                }
+                            } else {
+                                Log.i("database mgr", "got product image object from local")
+                                productImage = imageList[0]
+                                val localUrl = imageList[0].imageUrlLocal
+                                localUrl?.let {
+                                    Log.i("database mgr", "loading image from local")
+                                    productImage!!.image = ImageHandler.loadImageFromLocal(it)
+                                }
+
+                                //productImage = productImageLoaded.copy()
+                            }
+                            productImage?.let {
+                                Log.i("database mgr", "have product image setting to list")
+                                _sellerProductImages.value.set(i, it)
+                            }
                         }
                     }
-
-
-
-
-                    CoroutineScope(Dispatchers.IO).launch {
-                        ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
-                            _sellerProductImages.value.set(pairResult.first, pairResult.second)
-                        }
-                    }
+                    //CoroutineScope(Dispatchers.IO).launch {
+                    //    ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
+                    //        _sellerProductImages.value.set(pairResult.first, pairResult.second)
+                    //    }
+                    //}
 
                     // prepare bids and asking products associated with the product offering
                     CoroutineScope(Dispatchers.IO).launch {

@@ -244,23 +244,29 @@ object FirebaseClient {
             product
         }
 
-        val decomposed = decomposeProductOfferingFirebase(products)
+        CoroutineScope(Dispatchers.IO).launch {
+            val decomposed = CoroutineScope(Dispatchers.IO).async {
+                decomposeProductOfferingFirebase(products)
+            }.await()
+
+            BarterRepository.insertProductsOffering(decomposed.productsOffering)
+            BarterRepository.insertProductsAsking(decomposed.askingProducts)
+            BarterRepository.insertBids(decomposed.bids)
+            BarterRepository.insertImages(decomposed.images)
+        }
 
         //Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
         //Log.i("prepare product offering", "no of bids ${bids.size}")
-        BarterRepository.insertProductsOffering(decomposed.productsOffering)
-        BarterRepository.insertProductsAsking(decomposed.askingProducts)
-        BarterRepository.insertBids(decomposed.bids)
-        BarterRepository.insertImages(decomposed.images)
+
     }
 
-    private fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
+    private suspend fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
         ProductOfferingDecomposed
     {
         //Triple<List<ProductOffering>, List<ProductAsking>, List<Bid>> {
         val askingProducts = mutableListOf<ProductAsking>()
         val bids = mutableListOf<Bid>()
-        val productImages = mutableListOf<ProductImageToDisplay>()
+        var productImages = mutableListOf<ProductImageToDisplay>()
         val productsOffering = productsOfferingFirebase.map {
                 product ->
             product.askingProducts.map { (askingKey, asking) ->
@@ -275,35 +281,13 @@ object FirebaseClient {
             // if not, we create a new product image
             // retrieve the image from cloud storage
             // and save locally, we got the local uri and save it in product image's imageUrlLocal
-            product.images.map { (imageKey, imageUrl) ->
-                // now, for every image, launch a scope to wait for the result
-                Log.i("decompose product offering", "processing each image in a product")
-                CoroutineScope(Dispatchers.IO).launch {
-                    val result = CoroutineScope(Dispatchers.IO).async {
-                        Log.i("decompose product offering", "try to retrieve image locally")
-                        retrieveImageLocally(imageUrl)
-                    }.await()
-                    if (result.isNullOrEmpty()) {
-                        Log.i("decompose product offering", "result is null")
-                        // retrieve the image from cloud storage
-                        val image = ImageHandler.loadImageFromCloud(imageUrl)
-                        image?.let { bitmap ->
-                            Log.i("decompose product offering", "got image")
-                            val localUrl = ImageHandler.saveImageExternalStorage(imageUrl, bitmap)
-                            localUrl?.let {
-                                Log.i("decompose product offering", "got localUrl ${it}")
-                                productImages.add(
-                                    ProductImageToDisplay(
-                                        imageId = UUID.randomUUID().toString(),
-                                        imageUrlCloud = imageUrl,
-                                        imageUrlLocal = it.toString()
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
+            val productImagesUrl = product.images.map { (imageKey, imageUrl) ->
+                imageUrl
             }
+            productImages = CoroutineScope(Dispatchers.IO).async {
+                processImagesFromProduct(productImagesUrl)
+            }.await().toMutableList()
+
             convertProductFirebaseToProduct(product)
         }
         return ProductOfferingDecomposed(
@@ -313,6 +297,45 @@ object FirebaseClient {
             images = productImages
         )
         //return Triple(productsOffering, askingProducts, bids)
+    }
+
+    private suspend fun processImagesFromProduct(images: List<String>) : List<ProductImageToDisplay> {
+        val productImages = mutableListOf<ProductImageToDisplay>()
+
+        images.map { imageUrl ->
+            // now, for every image, launch a scope to wait for the result
+            Log.i("decompose product offering", "processing each image in a product")
+            CoroutineScope(Dispatchers.IO).launch {
+                val result = CoroutineScope(Dispatchers.IO).async {
+                    Log.i("decompose product offering", "try to retrieve image locally")
+                    retrieveImageLocally(imageUrl)
+                }.await()
+                if (result.isNullOrEmpty()) {
+                    Log.i("decompose product offering", "result is null")
+                    // retrieve the image from cloud storage
+                    val image = ImageHandler.loadImageFromCloud(imageUrl)
+                    image?.let { bitmap ->
+                        Log.i("decompose product offering", "got image")
+                        val localUrl = ImageHandler.saveImageExternalStorage(imageUrl, bitmap)
+                        Log.i("decompose product offering", "processing imageUrl ${imageUrl}")
+                        localUrl?.let {
+                            Log.i("decompose product offering", "got localUrl ${it}")
+                            productImages.add(
+                                ProductImageToDisplay(
+                                    imageId = UUID.randomUUID().toString(),
+                                    imageUrlCloud = imageUrl,
+                                    imageUrlLocal = it.toString()
+                                )
+                            )
+                        }
+                    }
+                } else {
+                    Log.i("decompose product offering", "retrieved the product image!")
+                    Log.i("decompose product offering", "image url: ${result[0].imageUrlCloud}")
+                }
+            }.join()  // we wait for all coroutines to finish before we return
+        }
+        return productImages
     }
 
     private suspend fun retrieveImageLocally(imageUrl: String) : List<ProductImageToDisplay>? {
