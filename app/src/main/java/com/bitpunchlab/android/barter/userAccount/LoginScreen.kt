@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.userAccount
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -43,7 +44,9 @@ fun LoginScreen(navController: NavHostController,
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
     val loginStatus by loginViewModel.loginStatus.collectAsState()
     val loadingAlpha by loginViewModel.loadingAlpha.collectAsState()
-    //var showFailureDialog = false
+    val resetPassStatus by loginViewModel.resetPassStatus.collectAsState()
+    val emailInput by loginViewModel.emailInput.collectAsState()
+    val emailInputError by loginViewModel.emailInputError.collectAsState()
 
     val onSignupClicked = { navController.navigate(Signup.route) }
 
@@ -153,10 +156,30 @@ fun LoginScreen(navController: NavHostController,
                         )
                         .fillMaxWidth(),
                 )
+
+                when (resetPassStatus) {
+                    0 -> Text(
+                        text = "Forgot Password",
+                        color = BarterColor.textGreen,
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .clickable { loginViewModel.updateResetPassStatus(1) }
+                    )
+
+                    1 -> CustomTextField(
+                        label = "Email",
+                        textValue = emailInput,
+                        onChange = { loginViewModel.updateEmailInput(it) },
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                    )
+
+                }
             }
         }
         if (loginStatus == 1) {
-            LoginFailureDialog(loginViewModel)
+            LoginFailureDialog { loginViewModel.updateLoginStatus(0) }
         }
         Box(
             contentAlignment = Alignment.Center,
@@ -170,13 +193,13 @@ fun LoginScreen(navController: NavHostController,
 }
 
 @Composable
-fun LoginFailureDialog(loginViewModel: LoginViewModel) {
+fun LoginFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
         title = "Login",
         message = "Can't login.  Please check your email and password.  Make sure wifi is on.",
         positiveText = "OK",
-        onDismiss = { loginViewModel.updateLoginStatus(0) },
-        onPositive = { loginViewModel.updateLoginStatus(0) }
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
     )
 
 }

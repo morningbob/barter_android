@@ -17,10 +17,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +51,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.reflect.KClass
 
@@ -466,8 +469,9 @@ fun LoadImage(url: String): MutableState<Bitmap?> {
 }
 
 @Composable
-fun BasicBidScreen(productName: String, productCategory: String, images: List<ProductImageToDisplay>,
-    updateShouldDisplayImages: (Boolean) -> Unit) {
+fun BasicBidScreen(productName: String, productCategory: String,
+                   images: SnapshotStateList<ProductImageToDisplay>,
+                   updateShouldDisplayImages: (Boolean) -> Unit) {
 
     Column(
         modifier = Modifier

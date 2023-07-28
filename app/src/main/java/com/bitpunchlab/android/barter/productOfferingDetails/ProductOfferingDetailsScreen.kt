@@ -66,6 +66,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val deleteConfirmStatus by productDetailsViewModel.deleteProductStatus.collectAsState()
     val deleteImageStatus by productDetailsViewModel.deleteImageStatus.collectAsState()
     val biddingStatus by productDetailsViewModel.biddingStatus.collectAsState()
+    val imagesDisplay = productDetailsViewModel.imagesDisplay.collectAsState()
 
     LaunchedEffect(key1 = shouldPopDetails) {
         if (shouldPopDetails) {
@@ -235,7 +236,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
                 if (shouldDisplayImages && userMode == UserMode.OWNER_MODE) {
                     ImagesDisplayDialog(
-                        images = productDetailsViewModel.imagesDisplay,
+                        images = imagesDisplay.value,
                         onDismiss = { productDetailsViewModel.updateShouldDisplayImages(false) },
                         deleteStatus = deleteImageStatus,
                         updateDeleteStatus = { productDetailsViewModel.updateDeleteImageStatus(it) },
@@ -246,7 +247,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                     )
                 } else if (shouldDisplayImages) {
                     ImagesDisplayDialog(
-                        images = productDetailsViewModel.imagesDisplay,
+                        images = imagesDisplay.value,
                         onDismiss = { productDetailsViewModel.updateShouldDisplayImages(false) },
                     )
                 }

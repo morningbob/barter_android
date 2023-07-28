@@ -34,11 +34,11 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val productCategory by sellViewModel.productCategory.collectAsState()
     val shouldExpandDuration by sellViewModel.shouldExpandDuration.collectAsState()
     val sellingDuration by sellViewModel.sellingDuration.collectAsState()
-    val productImages by sellViewModel.productImages.collectAsState()
+    val productImages = sellViewModel.productImages.collectAsState()
     val numOfImages = remember {
         mutableStateOf(0)
     }
-    numOfImages.value = productImages.size
+    numOfImages.value = productImages.value.size
     val askingProducts by AskingProductInfo.askingProducts.collectAsState()
     val numOfProducts = remember {
         mutableStateOf(0)
@@ -146,7 +146,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             }
             if (shouldDisplayImages) {
                 ImagesDisplayDialog(
-                    images = sellViewModel.productImages,
+                    images = productImages.value,
                     onDismiss = { sellViewModel.updateShouldDisplayImages(false) },
                     deleteStatus = deleteImageStatus,
                     updateDeleteStatus = { sellViewModel.updateDeleteImageStatus(it)},

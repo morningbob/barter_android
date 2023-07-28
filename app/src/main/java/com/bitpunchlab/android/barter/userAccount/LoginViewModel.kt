@@ -29,9 +29,18 @@ class LoginViewModel() : ViewModel() {
     private val _passError = MutableStateFlow("")
     val passError : StateFlow<String> get() = _passError.asStateFlow()
 
+    private val _emailInput = MutableStateFlow("")
+    val emailInput : StateFlow<String> get() = _emailInput.asStateFlow()
+
+    private val _emailInputError = MutableStateFlow("")
+    val emailInputError : StateFlow<String> get() = _emailInputError.asStateFlow()
+
     // 0 - no login, 1 - failed, 2 - success
     private val _loginStatus = MutableStateFlow<Int>(0)
     val loginStatus : StateFlow<Int> get() = _loginStatus
+
+    private val _resetPassStatus = MutableStateFlow<Int>(0)
+    val resetPassStatus : StateFlow<Int> get() = _resetPassStatus
 
     private val _loadingAlpha = MutableStateFlow<Float>(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha
@@ -60,6 +69,15 @@ class LoginViewModel() : ViewModel() {
         _loginStatus.value = status
     }
 
+    fun updateResetPassStatus(status: Int) {
+        _resetPassStatus.value = status
+    }
+
+    fun updateEmailInput(email: String) {
+        _emailInput.value = email
+
+    }
+
     fun clearFields() {
         _userEmail.value = ""
         _userPassword.value = ""
@@ -78,14 +96,9 @@ class LoginViewModel() : ViewModel() {
             clearFields()
         }
     }
-}
 
-class LoginViewModelFactory(private val firebaseClient: FirebaseClient)
-    : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-            return LoginViewModel() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    fun resetPassword() {
+
     }
 }
+

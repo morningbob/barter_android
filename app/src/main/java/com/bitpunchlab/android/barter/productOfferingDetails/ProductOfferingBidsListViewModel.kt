@@ -1,6 +1,8 @@
 package com.bitpunchlab.android.barter.productOfferingDetails
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
@@ -25,8 +27,8 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     private val _product = MutableStateFlow<ProductOffering?>(null)
     val product : StateFlow<ProductOffering?> get() = _product.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
-    val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     private val _shouldShowBid = MutableStateFlow<Boolean>(false)
     val shouldShowBid : StateFlow<Boolean> get() = _shouldShowBid.asStateFlow()
@@ -58,7 +60,7 @@ class ProductOfferingBidsListViewModel : ViewModel() {
         }
     }
 
-    fun updateImagesDisplay(images: List<ProductImageToDisplay>) {
+    fun updateImagesDisplay(images: SnapshotStateList<ProductImageToDisplay>) {
         _imagesDisplay.value = images
     }
 

@@ -39,6 +39,7 @@ fun AskingProductScreen(navController: NavHostController,
     val shouldExpandCategory by askingProductViewModel.shouldExpandCategory.collectAsState()
     val productCategory by askingProductViewModel.productCategory.collectAsState()
     val productImages by askingProductViewModel.askingProductImages.collectAsState()
+    val imagesDisplay = askingProductViewModel.askingProductImages.collectAsState()
     //Log.i("asking pd screen", "product images size is: ${productImages.size}")
 
     val screenContext = LocalContext.current
@@ -147,7 +148,7 @@ fun AskingProductScreen(navController: NavHostController,
             }
             if (shouldDisplayImages) {
                 ImagesDisplayDialog(
-                    images = askingProductViewModel.askingProductImages,
+                    images = imagesDisplay.value,
                     onDismiss = { askingProductViewModel.updateShouldDisplayImages(false) },
                     deleteStatus = deleteImageStatus,
                     updateDeleteStatus = { askingProductViewModel.updateDeleteImageStatus(it) },

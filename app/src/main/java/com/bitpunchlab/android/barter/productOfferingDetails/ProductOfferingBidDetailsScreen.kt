@@ -38,11 +38,11 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
             ProductOfferingBidDetailsViewModel()
         }) {
     val chosenBid by LocalDatabaseManager.bidChosen.collectAsState()
-    val imagesDisplay by LocalDatabaseManager.bidProductImages.collectAsState()
+    val imagesDisplay = LocalDatabaseManager.bidProductImages.collectAsState()
     val shouldDisplayImages by productOfferingBidDetailsViewModel.shouldDisplayImages.collectAsState()
     val acceptBidStatus by productOfferingBidDetailsViewModel.acceptBidStatus.collectAsState()
     val shouldShowBid by productOfferingBidDetailsViewModel.shouldShowBid.collectAsState()
-    val deleteImageStatus by productOfferingBidDetailsViewModel.deleteImageStatus.collectAsState()
+    //val deleteImageStatus by productOfferingBidDetailsViewModel.deleteImageStatus.collectAsState()
 
     LaunchedEffect(key1 = shouldShowBid) {
         if (!shouldShowBid) {
@@ -86,7 +86,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     BasicBidScreen(
                         productName = chosenBid!!.bidProduct.name,
                         productCategory = chosenBid!!.bidProduct.category,
-                        images = imagesDisplay,
+                        images = imagesDisplay.value,
                         updateShouldDisplayImages = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(it) }
                     )
                     // confirm before execute
@@ -106,7 +106,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                 }
                 if (shouldDisplayImages) {
                     ImagesDisplayDialog(
-                        images = productOfferingBidDetailsViewModel.imagesDisplay,
+                        images = imagesDisplay.value,
                         onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) },
                     )
                 }

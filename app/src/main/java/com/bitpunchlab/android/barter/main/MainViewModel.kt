@@ -14,6 +14,7 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.userAccount.LoginViewModel
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
+import com.bitpunchlab.android.barter.util.validatePassword
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -26,27 +27,41 @@ import kotlinx.coroutines.launch
 @OptIn(InternalCoroutinesApi::class)
 class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
-    private val database = BarterDatabase.getInstance(app.applicationContext)
-
-    val _productOfferingList = MutableStateFlow<List<ProductOffering>>(listOf())
-    val productOfferingList : StateFlow<List<ProductOffering>> get() = _productOfferingList.asStateFlow()
-    //var productBidding = MutableStateFlow<List<ProductOffering>>(listOf())
-    //val currentUser = database.barterDao.getUser(FirebaseClient.currentUserFirebase.value.id!!)
-
-    //private val _userId = MutableStateFlow("")
-    //val userId : StateFlow<String> get() = _userId.asStateFlow()
-
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser : StateFlow<User?> get() = _currentUser.asStateFlow()
-    init {
 
-        //_productOfferingList.value = retrieveProductsOffering()
-        CoroutineScope(Dispatchers.IO).launch {
-            retrieveProductsOffering()
-        }
+    private val _currentPassword = MutableStateFlow<String>("")
+    val currentPassword : StateFlow<String> get() = _currentPassword.asStateFlow()
+
+    private val _newPassword = MutableStateFlow<String>("")
+
+    val newPassword : StateFlow<String> get() = _newPassword.asStateFlow()
+
+    private val _confirmPassword = MutableStateFlow<String>("")
+    val confirmPassword : StateFlow<String> get() = _confirmPassword.asStateFlow()
+
+    private val _currentPassError = MutableStateFlow<String>("")
+    val currentPassError : StateFlow<String> get() = _currentPassError.asStateFlow()
+
+    private val _newPassError = MutableStateFlow<String>("")
+    val newPassError : StateFlow<String> get() = _newPassError.asStateFlow()
+
+    private val _confirmPassError = MutableStateFlow<String>("")
+    val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
+
+
+
+    private val _passwordOptionStatus = MutableStateFlow<Int>(0)
+    val passwordOptionStatus : StateFlow<Int> get() = _passwordOptionStatus.asStateFlow()
+
+    private val _loadingAlpha = MutableStateFlow(0f)
+    val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
+
+
+
+    init {
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.userId.collect() {
-            //_userId.value = it
                 if (it != "") {
                     Log.i("mainVM", "userid: $it")
                     BarterRepository.getCurrentUser(it)?.collect() { currentUserList ->
@@ -72,7 +87,6 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
-            //database.barterDao.getAllUsers().collect() {
             BarterRepository.getAllUsers()?.collect() {
                 Log.i("mainVM", "all users")
                 it.map { user ->
@@ -80,11 +94,41 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
                 }
             }
         }
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+        }
     }
-    // new relation, to get products
-    suspend fun retrieveProductsOffering()   {
-        BarterRepository.getAllProductOffering()?.collect() {
-            _productOfferingList.value = it
+
+    fun updateCurrentPassword(pass: String) {
+        _currentPassword.value = pass
+        _currentPassError.value = validatePassword(pass)
+    }
+
+    fun updateNewPassword(pass: String) {
+        _newPassword.value = pass
+        _newPassError.value = validatePassword(pass)
+    }
+
+    fun updateConfirmPassword(pass: String) {
+        _confirmPassword.value = pass
+        _confirmPassError.value = validatePassword(pass)
+    }
+
+    fun updatePasswordOptionStatus(status: Int) {
+        _passwordOptionStatus.value = status
+    }
+
+    fun changePassword() {
+        _loadingAlpha.value = 100f
+        CoroutineScope(Dispatchers.IO).launch {
+            if (FirebaseClient.changePasswordFirebaseAuth(currentPassword.value, newPassword.value)) {
+                _passwordOptionStatus.value = 2
+                _loadingAlpha.value = 0f
+            } else {
+                _passwordOptionStatus.value = 3
+                _loadingAlpha.value = 0f
+            }
         }
     }
 

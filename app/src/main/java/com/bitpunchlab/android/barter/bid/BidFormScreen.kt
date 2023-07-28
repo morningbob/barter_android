@@ -62,8 +62,9 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
     val shouldExpandCategoryDropdown by bidFormViewModel.shouldExpandCategoryDropdown.collectAsState()
     val currentContext = LocalContext.current
     val shouldDisplayImages by bidFormViewModel.shouldDisplayImages.collectAsState()
-    val imagesDisplay by bidFormViewModel.imagesDisplay.collectAsState()
+    val imagesDisplay = bidFormViewModel.imagesDisplay.collectAsState()
     val deleteImageStatus by bidFormViewModel.deleteImageStatus.collectAsState()
+    //val imagesDisplay = bidFormViewModel.imagesDisplay
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -148,7 +149,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
 
                     ) {
                     CustomButton(
-                        label = "Images  ${imagesDisplay.size}",
+                        label = "Images  ${imagesDisplay.value.size}",
                         onClick = { bidFormViewModel.updateShouldDisplayImages(true) },
 
                         modifier = Modifier
@@ -174,7 +175,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                             val bid = bidFormViewModel.createBid()
                             if (product != null && bid != null) {
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    processBidding(product!!, bid, imagesDisplay)
+                                    processBidding(product!!, bid, imagesDisplay.value)
                                     // I clear form here instead of after if clause
                                     // because I want to clear it after the processing has been done.
                                     bidFormViewModel.clearForm()
@@ -201,7 +202,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
 
                 if (shouldDisplayImages) {
                     ImagesDisplayDialog(
-                        images = bidFormViewModel.imagesDisplay,
+                        images = imagesDisplay.value,
                         onDismiss = { bidFormViewModel.updateShouldDisplayImages(false) },
                         deleteStatus = deleteImageStatus,
                         updateDeleteStatus = { bidFormViewModel.updateDeleteImageStatus(it) },

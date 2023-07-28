@@ -39,7 +39,8 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
     val shouldDisplayImages by acceptBidDetailsViewModel.shouldDisplayImages.collectAsState()
     val productOfferingImages by acceptBidDetailsViewModel.productOfferingImages.collectAsState()
     val productInExchangeImages by acceptBidDetailsViewModel.productInExchangeImages.collectAsState()
-    val deleteImageStatus by acceptBidDetailsViewModel.deleteImageStatus.collectAsState()
+    //val deleteImageStatus by acceptBidDetailsViewModel.deleteImageStatus.collectAsState()
+    val imagesDisplay = acceptBidDetailsViewModel.imagesDisplay.collectAsState()
 
 
     LaunchedEffect(key1 = shouldPopSelf) {
@@ -104,7 +105,7 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
         }
         if (shouldDisplayImages) {
             ImagesDisplayDialog(
-                images = acceptBidDetailsViewModel.imagesDisplay,
+                images = imagesDisplay.value,
                 onDismiss = { acceptBidDetailsViewModel.updateShouldDisplayImages(false) },
                 //deleteStatus = deleteImageStatus,
                 //updateDeleteStatus = { acceptBidDetailsViewModel.updateDeleteImageStatus(it) }

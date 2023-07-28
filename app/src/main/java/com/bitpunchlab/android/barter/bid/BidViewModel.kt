@@ -1,6 +1,8 @@
 package com.bitpunchlab.android.barter.bid
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
@@ -21,8 +23,8 @@ class BidViewModel : ViewModel() {
     private val _bid = MutableStateFlow<Bid?>(null)
     val bid : StateFlow<Bid?> get() = _bid.asStateFlow()
 
-    private val _imagesDisplay = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
-    val imagesDisplay : StateFlow<MutableList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
+    private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     // 1 is failed, 2 is succeeded, 3 is invalid info
     private val _biddingStatus = MutableStateFlow<Int>(0)

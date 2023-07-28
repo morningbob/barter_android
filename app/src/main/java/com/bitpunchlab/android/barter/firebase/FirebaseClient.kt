@@ -194,6 +194,54 @@ object FirebaseClient {
         BarterRepository.insertCurrentUser(user)
     }
 
+    suspend fun changePasswordFirebaseAuth(currentPassword: String, newPassword: String) : Boolean =
+        suspendCancellableCoroutine { cancellableContinuation ->
+            if (auth.currentUser != null) {
+                auth
+                    .signInWithEmailAndPassword(auth.currentUser!!.email!!, currentPassword)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.i("change password firebase auth", "signed in")
+                            auth.currentUser?.updatePassword(newPassword)
+                                ?.addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        Log.i("change password firebase auth", "change pass sucess")
+                                        cancellableContinuation.resume(true) {}
+                                    } else {
+                                        Log.i(
+                                            "change password firebase auth",
+                                            "failed ${task.exception}"
+                                        )
+                                        cancellableContinuation.resume(false) {}
+                                    }
+                                }
+                        }
+                    }
+            } else {
+                Log.i("change password firebase auth", "auth null")
+                cancellableContinuation.resume(false) {}
+            }
+    }
+
+    suspend fun sendResetPasswordLink(email: String) : Boolean =
+        suspendCancellableCoroutine { cancellableContinuation ->
+            if (auth.currentUser != null) {
+                auth.sendPasswordResetEmail(auth.currentUser!!.email!!)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.i("send reset email", "success")
+                            cancellableContinuation.resume(true) {}
+                        } else {
+                            Log.i("send reset email", "failed ${task.exception}")
+                            cancellableContinuation.resume(false) {}
+                        }
+                    }
+
+            } else {
+                cancellableContinuation.resume(false) {}
+            }
+    }
+
     private suspend fun prepareProductsOffering() {
         val productsFirebase = CoroutineScope(Dispatchers.IO).async {
            retrieveProductsOfferingFirebase()
@@ -313,8 +361,8 @@ object FirebaseClient {
                 if (result.isNullOrEmpty()) {
                     Log.i("decompose product offering", "result is null")
                     // retrieve the image from cloud storage
-                    val image = ImageHandler.loadImageFromCloud(imageUrl)
-                    image?.let { bitmap ->
+                    //val image = ImageHandler.loadImageFromCloud(imageUrl)
+                    ImageHandler.loadImageFromCloud(imageUrl)?.let { bitmap ->
                         Log.i("decompose product offering", "got image")
                         val localUrl = ImageHandler.saveImageExternalStorage(imageUrl, bitmap)
                         Log.i("decompose product offering", "processing imageUrl ${imageUrl}")

@@ -61,9 +61,6 @@ class BidFormViewModel : ViewModel() {
 
     fun updateImagesDisplay(bitmap: Bitmap) {
         val productImage = ProductImageToDisplay(UUID.randomUUID().toString(), bitmap, "")
-        //val newList = imagesDisplay.value.toMutableList()
-        //newList.add(productImage)
-
         _imagesDisplay.value.add(productImage)
     }
 
@@ -109,22 +106,6 @@ class BidFormViewModel : ViewModel() {
     fun clearForm() {
         _bidProductName.value = ""
         _bidProductCategory.value = Category.NOT_SET
+        _imagesDisplay.value = mutableStateListOf()
     }
-
-
 }
-/*
-            val bidProduct1 = ProductBidding(
-                productBidId = UUID.randomUUID().toString(),
-                productName = bidProductName.value,
-                productCategory = bidProductCategory.value.label,
-                ownerName = FirebaseClient.currentUserFirebase.value!!.name,
-                biddingDateCreated = getCurrentDateTime(),
-                productOfferingForBid = ProductBiddingInfo.product.value?.productOfferingForBid ?: "",
-                bidsHolder = BidsHolder(listOf<Bid>()),
-                biddingDuration = 0,
-                productImages = listOf(),
-                biddingAskingProducts = AskingHolder(listOf())
-            )
-
-             */

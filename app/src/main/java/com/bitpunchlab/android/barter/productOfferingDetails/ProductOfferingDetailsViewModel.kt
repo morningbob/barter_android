@@ -183,20 +183,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         }
     }
 
-    // the
-    private fun updateImagesList() {
-        // we convert product images to imageUrls
-    }
 
-    private fun convertProductsImageToImageList(image: ProductImageToDisplay) {
-        //ProductInfo.productChosen.value?.images?.filterNot { }
-    }
-
-    private fun deleteImageFromProductOffering(image: ProductImageToDisplay) {
-        // parse
-
-        ProductInfo.productChosen.value?.copy()
-    }
 }
 /*
         CoroutineScope(Dispatchers.IO).launch {
