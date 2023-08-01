@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.util.LoginStatus
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -36,8 +38,8 @@ class LoginViewModel() : ViewModel() {
     val emailInputError : StateFlow<String> get() = _emailInputError.asStateFlow()
 
     // 0 - no login, 1 - failed, 2 - success
-    private val _loginStatus = MutableStateFlow<Int>(0)
-    val loginStatus : StateFlow<Int> get() = _loginStatus
+    private val _loginStatus = MutableStateFlow<LoginStatus>(LoginStatus.LOGGED_OUT)
+    val loginStatus : StateFlow<LoginStatus> get() = _loginStatus
 
     private val _resetPassStatus = MutableStateFlow<Int>(0)
     val resetPassStatus : StateFlow<Int> get() = _resetPassStatus
@@ -47,8 +49,8 @@ class LoginViewModel() : ViewModel() {
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            combine(emailError, passError) { email, pass ->
-                _readyLogin.value = email == "" && pass == ""
+            combine(userEmail, userPassword, emailError, passError) { email, pass, emailEr, passEr ->
+                _readyLogin.value = emailEr == "" && passEr == "" && email != "" && pass != ""
             }.collect() {
                 Log.i("test errors", "ready login ${readyLogin.value}")
             }
@@ -65,7 +67,7 @@ class LoginViewModel() : ViewModel() {
         _passError.value = validatePassword(newPass)
     }
 
-    fun updateLoginStatus(status: Int) {
+    fun updateLoginStatus(status: LoginStatus) {
         _loginStatus.value = status
     }
 
@@ -75,30 +77,39 @@ class LoginViewModel() : ViewModel() {
 
     fun updateEmailInput(email: String) {
         _emailInput.value = email
-
+        _emailInputError.value = validateEmail(email)
     }
 
-    fun clearFields() {
+    private fun clearLoginFields() {
         _userEmail.value = ""
         _userPassword.value = ""
+    }
+
+    private fun clearResetPass() {
+        _emailInput.value = ""
     }
 
     fun login() {
         _loadingAlpha.value = 100f
         CoroutineScope(Dispatchers.IO).launch {
-            if (FirebaseClient.login(userEmail.value, userPassword.value)) {
-                _loginStatus.value = 2
-                _loadingAlpha.value = 0f // put this here, not after if clause, since login function has delay
-            } else {
-                _loginStatus.value = 1
-                _loadingAlpha.value = 0f //
-            }
-            clearFields()
+            _loginStatus.value = CoroutineScope(Dispatchers.IO).async {
+                FirebaseClient.login(userEmail.value, userPassword.value)
+            }.await()
+            _loadingAlpha.value = 0f
+            clearLoginFields()
         }
     }
 
     fun resetPassword() {
-
+        _loadingAlpha.value = 100f
+        CoroutineScope(Dispatchers.IO).launch {
+            _loginStatus.value = CoroutineScope(Dispatchers.IO).async {
+                FirebaseClient.sendResetPasswordLink(emailInput.value)
+            }.await()
+            clearResetPass()
+            _loadingAlpha.value = 0f
+        }
     }
 }
+
 

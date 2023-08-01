@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskProduct
@@ -53,8 +54,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val shouldShowAsking by sellViewModel.shouldShowAsking.collectAsState()
 
     var shouldCancel by remember { mutableStateOf(false) }
-
-    //var imageType = ImageType.PRODUCT_IMAGE
+    
     val screenContext = LocalContext.current
 
     LaunchedEffect(key1 = shouldCancel) {
@@ -130,13 +130,13 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                         .padding(top = 20.dp)
                 ) {
                     ChoiceButton(
-                        title = "Send",
+                        title = stringResource(id = R.string.send),
                         onClick = { sellViewModel.onSendClicked() },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                         )
                     ChoiceButton(
-                        title = "Cancel",
+                        title = stringResource(id = R.string.cancel),
                         onClick = { shouldCancel = true },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -154,10 +154,10 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                     //triggerImageUpdate = { sellViewModel.updateTriggerImageUpdate(true) }
                 )
             }
-            if (processSellingStatus != 0) {
+            if (processSellingStatus != ProcessSellingStatus.NORMAL) {
                 com.bitpunchlab.android.barter.sell.ProcessSellingStatus(
                     status = processSellingStatus,
-                    sellViewModel = sellViewModel
+                    onDismiss = { sellViewModel.updateProcessSellingStatus(ProcessSellingStatus.NORMAL) }
                 )
             }
             Box(
@@ -282,7 +282,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
 ) {
     Column() {
         CustomTextField(
-            label = "Product name",
+            label = stringResource(R.string.product_name),
             textValue = productName,
             onChange = {
                updateName(it)
@@ -299,7 +299,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
 
         ) {
             CustomTextField(
-                label = "Category",
+                label = stringResource(R.string.category),
                 textValue = productCategory.label,
                 onChange = {},
                 modifier = Modifier
@@ -307,7 +307,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
             )
 
             CustomDropDown(
-                title = "Category",
+                title = stringResource(R.string.category),
                 shouldExpand = shouldExpandCat,
                 onClickButton = {
                     updateExpandCat(!shouldExpandCat)
@@ -341,7 +341,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
 
                 )
             ChoiceButton(
-                title = "Upload",
+                title = stringResource(R.string.upload),
                 onClick = { pickImageLauncher.launch("image/*") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -354,48 +354,49 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
 
 
 @Composable
-fun ProcessSellingStatus(status: Int, sellViewModel: SellViewModel) {
+fun ProcessSellingStatus(status: ProcessSellingStatus, onDismiss: () -> Unit) {
     when (status) {
-        2 -> {
-            ProcessSellingSuccessDialog(sellViewModel)
+        ProcessSellingStatus.SUCCESS -> {
+            ProcessSellingSuccessDialog(onDismiss)
         }
-        1 -> {
-            ProcessSellingFailureDialog(sellViewModel)
+        ProcessSellingStatus.FAILURE -> {
+            ProcessSellingFailureDialog(onDismiss)
         }
-        3 -> {
-            ProcessSellingInvalidFieldDialog(sellViewModel)
+        ProcessSellingStatus.INVALID_INPUTS-> {
+            ProcessSellingInvalidFieldDialog(onDismiss)
         }
+        else -> 0
     }
 }
 
 @Composable
-fun ProcessSellingSuccessDialog(sellViewModel: SellViewModel) {
+fun ProcessSellingSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Selling Confirmation",
-        message = "The product was successfully sent to the server.  It will be available to all the users who read the products offering list.",
-        positiveText = "OK",
-        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
-        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+        title = stringResource(R.string.selling_confirmation_alert),
+        message = stringResource(R.string.selling_success_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 
 @Composable
-fun ProcessSellingFailureDialog(sellViewModel: SellViewModel) {
+fun ProcessSellingFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Selling Failed",
-        message = "There is error sending the product's information to the server.  Please make sure you have wifi and try again later.",
-        positiveText = "OK",
-        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
-        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+        title = stringResource(R.string.selling_failed_alert),
+        message = stringResource(R.string.selling_failure_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 
 @Composable
-fun ProcessSellingInvalidFieldDialog(sellViewModel: SellViewModel) {
+fun ProcessSellingInvalidFieldDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Invalid Fields",
-        message = "Please make sure to fill in product name, category and duration information.",
-        positiveText = "OK",
-        onDismiss = { sellViewModel.updateProcessSellingStatus(0) },
-        onPositive = { sellViewModel.updateProcessSellingStatus(0) })
+        title = stringResource(R.string.invalid_fields_alert),
+        message = stringResource(R.string.selling_invalid_fields_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 /*
 @Composable

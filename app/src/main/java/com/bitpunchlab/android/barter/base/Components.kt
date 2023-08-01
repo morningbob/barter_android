@@ -56,8 +56,8 @@ import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.reflect.KClass
 
 @Composable
-fun CustomTextField(label: String, textValue: String, onChange: (String) -> Unit,
-                    hide: Boolean = false, modifier: Modifier = Modifier) {
+fun CustomTextField(modifier: Modifier = Modifier, label: String, textValue: String, onChange: (String) -> Unit,
+                    hide: Boolean = false, ) {
     OutlinedTextField(
         label = {
                 Text(
@@ -82,16 +82,16 @@ fun CustomTextField(label: String, textValue: String, onChange: (String) -> Unit
 }
 
 @Composable
-fun CustomButton(label: String, onClick: () -> Unit, enable: Boolean = true,
-                 modifier: Modifier = Modifier) {
+fun CustomButton(modifier: Modifier = Modifier,
+                 label: String, onClick: () -> Unit, enable: Boolean = true, ) {
     OutlinedButton(
         onClick = { onClick.invoke() },
         modifier = Modifier
             .then(modifier),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = BarterColor.lightGreen,
-            disabledContentColor = BarterColor.orange,
-            disabledBackgroundColor = BarterColor.orange,
+            disabledContentColor = BarterColor.lightGray,
+            disabledBackgroundColor = BarterColor.lightGray,
             contentColor = BarterColor.green
             ),
         enabled = enable,
@@ -273,7 +273,8 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
 }
 
 @Composable
-fun CustomCard(content: @Composable() () -> Unit, modifier: Modifier = Modifier) {
+fun CustomCard(modifier: Modifier = Modifier,
+               content: @Composable() () -> Unit,) {
     Card(
         modifier = Modifier
             .then(modifier),
@@ -281,6 +282,19 @@ fun CustomCard(content: @Composable() () -> Unit, modifier: Modifier = Modifier)
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(3.dp, BarterColor.textGreen)
     ) {
+        content()
+    }
+}
+
+@Composable
+fun TwoButtonsRow(modifier: Modifier, content: @Composable () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp),
+
+        ) {
         content()
     }
 }
@@ -658,12 +672,10 @@ fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
 }
 
 @Composable
-fun LoadedImageOrPlaceholder(imageUrls: List<String>, contentDes: String, modifier: Modifier = Modifier) {
+fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<String>, contentDes: String, ) {
     Column(
         modifier = Modifier
             .then(modifier)
-            //.fillMaxWidth(),
-        //horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         if (imageUrls.isNotEmpty()) {
@@ -673,6 +685,7 @@ fun LoadedImageOrPlaceholder(imageUrls: List<String>, contentDes: String, modifi
                     bitmap = bitmap.value!!.asImageBitmap(),
                     contentDescription = contentDes,
                     modifier = Modifier
+                        .fillMaxWidth()
                         //.then(modifier)
                 )
             } else {

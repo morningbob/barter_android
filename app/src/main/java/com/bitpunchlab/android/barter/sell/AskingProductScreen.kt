@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
@@ -27,6 +28,7 @@ import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
+import com.bitpunchlab.android.barter.util.SetAskingProductStatus
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -40,7 +42,6 @@ fun AskingProductScreen(navController: NavHostController,
     val productCategory by askingProductViewModel.productCategory.collectAsState()
     val productImages by askingProductViewModel.askingProductImages.collectAsState()
     val imagesDisplay = askingProductViewModel.askingProductImages.collectAsState()
-    //Log.i("asking pd screen", "product images size is: ${productImages.size}")
 
     val screenContext = LocalContext.current
     var popCurrent by remember { mutableStateOf(false) }
@@ -127,7 +128,7 @@ fun AskingProductScreen(navController: NavHostController,
                             askingProductViewModel.processAskingProduct()
                         },
                         modifier = Modifier
-                            .fillMaxWidth(0.45f)
+                            .fillMaxWidth(0.48f)
 
                     )
                     ChoiceButton(
@@ -143,8 +144,11 @@ fun AskingProductScreen(navController: NavHostController,
                 }
             }
             // show success dialog
-            if (status != 0) {
-                ShowStatus(status = status, askingProductViewModel = askingProductViewModel)
+            if (status != SetAskingProductStatus.NORMAL) {
+                ShowStatus(
+                    status = status,
+                    onDismiss = { askingProductViewModel.updateStatus(SetAskingProductStatus.NORMAL) }
+                    )
             }
             if (shouldDisplayImages) {
                 ImagesDisplayDialog(
@@ -160,20 +164,34 @@ fun AskingProductScreen(navController: NavHostController,
 }
 
 @Composable
-fun ShowStatus(status: Int, askingProductViewModel: AskingProductViewModel) {
+fun ShowStatus(status: SetAskingProductStatus, onDismiss: () -> Unit) {
     when (status) {
-        2 -> {
-            SuccessDialog(askingProductViewModel)
+        SetAskingProductStatus.INVALID_INPUTS -> {
+            InvalidInputProductDialog(onDismiss)
         }
+        SetAskingProductStatus.SUCCESS -> {
+            SuccessProductDialog(onDismiss)
+        }
+        else -> 0
     }
 }
 
 @Composable
-fun SuccessDialog(askingProductViewModel: AskingProductViewModel) {
+fun SuccessProductDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Product recorded",
-        message = "The asking product was saved.  It will be shown to the user who bid your product.",
-        positiveText = "OK",
-        onDismiss = { askingProductViewModel.updateStatus(0) },
-        onPositive = { askingProductViewModel.updateStatus(0) })
+        title = stringResource(R.string.product_recorded_alert),
+        message = stringResource(R.string.product_recorded_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
+}
+
+@Composable
+fun InvalidInputProductDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = stringResource(R.string.invalid_product_info_alert),
+        message = stringResource(R.string.invalid_product_info_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }

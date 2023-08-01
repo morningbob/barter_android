@@ -13,6 +13,7 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageType
+import com.bitpunchlab.android.barter.util.ProcessSellingStatus
 import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.CoroutineScope
@@ -69,8 +70,8 @@ class SellViewModel : ViewModel() {
 
     private val userId = MutableStateFlow("")
 
-    private val _processSellingStatus = MutableStateFlow(0)
-    val processSellingStatus : StateFlow<Int> get() = _processSellingStatus.asStateFlow()
+    private val _processSellingStatus = MutableStateFlow(ProcessSellingStatus.NORMAL)
+    val processSellingStatus : StateFlow<ProcessSellingStatus> get() = _processSellingStatus.asStateFlow()
 
     private val _shouldShowAsking = MutableStateFlow(false)
     val shouldShowAsking : StateFlow<Boolean> get() = _shouldShowAsking.asStateFlow()
@@ -90,14 +91,6 @@ class SellViewModel : ViewModel() {
                 userId.value = it
             }
         }
-
-        //CoroutineScope(Dispatchers.IO).launch {
-        //    triggerImageUpdate.collect() {
-        //        if (it) {
-
-        //        }
-        //    }
-        //}
     }
 
     fun updateShouldExpandCategory(should: Boolean) {
@@ -172,7 +165,7 @@ class SellViewModel : ViewModel() {
             CoroutineScope(Dispatchers.IO).launch {
                 if (processSelling()) {
                     Log.i("process selling, from sellVM", "succeeded")
-                    _processSellingStatus.value = 2
+                    _processSellingStatus.value = ProcessSellingStatus.SUCCESS
                     // I clear the fields and stop loading spinner as such in 2 places
                     // because the timing of each are different.
                     // Can't put it after if clause
@@ -181,7 +174,7 @@ class SellViewModel : ViewModel() {
                     _loadingAlpha.value = 0f
                 } else {
                     Log.i("process selling, from sellVM", "failed")
-                    _processSellingStatus.value = 1
+                    _processSellingStatus.value = ProcessSellingStatus.FAILURE
                     clearFields()
                     _loadingAlpha.value = 0f
                 }
@@ -189,7 +182,7 @@ class SellViewModel : ViewModel() {
 
         } else {
             // invalid field
-            _processSellingStatus.value = 3
+            _processSellingStatus.value = ProcessSellingStatus.INVALID_INPUTS
         }
     }
 
@@ -234,7 +227,7 @@ class SellViewModel : ViewModel() {
         _productImages.value.remove(image)
     }
 
-    fun updateProcessSellingStatus(status: Int) {
+    fun updateProcessSellingStatus(status: ProcessSellingStatus) {
         _processSellingStatus.value = status
     }
 

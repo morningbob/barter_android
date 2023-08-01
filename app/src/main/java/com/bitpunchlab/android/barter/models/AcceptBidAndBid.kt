@@ -11,5 +11,5 @@ data class AcceptBidAndBid(
         parentColumn = "acceptId",
         entityColumn = "acceptBidId"
     )
-    val bid: Bid
+    var bid: Bid? = null
 )

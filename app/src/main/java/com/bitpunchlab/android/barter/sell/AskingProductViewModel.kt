@@ -13,6 +13,7 @@ import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.SellingDuration
+import com.bitpunchlab.android.barter.util.SetAskingProductStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,17 +34,8 @@ class AskingProductViewModel : ViewModel() {
     private val _askingProductImages = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
     val askingProductImages : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _askingProductImages.asStateFlow()
 
-    private val _status = MutableStateFlow(0)
-    val status : StateFlow<Int> get() = _status.asStateFlow()
-
-    private val _askingProductsList = MutableStateFlow<List<ProductOffering>>(mutableListOf())
-    val askingProductsList : StateFlow<List<ProductOffering>> get() = _askingProductsList.asStateFlow()
-
-    private val _askingProductsImages = MutableStateFlow<SnapshotStateList<SnapshotStateList<Bitmap>>>(mutableStateListOf())
-    val askingProductsImages : StateFlow<SnapshotStateList<SnapshotStateList<Bitmap>>> get() = _askingProductsImages.asStateFlow()
-
-    private val _askingProductsImages1 = MutableStateFlow<List<List<Bitmap>>>(mutableListOf())
-    val askingProductsImages1 : StateFlow<List<List<Bitmap>>> get() = _askingProductsImages1.asStateFlow()
+    private val _status = MutableStateFlow(SetAskingProductStatus.NORMAL)
+    val status : StateFlow<SetAskingProductStatus> get() = _status.asStateFlow()
 
     private val _update = MutableStateFlow(false)
     val update : StateFlow<Boolean> get() = _update.asStateFlow()
@@ -74,9 +66,6 @@ class AskingProductViewModel : ViewModel() {
 
     fun updateAskingImages(image: Bitmap) {
         val productImage = ProductImageToDisplay(imageId = UUID.randomUUID().toString(), image = image, "")
-        //val newList = askingProductImages.value.toMutableList()
-        //newList.add(productImage)
-        //Log.i("sellVM", "added one bitmap")
         _askingProductImages.value.add(productImage)
     }
 
@@ -113,17 +102,19 @@ class AskingProductViewModel : ViewModel() {
 
             // clean up
             clearForm()
-            _status.value = 2
+            _status.value = SetAskingProductStatus.SUCCESS
             _update.value = true
+        } else {
+            _status.value = SetAskingProductStatus.INVALID_INPUTS
         }
     }
 
 
-    fun updateStatus(status: Int) {
+    fun updateStatus(status: SetAskingProductStatus) {
         _status.value = status
     }
 
-    fun validateInputs() : Boolean {
+    private fun validateInputs() : Boolean {
         return !(productName.value == "" || productCategory.value == Category.NOT_SET)
     }
 

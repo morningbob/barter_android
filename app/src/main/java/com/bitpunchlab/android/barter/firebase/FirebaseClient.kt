@@ -18,7 +18,10 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.util.AppStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
+import com.bitpunchlab.android.barter.util.LoginStatus
+import com.bitpunchlab.android.barter.util.MainStatus
 import com.bitpunchlab.android.barter.util.ProductOfferingDecomposed
 import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
@@ -98,17 +101,17 @@ object FirebaseClient {
         auth.addAuthStateListener(authStateListener)
     }
 
-    suspend fun login(email: String, password: String) : Boolean =
-        suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+    suspend fun login(email: String, password: String) : LoginStatus =
+        suspendCancellableCoroutine<LoginStatus> { cancellableContinuation ->
         auth
             .signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.i("fire auth", "login successful")
-                    cancellableContinuation.resume(true) {}
+                    cancellableContinuation.resume(LoginStatus.LOGGED_IN) {}
                 } else {
                     Log.i("fire auth", "failed to login ${task.exception}")
-                    cancellableContinuation.resume(false) {}
+                    cancellableContinuation.resume(LoginStatus.LOGIN_SERVER_ERROR) {}
                 }
             }
     }
@@ -194,7 +197,7 @@ object FirebaseClient {
         BarterRepository.insertCurrentUser(user)
     }
 
-    suspend fun changePasswordFirebaseAuth(currentPassword: String, newPassword: String) : Boolean =
+    suspend fun changePasswordFirebaseAuth(currentPassword: String, newPassword: String) : MainStatus =
         suspendCancellableCoroutine { cancellableContinuation ->
             if (auth.currentUser != null) {
                 auth
@@ -206,40 +209,38 @@ object FirebaseClient {
                                 ?.addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         Log.i("change password firebase auth", "change pass sucess")
-                                        cancellableContinuation.resume(true) {}
+                                        cancellableContinuation.resume(MainStatus.SUCCESS) {}
                                     } else {
                                         Log.i(
                                             "change password firebase auth",
                                             "failed ${task.exception}"
                                         )
-                                        cancellableContinuation.resume(false) {}
+                                        cancellableContinuation.resume(MainStatus.FAILED_SERVER_ERROR) {}
                                     }
                                 }
+                        } else {
+                            Log.i("change password firebase auth", "failed to sign in, probably password wrong. ${task.exception}")
+                            cancellableContinuation.resume(MainStatus.FAILED_INCORRECT_PASSWORD) {}
                         }
                     }
             } else {
                 Log.i("change password firebase auth", "auth null")
-                cancellableContinuation.resume(false) {}
+                cancellableContinuation.resume(MainStatus.FAILED_APPLICATION_ERROR) {}
             }
     }
 
-    suspend fun sendResetPasswordLink(email: String) : Boolean =
+    suspend fun sendResetPasswordLink(email: String) : LoginStatus =
         suspendCancellableCoroutine { cancellableContinuation ->
-            if (auth.currentUser != null) {
-                auth.sendPasswordResetEmail(auth.currentUser!!.email!!)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.i("send reset email", "success")
-                            cancellableContinuation.resume(true) {}
-                        } else {
-                            Log.i("send reset email", "failed ${task.exception}")
-                            cancellableContinuation.resume(false) {}
-                        }
+            auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("send reset email", "success")
+                        cancellableContinuation.resume(LoginStatus.RESET_PASSWORD_SUCCESS) {}
+                    } else {
+                        Log.i("send reset email", "failed ${task.exception}")
+                        cancellableContinuation.resume(LoginStatus.RESET_SERVER_ERROR) {}
                     }
-
-            } else {
-                cancellableContinuation.resume(false) {}
-            }
+                }
     }
 
     private suspend fun prepareProductsOffering() {

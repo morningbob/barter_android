@@ -12,11 +12,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Login
+import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
@@ -47,7 +49,7 @@ fun LogoutScreen(navController: NavHostController) {
                 .background(BarterColor.lightGreen)
         ) {
             Text(
-                text = "Logging out",
+                text = stringResource(R.string.logging_out),
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
                 color = BarterColor.textGreen,

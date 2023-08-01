@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Main
@@ -35,8 +36,6 @@ fun SignupScreen(navController: NavHostController,
     val passError by signupViewModel.passError.collectAsState()
     val confirmPassError by signupViewModel.confirmPassError.collectAsState()
     val readySignup by signupViewModel.readySignup.collectAsState()
-    val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
-    //val shouldShowStatus by signupViewModel.shouldShowStatus.collectAsState()
     val createACStatus by FirebaseClient.createACStatus.collectAsState()
     val loadingAlpha by signupViewModel.loadingAlpha.collectAsState()
 
@@ -68,95 +67,76 @@ fun SignupScreen(navController: NavHostController,
             )
 
                 TitleText(
-                    title = "Sign Up",
+                    title = stringResource(R.string.sign_up),
                     modifier = Modifier
                         .padding(top = 40.dp, bottom = 30.dp)
                 )
 
                 CustomTextField(
-                    label = "Name",
+                    label = stringResource(R.string.name),
                     textValue = name,
                     onChange = { signupViewModel.updateName(it) },
                     modifier = Modifier
-                        .padding(
-                            top = 30.dp,
-                            bottom = 3.dp
-                        )
+                        .padding(top = 30.dp, bottom = 3.dp)
                         .fillMaxWidth())
 
                 ErrorText(
                     error = nameError,
                     modifier = Modifier
-                        .padding(
-                            bottom = 20.dp
-                        )
+                        .padding(bottom = 20.dp)
                         .fillMaxWidth()
                 )
 
                 CustomTextField(
-                    label = "Email",
+                    label = stringResource(id = R.string.email),
                     textValue = email,
                     onChange = { signupViewModel.updateEmail(it) },
                     modifier = Modifier
-                        .padding(
-                            bottom = 3.dp
-                        )
+                        .padding(bottom = 3.dp)
                         .fillMaxWidth())
 
                 ErrorText(
                     error = emailError,
                     modifier = Modifier
-                        .padding(
-                            bottom = 20.dp
-                        )
+                        .padding(bottom = 20.dp)
                         .fillMaxWidth()
                 )
 
                 CustomTextField(
-                    label = "Password",
+                    label = stringResource(id = R.string.password),
                     textValue = password,
                     onChange = { signupViewModel.updatePassword(it) },
                     modifier = Modifier
-                        .padding(
-                            bottom = 3.dp
-                        )
+                        .padding(bottom = 3.dp)
                         .fillMaxWidth())
 
                 ErrorText(
                     error = passError,
                     modifier = Modifier
-                        .padding(
-                            bottom = 20.dp
-                        )
+                        .padding(bottom = 20.dp)
                         .fillMaxWidth()
                 )
 
                 CustomTextField(
-                    label = "Confirm Password",
+                    label = stringResource(id = R.string.confirm_password),
                     textValue = confirmPassword,
                     onChange = { signupViewModel.updateConfirmPassword(it) },
                     modifier = Modifier
-                        .padding(
-                            bottom = 3.dp
-                        )
+                        .padding(bottom = 3.dp)
                         .fillMaxWidth())
 
                 ErrorText(
                     error = confirmPassError,
                     modifier = Modifier
-                        .padding(
-                            bottom = 20.dp
-                        )
+                        .padding(bottom = 20.dp)
                         .fillMaxWidth()
                 )
 
                 CustomButton(
-                    label = "Send",
+                    label = stringResource(id = R.string.send),
                     onClick = { signupViewModel.signup() },
                     modifier = Modifier
-                        .padding(
-                            bottom = 50.dp
-                        )
+                        .padding(bottom = 50.dp)
                         .fillMaxWidth(),
                     enable = readySignup
                 )
@@ -176,28 +156,38 @@ fun SignupScreen(navController: NavHostController,
         ) {
             CustomCircularProgressBar()
         }
-
     }
-
 }
 
 @Composable
 fun ShowStatusDialog(status: Int) {
-    if (status == 2) {
-        SuccessStatusDialog()
-    } else if (status == 1) {
-
+    when (status) {
+        2 -> RegistrationSuccessDialog { FirebaseClient.updateCreateACStatus(0) }
+        1 -> RegistrationFailureDialog { FirebaseClient.updateCreateACStatus(0) }
+        else -> 0
     }
 }
 
 @Composable
-fun SuccessStatusDialog() {
+fun RegistrationSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Registration",
-        message = "You are successfully registered.",
+        title = stringResource(R.string.registration),
+        message = stringResource(R.string.registration_alert_success_desc),
         positiveText = "OK",
-        onDismiss = { FirebaseClient.updateCreateACStatus(0)},
-        onPositive = { FirebaseClient.updateCreateACStatus(0) }
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    ) {}
+
+}
+
+@Composable
+fun RegistrationFailureDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = stringResource(R.string.registration),
+        message = stringResource(R.string.registration_alert_failure_desc),
+        positiveText = "OK",
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
     ) {}
 
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -129,7 +130,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                     }
 
                     Text(
-                        text = product?.name ?: "Not Available",
+                        text = product?.name ?: stringResource(R.string.not_available),
                         fontSize = 20.sp,
                         color = BarterColor.textGreen,
                         fontWeight = FontWeight.Bold,
@@ -139,7 +140,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             )
                     )
                     Text(
-                        text = product?.category ?: "Not Available",
+                        text = product?.category ?: stringResource(id = R.string.not_available),
                         fontSize = 20.sp,
                         color = BarterColor.textGreen,
                         //fontWeight = FontWeight.Bold,

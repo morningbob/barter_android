@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,12 +67,12 @@ fun ProductsOfferingListScreen(navController: NavHostController,
         products = LocalDatabaseManager.userProductsOffering.collectAsState()
         backgroundColor = BarterColor.lightBlue
         iconId = R.mipmap.products
-        title = "Your Products"
+        title = stringResource(R.string.products_offering_title)
     } else {
         products = LocalDatabaseManager.allProductsOffering.collectAsState()
         backgroundColor = BarterColor.lightYellow
         iconId = R.mipmap.bidding
-        title = "Products Available"
+        title = stringResource(R.string.products_available_title)
     }
 
     LaunchedEffect(key1 = shouldDisplayDetails) {

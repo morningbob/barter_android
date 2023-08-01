@@ -2,26 +2,24 @@ package com.bitpunchlab.android.barter.main
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
-import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
-import com.bitpunchlab.android.barter.userAccount.LoginViewModel
+import com.bitpunchlab.android.barter.util.MainStatus
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
 import com.bitpunchlab.android.barter.util.validatePassword
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @OptIn(InternalCoroutinesApi::class)
@@ -49,14 +47,14 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
     private val _confirmPassError = MutableStateFlow<String>("")
     val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
 
+    private val _mainStatus = MutableStateFlow<MainStatus>(MainStatus.NORMAL)
+    val mainStatus : StateFlow<MainStatus> get() = _mainStatus.asStateFlow()
 
-
-    private val _passwordOptionStatus = MutableStateFlow<Int>(0)
-    val passwordOptionStatus : StateFlow<Int> get() = _passwordOptionStatus.asStateFlow()
+    //private val _readyChangePass = MutableStateFlow<>("")
+    //val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
 
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
-
 
 
     init {
@@ -94,9 +92,15 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
                 }
             }
         }
-
         CoroutineScope(Dispatchers.IO).launch {
-
+            combine(currentPassword, newPassword, confirmPassword, currentPassError, newPassError, confirmPassError ) { flows: Array<String> ->
+                //_mainStatus.value = MainStatus.READY_CHANGE_PASSWORD
+                if (flows[0] != "" && flows[1] != "" && flows[2] != "" && flows[3] == "" && flows[4] == "" && flows[5] == "") {
+                    _mainStatus.value = MainStatus.READY_CHANGE_PASSWORD
+                }
+            }.collect() {
+                Log.i("f", "s")
+            }
         }
     }
 
@@ -115,20 +119,17 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
         _confirmPassError.value = validatePassword(pass)
     }
 
-    fun updatePasswordOptionStatus(status: Int) {
-        _passwordOptionStatus.value = status
+    fun updateMainStatus(status: MainStatus) {
+        _mainStatus.value = status
     }
 
     fun changePassword() {
         _loadingAlpha.value = 100f
         CoroutineScope(Dispatchers.IO).launch {
-            if (FirebaseClient.changePasswordFirebaseAuth(currentPassword.value, newPassword.value)) {
-                _passwordOptionStatus.value = 2
-                _loadingAlpha.value = 0f
-            } else {
-                _passwordOptionStatus.value = 3
-                _loadingAlpha.value = 0f
-            }
+            _mainStatus.value = CoroutineScope(Dispatchers.IO).async {
+                FirebaseClient.changePasswordFirebaseAuth(currentPassword.value, newPassword.value)
+            }.await()
+            _loadingAlpha.value = 0f
         }
     }
 
