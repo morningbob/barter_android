@@ -40,4 +40,17 @@
     <string name="products_offering_title">Your Products</string>
     <string name="products_available_title">Products Available</string>
     <string name="not_available">Not Available</string>
+    <string name="confirm_del_product_alert">Confirmation to Delete</string>
+    <string name="confirm_del_product_alert_desc">Please confirm to delete the product.</string>
+    <string name="confirm">Confirm</string>
+    <string name="product_deletion_alert">Product Deletion</string>
+    <string name="delete_product_success_desc">We removed the product successfully.</string>
+    <string name="delete_product_failure_desc">We couldn\'t process the deletion of the product.  Please make sure you have wifi and try again later.</string>
+    <string name="images">Images</string>
+    <string name="products_asked">Products Asked</string>
+    <string name="current_bids">Current Bids</string>
+    <string name="delete_product">Delete Product</string>
+    <string name="bid">Bid</string>
+    <string name="invalid_information">Invalid Information</string>
+    <string name="invalid_info_bidding_alert">Please make sure all the fields are filled.</string>
 </resources>

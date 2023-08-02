@@ -47,6 +47,7 @@ import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.bid.BidFormScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.DeleteProductStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
 
@@ -65,6 +66,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val shouldPopDetails by productDetailsViewModel.shouldPopDetails.collectAsState()
     val shouldBid by productDetailsViewModel.shouldBid.collectAsState()
     val deleteConfirmStatus by productDetailsViewModel.deleteProductStatus.collectAsState()
+    // I use Int, 0 - normal, 1 - confirm, it is easier for the image display dialog to signal the status
     val deleteImageStatus by productDetailsViewModel.deleteImageStatus.collectAsState()
     val biddingStatus by productDetailsViewModel.biddingStatus.collectAsState()
     val imagesDisplay = productDetailsViewModel.imagesDisplay.collectAsState()
@@ -183,7 +185,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                         .padding(start = 20.dp)
                                 ) {
                                     CustomButton(
-                                        label = "Images",
+                                        label = stringResource(R.string.images),
                                         onClick = {
                                             productDetailsViewModel.updateShouldDisplayImages(true)
                                         },
@@ -191,7 +193,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                             .padding(top = 0.dp)
                                     )
                                     CustomButton(
-                                        label = "Products Asked",
+                                        label = stringResource(R.string.products_asked),
                                         onClick = {
                                             ProductInfo.updateUserMode(userMode)
                                             productDetailsViewModel.prepareAskingProducts()
@@ -204,7 +206,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                     )
                                     if (userMode == UserMode.OWNER_MODE) {
                                         CustomButton(
-                                            label = "Current Bids",
+                                            label = stringResource(R.string.current_bids),
                                             onClick = {
                                                 productDetailsViewModel.updateShouldShowBidsListStatus(1)
                                             },
@@ -212,7 +214,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                                 .padding(top = 10.dp)
                                         )
                                         CustomButton(
-                                            label = "Delete Product",
+                                            label = stringResource(R.string.delete_product),
                                             onClick = {
                                                 productDetailsViewModel.confirmDelete()
                                             },
@@ -222,7 +224,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 
                                     } else {
                                         CustomButton(
-                                            label = "Bid",
+                                            label = stringResource(R.string.bid),
                                             onClick = {
                                                 productDetailsViewModel.updateShouldBid(true)
                                             },
@@ -233,7 +235,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 }
                         }
                     }
-                }
+                }//
 
                 if (shouldDisplayImages && userMode == UserMode.OWNER_MODE) {
                     ImagesDisplayDialog(
@@ -245,7 +247,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             productDetailsViewModel.deleteProductImage(it)
                         },
                         triggerImageUpdate = { productDetailsViewModel.updateTriggerImageUpdate(it) }
-                    )
+                    )//
                 } else if (shouldDisplayImages) {
                     ImagesDisplayDialog(
                         images = imagesDisplay.value,
@@ -259,12 +261,17 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         .alpha(loadingAlpha)
                 ) {
                     CustomCircularProgressBar()
-                }
+                }//dfolgkjklsdafjlkweJRIO[werjowekRNLK;snfdk
 
-                if (deleteConfirmStatus != 0) {
+                if (deleteConfirmStatus != DeleteProductStatus.NORMAL) {
                     product?.let {
-                        ShowDeleteStatus(deleteConfirmStatus, it, productDetailsViewModel)
-                    }
+                        ShowDeleteStatus(
+                            status = deleteConfirmStatus,
+                            product = it,
+                            onConfirm = { productDetailsViewModel.deleteProduct(it) },
+                            onDismiss = { productDetailsViewModel.updateDeleteProductStatus(DeleteProductStatus.NORMAL) }
+                            )
+                    }//sdfljsdlakfl;ksdafklsdajfklsdjlfkjwefelsddkl
                 }
 
                 if (shouldBid) {
@@ -285,48 +292,54 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
 }
 
 @Composable
-fun ShowDeleteStatus(status: Int, product: ProductOffering,
-                     productDetailsViewModel: ProductOfferingDetailsViewModel) {
+fun ShowDeleteStatus(status: DeleteProductStatus, product: ProductOffering,
+                     onConfirm: (ProductOffering) -> Unit, onDismiss: () -> Unit) {
 
     when (status) {
-        1 -> { ConfirmDeleteDialog(product, productDetailsViewModel) }
-        2 -> { DeleteSuccessDialog(productDetailsViewModel) }
-        3 -> { DeleteFailureDialog(productDetailsViewModel) }
+        DeleteProductStatus.CONFIRM -> { ConfirmDeleteDialog(
+            product = product,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss
+        ) }
+        DeleteProductStatus.SUCCESS -> { DeleteSuccessDialog(onDismiss) }
+        DeleteProductStatus.FAILURE -> { DeleteFailureDialog(onDismiss) }
+        else -> 0
     }
 
 }
 
 @Composable
-fun ConfirmDeleteDialog(product: ProductOffering,  productDetailsViewModel: ProductOfferingDetailsViewModel) {
+fun ConfirmDeleteDialog(product: ProductOffering, onConfirm: (ProductOffering) -> Unit,
+    onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Confirmation to delete",
-        message = "Please confirm to delete the product.",
-        positiveText = "Confirm",
-        negativeText = "Cancel",
-        onDismiss = { productDetailsViewModel.updateDeleteProductStatus(0) },
-        onPositive = { productDetailsViewModel.deleteProduct(product) },
-        onNegative = { productDetailsViewModel.updateDeleteProductStatus(0) }
+        title = stringResource(R.string.confirm_del_product_alert),
+        message = stringResource(R.string.confirm_del_product_alert_desc),
+        positiveText = stringResource(R.string.confirm),
+        negativeText = stringResource(id = R.string.cancel),
+        onDismiss = { onDismiss() },
+        onPositive = { onConfirm(product) },
+        onNegative = { onDismiss() }
     )
 }
 
 @Composable
-fun DeleteSuccessDialog(productDetailsViewModel: ProductOfferingDetailsViewModel) {
+fun DeleteSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Product Deletion",
-        message = "We removed the product successfully.",
-        positiveText = "OK",
-        onDismiss = { productDetailsViewModel.updateDeleteProductStatus(0) },
-        onPositive = { productDetailsViewModel.updateDeleteProductStatus(0) })
+        title = stringResource(R.string.product_deletion_alert),
+        message = stringResource(R.string.delete_product_success_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 
 @Composable
-fun DeleteFailureDialog(productDetailsViewModel: ProductOfferingDetailsViewModel) {
+fun DeleteFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Product Deletion",
-        message = "We couldn't process the deletion of the product.  Please make sure you have wifi and try again later.",
-        positiveText = "OK",
-        onDismiss = { productDetailsViewModel.updateDeleteProductStatus(0) },
-        onPositive = { productDetailsViewModel.updateDeleteProductStatus(0) })
+        title = stringResource(R.string.product_deletion_alert),
+        message = stringResource(R.string.delete_product_failure_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 
 

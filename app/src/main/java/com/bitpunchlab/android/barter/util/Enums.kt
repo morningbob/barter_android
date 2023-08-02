@@ -56,6 +56,19 @@ enum class ProcessSellingStatus {
     FAILURE
 }
 
+enum class DeleteProductStatus {
+    NORMAL,
+    CONFIRM,
+    SUCCESS,
+    FAILURE
+}
+
+enum class BiddingStatus {
+    NORMAL,
+    INVALID_INPUTS,
+    SUCCESS,
+    FAILURE
+}
 enum class ImageType {
     PRODUCT_IMAGE,
     ASKING_IMAGE

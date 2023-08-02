@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -213,7 +214,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                 if (biddingStatus != 0) {
                     ShowBiddingStatus(
                         status = biddingStatus,
-                        resetStatus = resetStatus
+                        onDismiss = resetStatus
                     )
                 }
             }
@@ -231,32 +232,32 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
 }
 
 @Composable
-fun ShowBiddingStatus(status: Int, resetStatus: () -> Unit) {
+fun ShowBiddingStatus(status: Int, onDismiss: () -> Unit) {
     when (status) {
-        1 -> { BiddingFailureAlert(resetStatus) }
-        2 -> { BiddingSuccessAlert(resetStatus) }
-        3 -> { InvalidInfoAlert(resetStatus) }
+        1 -> { BiddingFailureAlert(onDismiss) }
+        2 -> { BiddingSuccessAlert(onDismiss) }
+        3 -> { InvalidInfoAlert(onDismiss) }
     }
 }
 
 @Composable
-fun InvalidInfoAlert(resetStatus: () -> Unit) {
+fun InvalidInfoAlert(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Invalid Information",
-        message = "Please make sure all the fields are filled.",
-        positiveText = "OK",
-        onDismiss = { resetStatus.invoke() },
-        onPositive = { resetStatus.invoke() })
+        title = stringResource(R.string.invalid_information),
+        message = stringResource(R.string.invalid_info_bidding_alert),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 
 @Composable
-fun BiddingSuccessAlert(resetStatus: () -> Unit) {
+fun BiddingSuccessAlert(onDismiss: () -> Unit) {
     CustomDialog(
         title = "Bidding Success",
         message = "The bid was sent to the server successfully.",
-        positiveText = "OK",
-        onDismiss = { resetStatus.invoke() },
-        onPositive = { resetStatus.invoke() })
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 
 @Composable
@@ -264,7 +265,7 @@ fun BiddingFailureAlert(resetStatus: () -> Unit) {
     CustomDialog(
         title = "Bidding Failure",
         message = "The bid couldn't be send to the server.  Please make sure you have wifi and try again later.",
-        positiveText = "OK",
+        positiveText = stringResource(id = R.string.ok),
         onDismiss = { resetStatus.invoke() },
         onPositive = { resetStatus.invoke() })
 }

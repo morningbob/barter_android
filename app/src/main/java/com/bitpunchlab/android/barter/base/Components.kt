@@ -675,7 +675,8 @@ fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
 fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<String>, contentDes: String, ) {
     Column(
         modifier = Modifier
-            .then(modifier)
+            .then(modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         if (imageUrls.isNotEmpty()) {

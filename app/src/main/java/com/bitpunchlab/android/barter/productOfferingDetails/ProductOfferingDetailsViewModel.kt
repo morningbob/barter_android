@@ -10,6 +10,7 @@ import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.util.DeleteProductStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,14 +57,15 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     private val _shouldPopDetails = MutableStateFlow<Boolean>(false)
     val shouldPopDetails : StateFlow<Boolean> get() = _shouldPopDetails.asStateFlow()
 
-    private val _deleteProductStatus = MutableStateFlow<Int>(0)
-    val deleteProductStatus : StateFlow<Int> get() = _deleteProductStatus.asStateFlow()
+    private val _deleteProductStatus = MutableStateFlow<DeleteProductStatus>(DeleteProductStatus.NORMAL)
+    val deleteProductStatus : StateFlow<DeleteProductStatus> get() = _deleteProductStatus.asStateFlow()
 
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
 
     private val _triggerImageUpdate = MutableStateFlow(false)
     val triggerImageUpdate : StateFlow<Boolean> get() = _triggerImageUpdate.asStateFlow()
+
 
     init {
         // this is to prepare the images to be shown in image display screen
@@ -87,14 +89,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            triggerImageUpdate.collect() {
-                if (it) {
+    }
 
-                }
-            }
-        }
-
+    fun updateTriggerImageUpdate(trigger: Boolean) {
+        _triggerImageUpdate.value = trigger
     }
 
     fun updateBiddingStatus(status: Int) {
@@ -125,26 +123,22 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _shouldBid.value = should
     }
 
-    fun updateDeleteProductStatus(status: Int) {
+    fun updateDeleteProductStatus(status: DeleteProductStatus) {
         _deleteProductStatus.value = status
     }
 
     fun confirmDelete() {
-        _deleteProductStatus.value = 1
+        _deleteProductStatus.value = DeleteProductStatus.CONFIRM
     }
 
     fun deleteProduct(product: ProductOffering) {
         CoroutineScope(Dispatchers.IO).launch {
             if (FirebaseClient.processDeleteProduct(product)) {
-                _deleteProductStatus.value = 2
+                _deleteProductStatus.value = DeleteProductStatus.SUCCESS
             } else {
-                _deleteProductStatus.value = 3
+                _deleteProductStatus.value = DeleteProductStatus.FAILURE
             }
         }
-    }
-
-    fun updateTriggerImageUpdate(trigger: Boolean) {
-        _triggerImageUpdate.value = trigger
     }
 
     fun deleteProductImage(image: ProductImageToDisplay) {
