@@ -6,6 +6,13 @@ interface Destinations {
     val icon : Int
 }
 
+object Permission : Destinations {
+    override val title: String = "Permission"
+    override val route: String = "Permission"
+    override val icon: Int = 1
+}
+
+
 object Login : Destinations {
     override val title: String = "Login"
     override val route: String = "Login"

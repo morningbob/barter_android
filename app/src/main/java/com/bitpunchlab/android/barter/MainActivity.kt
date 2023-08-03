@@ -44,26 +44,37 @@ import com.bitpunchlab.android.barter.transactionRecords.RecordsScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.LogoutScreen
+import com.bitpunchlab.android.barter.userAccount.PermissionScreen
+import com.bitpunchlab.android.barter.userAccount.PermissionViewModel
 import com.bitpunchlab.android.barter.userAccount.SignupScreen
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.UserMode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    var readPermissionGranted = false
-    var writePermissionGranted = false
+    private val _readPermissionGranted = MutableStateFlow(false)
+    val readPermissionGranted : StateFlow<Boolean> get() = _readPermissionGranted.asStateFlow()
+    private var _writePermissionGranted = MutableStateFlow(false)
+    val writePermissionGranted : StateFlow<Boolean> get() = _writePermissionGranted.asStateFlow()
 
     private var permissionsLauncher  = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             resultMap ->
             resultMap.map { (key, value) ->
                 when (key) {
                     Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                        readPermissionGranted = true
+                        _readPermissionGranted.value = true
                         Log.i("main activity", "read permission granted")
                     }
                     Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
-                        writePermissionGranted = true
+                        _writePermissionGranted.value = true
                         Log.i("main activity", "write permission granted")
                     }
                     else -> 0
@@ -74,6 +85,33 @@ class MainActivity : ComponentActivity() {
     @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val permissionViewModel = ViewModelProvider(this)
+            .get(PermissionViewModel::class.java)
+        CoroutineScope(Dispatchers.IO).launch {
+            permissionViewModel.shouldRequestPermission.collect() {
+                if (it) {
+                    updateOrRequestPermissions(applicationContext)
+                }
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            combine(readPermissionGranted, writePermissionGranted) { read, write ->
+                if (read && write) {
+                    permissionViewModel.updatePermissionGranted(true)
+                }
+            }
+        }
+        val mainViewModel = ViewModelProvider(this,
+            MainViewModelFactory(application))
+            .get(MainViewModel::class.java)
+        val sellViewModel = ViewModelProvider(this)
+            .get(SellViewModel::class.java)
+
+
+        ImageHandler.currentContext = applicationContext
+        FirebaseClient.localDatabase = BarterDatabase.getInstance(applicationContext)
+        BarterRepository.database = BarterDatabase.getInstance(applicationContext)
+
         setContent {
             BarterTheme {
                 // A surface container using the 'background' color from the theme
@@ -81,17 +119,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-
-                    val mainViewModel = ViewModelProvider(this,
-                        MainViewModelFactory(application))
-                        .get(MainViewModel::class.java)
-                    val sellViewModel = ViewModelProvider(this)
-                        .get(SellViewModel::class.java)
-                    ImageHandler.currentContext = applicationContext
-                    FirebaseClient.localDatabase = BarterDatabase.getInstance(applicationContext)
-                    BarterRepository.database = BarterDatabase.getInstance(applicationContext)
-
-                    BarterNavigation(mainViewModel, sellViewModel)
+                    BarterNavigation(mainViewModel, sellViewModel, permissionViewModel)
                 }
             }
         }
@@ -111,15 +139,15 @@ class MainActivity : ComponentActivity() {
 
         val minSdk29 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
-        readPermissionGranted = hasReadPermission
-        writePermissionGranted = hasWritePermssion || minSdk29
+        _readPermissionGranted.value = hasReadPermission
+        _writePermissionGranted.value = hasWritePermssion || minSdk29
 
         val permissionsToRequest = mutableListOf<String>()
-        if (!writePermissionGranted) {
+        if (!writePermissionGranted.value) {
             permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             Log.i("main activity", "added write permission request")
         }
-        if (!readPermissionGranted) {
+        if (!readPermissionGranted.value) {
             permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE)
             Log.i("main activity", "added read permission request")
         }
@@ -133,10 +161,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel) {
+fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel, permissionViewModel: PermissionViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Login.route) {
+    NavHost(navController = navController, startDestination = Permission.route) {
+        composable(Permission.route) {
+            PermissionScreen(navController, permissionViewModel)
+        }
         composable(Login.route) {
             LoginScreen(navController)
         }
@@ -187,12 +218,3 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel)
         }
     }
 }
-/*
-        isGranted : Boolean ->
-        if (isGranted) {
-            Log.i("main activity", "requested permissions and granted")
-        } else {
-            Log.i("main activity", "requested permissions and not granted")
-        }
-
-         */

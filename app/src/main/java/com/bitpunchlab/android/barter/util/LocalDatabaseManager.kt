@@ -68,7 +68,6 @@ object LocalDatabaseManager {
     }
     private fun prepare() {
         // get all products available for bidding
-        //CoroutineScope(Dispatchers.IO).launch {
             CoroutineScope(Dispatchers.IO).launch {
                 BarterRepository.getAllProductOffering()?.collect() {
                     _allProductsOffering.value = it

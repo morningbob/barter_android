@@ -92,12 +92,7 @@ class BidFormViewModel : ViewModel() {
                 bidTime = getCurrentDateTime(),
                 bidProductId = LocalDatabaseManager.productChosen.value!!.productId,
             )
-        }// else {
-            //_shouldShowInvalidFieldsError.value = true
-            //?.let {
-            //    it(BiddingStatus.INVALID_INPUTS)
-            //}
-        //}
+        }
         return null
     }
 

@@ -91,7 +91,6 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BarterColor.lightGreen),
-                    //.verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -109,7 +108,6 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
                 // display change password input field only upon the button clicked
                 if (mainStatus == MainStatus.NORMAL) {
-
                     UserProfile(
                         user = currentUser,
                         updateStatus = { mainViewModel.updateMainStatus(MainStatus.CHANGE_PASSWORD) },
@@ -117,7 +115,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                             .background(BarterColor.lightGreen)
                             .padding(top = 30.dp, bottom = 100.dp)
                             .fillMaxWidth(0.8f)
-                            .fillMaxHeight(0.4f),
+                            .fillMaxHeight(0.6f),
                         contentModifier = Modifier
                             .background(BarterColor.lightGreen)
                             .padding(top = 30.dp, bottom = 30.dp)
@@ -206,7 +204,7 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
             CustomButton(
                 label = stringResource(R.string.change_password),
                 onClick = {
-                    updateStatus.invoke()
+                    updateStatus()
                 },
                 modifier = Modifier
                     .padding(top = 20.dp)
@@ -214,7 +212,7 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
         }
     }
 }
-//
+
 @Composable
 fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modifier = Modifier,
                             currentPassword: String, newPassword: String, confirmPassword: String,
@@ -222,7 +220,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                             readyChangePassword: Boolean, updateCurrentPass: (String) -> Unit, updateNewPass: (String) -> Unit,
                             updateConfirmPass: (String) -> Unit, updateStatus: (MainStatus) -> Unit,
                             changePassword: () -> Unit
-                            ) {
+    ) {
     CustomCard(modifier = modifier) {
         Column(
             modifier = Modifier
@@ -238,6 +236,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 onChange = {
                     updateCurrentPass(it)
                 },
+                hide = true,
                 modifier = Modifier
                     .padding(top = 10.dp)
             )
@@ -253,6 +252,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 onChange = {
                     updateNewPass(it)
                 },
+                hide = true,
                 modifier = Modifier
                     .padding(top = 10.dp)
             )
@@ -268,6 +268,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 onChange = {
                     updateConfirmPass(it)
                 },
+                hide = true,
                 modifier = Modifier
                     .padding(top = 10.dp)
             )
@@ -297,36 +298,6 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                     .fillMaxWidth(0.7f)
                     .padding(top = 10.dp)
             )
-            /*
-            Row(
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp),
-
-                ) {
-                CustomButton(
-                    label = stringResource(R.string.send),
-                    onClick = {
-                        changePassword()
-                    },
-                    enable = readyChangePassword,
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                )
-                CustomButton(
-                    label = stringResource(R.string.cancel),
-                    onClick = {
-                        updateStatus(MainStatus.NORMAL)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, bottom = 20.dp)
-                )
-            }
-
-             */
-
         }
     }
 }
@@ -366,24 +337,4 @@ fun ChangePassIncorrectPassDialog(onDismiss: () -> Unit) {
     )
 
 }
-/*
-CustomButton(
-                label = stringResource(R.string.send),
-                onClick = {
-                    changePassword()
-                },
-                enable = readyChangePassword,
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(top = 20.dp)
-            )
-            CustomButton(
-                label = stringResource(R.string.cancel),
-                onClick = {
-                    updateStatus(MainStatus.NORMAL)
-                },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(top = 20.dp)
-            )
- */
+
