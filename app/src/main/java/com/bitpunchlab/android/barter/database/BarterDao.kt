@@ -76,15 +76,7 @@ interface BarterDao {
 
     //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
     //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
-/*
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProductsBidding(vararg productBidding: ProductBidding)
 
-    @Query("SELECT * from products_bidding")
-    fun getAllProductsBidding() : Flow<List<ProductBidding>>
-
-
- */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBids(vararg bid: Bid)
 /*
@@ -105,9 +97,6 @@ interface BarterDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAcceptBids(vararg bid: AcceptBid)
-
-    //@Query("SELECT * FROM accept_bids WHERE")
-    //suspend fun getAcceptedBids(userId: String) : Flow<List<AcceptBid>>
 
     @Transaction
     @Query("SELECT * FROM accept_bids")
@@ -133,24 +122,4 @@ interface BarterDao {
     @Query("SELECT * FROM users WHERE :id == id")
     fun getUserAndAcceptBidsById(id: String) : Flow<List<UserAndAcceptBid>>
 
-    //@Query("SELECT * FROM ")
-
-/*
-    @Transaction
-    @Query("SELECT * FROM products_offering")
-    fun getProductAndAcceptBid() : List<ProductAndAcceptBid>
-
-    @Transaction
-    @Query("SELECT * FROM bids")
-    fun getBidAndAcceptBid() : List<BidAndAcceptBid>
-
-    @Transaction
-    @Query("SELECT * FROM products_offering WHERE :id == productId")
-    fun getProductAndAcceptBidById(id: String) : List<ProductAndAcceptBid>
-
-    @Transaction
-    @Query("SELECT * FROM bids WHERE :id == bidId")
-    fun getBidAndAcceptBidById(id: String) : List<BidAndAcceptBid>
-
- */
 }

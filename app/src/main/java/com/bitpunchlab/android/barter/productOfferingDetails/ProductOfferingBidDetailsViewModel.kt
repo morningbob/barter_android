@@ -7,6 +7,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
+import com.bitpunchlab.android.barter.util.AcceptBidStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,8 +33,8 @@ class ProductOfferingBidDetailsViewModel : ViewModel() {
     private val _shouldShowBid = MutableStateFlow<Boolean>(true)
     val shouldShowBid : StateFlow<Boolean> get() = _shouldShowBid.asStateFlow()
 
-    private val _acceptBidStatus = MutableStateFlow<Int>(0)
-    val acceptBidStatus : StateFlow<Int> get() = _acceptBidStatus.asStateFlow()
+    private val _acceptBidStatus = MutableStateFlow<AcceptBidStatus>(AcceptBidStatus.NORMAL)
+    val acceptBidStatus : StateFlow<AcceptBidStatus> get() = _acceptBidStatus.asStateFlow()
 
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
@@ -56,7 +57,7 @@ class ProductOfferingBidDetailsViewModel : ViewModel() {
     fun updateShouldPopImages(should: Boolean) {
         _shouldPopImages.value = should
     }
-    fun updateAcceptBidStatus(status: Int) {
+    fun updateAcceptBidStatus(status: AcceptBidStatus) {
         _acceptBidStatus.value = status
     }
 
@@ -83,13 +84,13 @@ class ProductOfferingBidDetailsViewModel : ViewModel() {
             combine(LocalDatabaseManager.productChosen, LocalDatabaseManager.bidChosen) { product, bid ->
                 if (bid != null && product != null) {
                     if (FirebaseClient.processAcceptBid(product, bid)) {
-                        updateAcceptBidStatus(3)
+                        updateAcceptBidStatus(AcceptBidStatus.SUCCESS)
                     } else {
-                        updateAcceptBidStatus(4)
+                        updateAcceptBidStatus(AcceptBidStatus.SERVER_FAILURE)
                     }
                 } else {
-                    Log.i("accept bid", "product info not available")
-                    updateAcceptBidStatus(5)
+                    //Log.i("accept bid", "product info not available")
+                    updateAcceptBidStatus(AcceptBidStatus.APP_FAILURE)
                 }
             }
         }

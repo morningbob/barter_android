@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
@@ -29,6 +30,7 @@ import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.AcceptBidStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 
 @Composable
@@ -91,7 +93,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     )
                     // confirm before execute
                     CustomButton(
-                        label = "Accept Bid",
+                        label = stringResource(R.string.accept_bid),
                         onClick = { productOfferingBidDetailsViewModel.acceptBid() },
                         modifier = Modifier
                             .padding(top = 20.dp)
@@ -110,69 +112,68 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                         onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) },
                     )
                 }
-                if (acceptBidStatus != 0) {
+                if (acceptBidStatus != AcceptBidStatus.NORMAL) {
                     ShowAcceptBidStatus(status = acceptBidStatus,
-                        productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel)
+                        onConfirm = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.CONFIRMED) },
+                        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.NORMAL) }
+                    )
                 }
             }
         }
 }
 
-// 1 -> to confirm
-// 2 -> user confirmed
-// 3 -> sent to server
-// 4 -> server error
-// 5 -> app error
+
 @Composable
-fun ShowAcceptBidStatus(status: Int, productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
+fun ShowAcceptBidStatus(status: AcceptBidStatus, onDismiss: () -> Unit, onConfirm: () -> Unit) {
     when (status) {
-        1 -> { ConfirmAcceptBid(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
-        3 -> { AcceptBidSuccess(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
-        4 -> { AcceptBidServerError(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
-        5 -> { AcceptBidAppError(productOfferingBidDetailsViewModel = productOfferingBidDetailsViewModel) }
+        AcceptBidStatus.TO_CONFIRM -> { ConfirmAcceptBid(onConfirm, onDismiss) }
+        AcceptBidStatus.SUCCESS -> { AcceptBidSuccess(onDismiss) }
+        AcceptBidStatus.SERVER_FAILURE -> { AcceptBidServerError(onDismiss) }
+        AcceptBidStatus.APP_FAILURE -> { AcceptBidAppError(onDismiss) }
+        else -> 0
     }
 }
 
 @Composable
-fun ConfirmAcceptBid(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
+fun ConfirmAcceptBid(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Accept Bid Confirmation",
-        message = "By accepting the bid, the bidding process will be ended before time elapsed.",
-        positiveText = "Confirm",
-        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(2) }
+        title = stringResource(R.string.accept_bid_confirmation),
+        message = stringResource(R.string.confirm_accept_bid_alert_desc),
+        positiveText = stringResource(id = R.string.confirm),
+        onDismiss = { onDismiss() },
+        onPositive = { onConfirm() }
     )
 }
 
 @Composable
-fun AcceptBidSuccess(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
+fun AcceptBidSuccess(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Accepted Bid",
-        message = "The acceptance of the bid was sent to the server successfully.",
-        positiveText = "OK",
-        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) }
+        title = stringResource(R.string.accepted_bid),
+        message = stringResource(R.string.accept_bid_success_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() }
     )
 }
 
 @Composable
-fun AcceptBidServerError(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
+fun AcceptBidServerError(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Accept Bid Error",
-        message = "The acceptance couldn't be sent to the server.  There may be error in the server.  Please also make sure you have wifi.",
-        positiveText = "OK",
-        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) }
+        title = stringResource(R.string.accept_bid_server_error_alert),
+        message = stringResource(R.string.accept_bid_server_error_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() }
     )
 }
 
 @Composable
-fun AcceptBidAppError(productOfferingBidDetailsViewModel: ProductOfferingBidDetailsViewModel) {
+fun AcceptBidAppError(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Accept Bid Error",
-        message = "The acceptance couldn't be sent to the server.  There may be error in the server.  Please also make sure you have wifi.",
-        positiveText = "OK",
-        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) },
-        onPositive = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(0) }
+        title = stringResource(R.string.accept_bid_app_error_alert),
+        message = stringResource(R.string.accept_bid_app_error_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() }
     )
 }

@@ -43,6 +43,7 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.BiddingStatus
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.RetrievePhotoHelper
@@ -52,9 +53,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() },
-    biddingStatus: Int, loadingAlpha: Float, resetStatus: () -> Unit,
+    biddingStatus: BiddingStatus, updateBiddingStatus: (BiddingStatus) -> Unit, loadingAlpha: Float, resetStatus: () -> Unit,
     processBidding: (product: ProductOffering, bid: Bid, images: List<ProductImageToDisplay>) -> Unit,
-    updateBidError: (Int) -> Unit, updateShouldStartBidding: (Boolean) -> Unit
+    updateShouldStartBidding: (Boolean) -> Unit
 ) {
 
     val product by LocalDatabaseManager.productChosen.collectAsState()
@@ -105,7 +106,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                 )
 
                 CustomTextField(
-                    label = "Product Name",
+                    label = stringResource(id = R.string.product_name),
                     textValue = bidProductName,
                     onChange = { bidFormViewModel.updateBidProductName(it) },
                     modifier = Modifier
@@ -121,14 +122,14 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     CustomTextField(
-                        label = "Product Category",
+                        label = stringResource(R.string.product_category),
                         textValue = bidProductCategory.label,
                         onChange = {  },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                     )
                     CustomDropDown(
-                        title = "Category",
+                        title = stringResource(id = R.string.category),
                         shouldExpand = shouldExpandCategoryDropdown,
                         onClickButton = { bidFormViewModel.updateShouldExpandCategoryDropdown(true) },
                         onClickItem = {
@@ -157,7 +158,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                             .fillMaxWidth(0.5f)
                     )
                     ChoiceButton(
-                        title = "Upload",
+                        title = stringResource(id = R.string.upload),
                         onClick = { pickImageLauncher.launch("image/*") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -171,7 +172,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         .padding(top = 20.dp)
                 ) {
                     ChoiceButton(
-                        title = "Send",
+                        title = stringResource(id = R.string.send),
                         onClick = {
                             val bid = bidFormViewModel.createBid()
                             if (product != null && bid != null) {
@@ -185,21 +186,20 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                                 //Log.i("bid screen", "null product or bid")
                                 // alert user that the info is invalid
                                 bidFormViewModel.clearForm()
-                                updateBidError(3)
+                                updateBiddingStatus(BiddingStatus.INVALID_INPUTS)
                             }
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                     )
                     ChoiceButton(
-                        title = "Cancel",
+                        title = stringResource(id = R.string.cancel),
                         onClick = { updateShouldStartBidding(false) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 20.dp, bottom = 100.dp)
                     )
                 }
-
 
                 if (shouldDisplayImages) {
                     ImagesDisplayDialog(
@@ -211,7 +211,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                     )
                 }
 
-                if (biddingStatus != 0) {
+                if (biddingStatus != BiddingStatus.NORMAL) {
                     ShowBiddingStatus(
                         status = biddingStatus,
                         onDismiss = resetStatus
@@ -232,11 +232,12 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
 }
 
 @Composable
-fun ShowBiddingStatus(status: Int, onDismiss: () -> Unit) {
+fun ShowBiddingStatus(status: BiddingStatus, onDismiss: () -> Unit) {
     when (status) {
-        1 -> { BiddingFailureAlert(onDismiss) }
-        2 -> { BiddingSuccessAlert(onDismiss) }
-        3 -> { InvalidInfoAlert(onDismiss) }
+        BiddingStatus.FAILURE -> { BiddingFailureAlert(onDismiss) }
+        BiddingStatus.SUCCESS -> { BiddingSuccessAlert(onDismiss) }
+        BiddingStatus.INVALID_INPUTS -> { InvalidInfoAlert(onDismiss) }
+        else -> 0
     }
 }
 
@@ -253,21 +254,21 @@ fun InvalidInfoAlert(onDismiss: () -> Unit) {
 @Composable
 fun BiddingSuccessAlert(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Bidding Success",
-        message = "The bid was sent to the server successfully.",
+        title = stringResource(R.string.bidding_success),
+        message = stringResource(R.string.bidding_success_alert_desc),
         positiveText = stringResource(id = R.string.ok),
         onDismiss = { onDismiss() },
         onPositive = { onDismiss() })
 }
 
 @Composable
-fun BiddingFailureAlert(resetStatus: () -> Unit) {
+fun BiddingFailureAlert(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Bidding Failure",
-        message = "The bid couldn't be send to the server.  Please make sure you have wifi and try again later.",
+        title = stringResource(R.string.bidding_failure),
+        message = stringResource(R.string.bidding_failure_alert_desc),
         positiveText = stringResource(id = R.string.ok),
-        onDismiss = { resetStatus.invoke() },
-        onPositive = { resetStatus.invoke() })
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() })
 }
 /*
                 CustomButton(

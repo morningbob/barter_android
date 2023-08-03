@@ -53,4 +53,23 @@
     <string name="bid">Bid</string>
     <string name="invalid_information">Invalid Information</string>
     <string name="invalid_info_bidding_alert">Please make sure all the fields are filled.</string>
+    <string name="product_category">Product Category</string>
+    <string name="bidding_success">Bidding Success</string>
+    <string name="bidding_failure">Bidding Failure</string>
+    <string name="bidding_success_alert_desc">The bid was sent to the server successfully.</string>
+    <string name="bidding_failure_alert_desc">The bid couldn\'t be send to the server.  Please make sure you have wifi and try again later.</string>
+    <string name="accept_bid_confirmation">Accept Bid Confirmation</string>
+    <string name="confirm_accept_bid_alert_desc">By accepting the bid, the bidding process will be ended before time elapsed.</string>
+    <string name="accepted_bid">Accepted Bid</string>
+    <string name="accept_bid_success_desc">The acceptance of the bid was sent to the server successfully.</string>
+    <string name="accept_bid_server_error_alert">Accept Bid Error</string>
+    <string name="accept_bid_server_error_alert_desc">The acceptance couldn\'t be sent to the server.  There may be error in the server.  Please also make sure you have wifi.</string>
+    <string name="accept_bid_app_error_alert">Accept Bid Error</string>
+    <string name="accept_bid_app_error_alert_desc">The acceptance couldn\'t be sent to the server.  There may be error in the server.  Please also make sure you have wifi.</string>
+    <string name="accept_bid">Accept Bid</string>
+    <string name="delete">Delete</string>
+    <string name="remove_confirmation">Remove Confirmation</string>
+    <string name="confirm_remove_product_alert_desc">Are you sure to remove the product?</string>
+    <string name="deletion_success">Deletion Success</string>
+    <string name="product_delete_alert_desc">The product was deleted</string>
 </resources>

@@ -19,9 +19,6 @@ class ProductsOfferingListViewModel : ViewModel() {
 
     var userMode : UserMode = UserMode.OWNER_MODE
 
-    private var _productsOffering = MutableStateFlow<List<ProductOffering>>(listOf())
-    val productsOffering : StateFlow<List<ProductOffering>> get() = _productsOffering.asStateFlow()
-
     private var _shouldDisplayDetails = MutableStateFlow<Boolean>(false)
     val shouldDisplayDetails : StateFlow<Boolean> get() = _shouldDisplayDetails.asStateFlow()
 
@@ -30,7 +27,6 @@ class ProductsOfferingListViewModel : ViewModel() {
 
     init {
         ProductInfo.updateProductChosen(null)
-
     }
 
     fun updateShouldDisplayProductDetails(should: Boolean) {

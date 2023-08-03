@@ -10,6 +10,7 @@ import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.util.AcceptBidStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,21 +40,15 @@ class ProductOfferingBidsListViewModel : ViewModel() {
     private val _shouldPopImages = MutableStateFlow<Boolean>(false)
     val shouldPopImages : StateFlow<Boolean> get() = _shouldPopImages.asStateFlow()
 
-    private val _shouldDismissDetails = MutableStateFlow<Boolean>(false)
-    val shouldDismissDetails : StateFlow<Boolean> get() = _shouldDismissDetails.asStateFlow()
-
     // this variable is used to pop off the current screen as cross cancelled
     private val _shouldPopBids = MutableStateFlow<Boolean>(false)
     val shouldPopBids : StateFlow<Boolean> get() = _shouldPopBids.asStateFlow()
-
-    private val _acceptBidStatus = MutableStateFlow<Int>(0)
-    val acceptBidStatus : StateFlow<Int> get() = _acceptBidStatus.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
             LocalDatabaseManager.bidProductImages.collect() {
                 if (it.isNotEmpty()) {
-                    Log.i("bid list vm", "images transferred for display")
+                    //Log.i("bid list vm", "images transferred for display")
                     _imagesDisplay.value = it
                 }
             }
@@ -80,18 +75,9 @@ class ProductOfferingBidsListViewModel : ViewModel() {
         _shouldPopImages.value = should
     }
 
-    fun updateShouldDismissDetails(should: Boolean) {
-        _shouldDismissDetails.value = should
-    }
-
     fun updateShouldPopBids(should: Boolean) {
         _shouldPopBids.value = should
     }
-
-    fun updateAcceptBidStatus(status: Int) {
-        _acceptBidStatus.value = status
-    }
-
 
     fun deleteImage(image: ProductImageToDisplay) {
         Log.i("askingVM", "got image")
@@ -100,23 +86,6 @@ class ProductOfferingBidsListViewModel : ViewModel() {
         //_imagesDisplay.value = newList
     }
 
-
-    // we retrieve the product bidding object stored in the local database
-    // it should be retrieved from the server together with the other products bidding.
-    fun acceptBid() {
-        CoroutineScope(Dispatchers.IO).launch {
-            if (product.value != null && bid.value != null) {
-                if (FirebaseClient.processAcceptBid(product.value!!, bid.value!!)) {
-                    updateAcceptBidStatus(3)
-                } else {
-                    updateAcceptBidStatus(4)
-                }
-            } else {
-                Log.i("accept bid", "product info not available")
-                updateAcceptBidStatus(5)
-            }
-        }
-    }
 }
 /*
     init {

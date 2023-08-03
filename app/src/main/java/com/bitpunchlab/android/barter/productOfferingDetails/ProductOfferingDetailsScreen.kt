@@ -47,6 +47,7 @@ import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.bid.BidFormScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.BiddingStatus
 import com.bitpunchlab.android.barter.util.DeleteProductStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
@@ -235,7 +236,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 }
                         }
                     }
-                }//
+                }
 
                 if (shouldDisplayImages && userMode == UserMode.OWNER_MODE) {
                     ImagesDisplayDialog(
@@ -261,28 +262,27 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         .alpha(loadingAlpha)
                 ) {
                     CustomCircularProgressBar()
-                }//dfolgkjklsdafjlkweJRIO[werjowekRNLK;snfdk
-
+                }
                 if (deleteConfirmStatus != DeleteProductStatus.NORMAL) {
-                    product?.let {
+                    product?.let { product ->
                         ShowDeleteStatus(
                             status = deleteConfirmStatus,
-                            product = it,
-                            onConfirm = { productDetailsViewModel.deleteProduct(it) },
+                            product = product,
+                            onConfirm = { productDetailsViewModel.deleteProduct(product) },
                             onDismiss = { productDetailsViewModel.updateDeleteProductStatus(DeleteProductStatus.NORMAL) }
                             )
-                    }//sdfljsdlakfl;ksdafklsdajfklsdjlfkjwefelsddkl
+                    }
                 }
 
                 if (shouldBid) {
                     BidFormScreen(
                         biddingStatus = biddingStatus,
                         loadingAlpha = loadingAlpha,
-                        resetStatus = { productDetailsViewModel.updateBiddingStatus(0) },
+                        resetStatus = { productDetailsViewModel.updateBiddingStatus(BiddingStatus.NORMAL) },
                         processBidding = { product, bid, images ->
                             productDetailsViewModel.processBidding(product, bid, images)
                         },
-                        updateBidError = { productDetailsViewModel.updateBiddingStatus(it) },
+                        updateBiddingStatus = { productDetailsViewModel.updateBiddingStatus(it) },
                         updateShouldStartBidding = { productDetailsViewModel.updateShouldBid(it) }
                     )
                 }

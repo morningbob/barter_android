@@ -251,6 +251,7 @@ object FirebaseClient {
         val (products, askingProducts, bids) =
             decomposeProductOfferingFirebase(productsFirebase)
 
+        //Log.i("firebase client", "products retrieved")
         BarterRepository.insertProductsOffering(products)
         BarterRepository.insertProductsAsking(askingProducts)
         BarterRepository.insertBids(bids)
@@ -298,15 +299,14 @@ object FirebaseClient {
                 decomposeProductOfferingFirebase(products)
             }.await()
 
+            //Log.i("firebase client", "in user, got products ${decomposed.productsOffering.size}")
             BarterRepository.insertProductsOffering(decomposed.productsOffering)
             BarterRepository.insertProductsAsking(decomposed.askingProducts)
             BarterRepository.insertBids(decomposed.bids)
             BarterRepository.insertImages(decomposed.images)
         }
-
         //Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
         //Log.i("prepare product offering", "no of bids ${bids.size}")
-
     }
 
     private suspend fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
@@ -781,6 +781,26 @@ object FirebaseClient {
                     cancellableContinuation.resume(false) {}
                 }
             }
+    }
+
+    suspend fun processDeleteAskingProduct(product: ProductOffering, asking: ProductAsking)
+    : Boolean {
+        var updatedAskingProduct = mapOf<String, ProductAskingFirebase>()
+
+        currentUserFirebase.value?.let { user ->
+            user.productsOffering.map { (productKey, productValue) ->
+                if (productValue.id == product.productId) {
+                    updatedAskingProduct = productValue.askingProducts.filterNot { it.key != asking.productId }
+                }
+            }
+            user.productsOffering[product.productId]!!.askingProducts = updatedAskingProduct as HashMap<String, ProductAskingFirebase>
+            // update user in firebase
+            //Log.i("delete asking product", "will update user.")
+            return CoroutineScope(Dispatchers.IO).async {
+                saveUserFirebase(user)
+            }.await()
+        }
+        return false
     }
 
     private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase) =

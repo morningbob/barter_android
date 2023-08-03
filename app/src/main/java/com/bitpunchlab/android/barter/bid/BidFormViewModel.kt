@@ -11,6 +11,7 @@ import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
+import com.bitpunchlab.android.barter.util.BiddingStatus
 import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
@@ -91,7 +92,12 @@ class BidFormViewModel : ViewModel() {
                 bidTime = getCurrentDateTime(),
                 bidProductId = LocalDatabaseManager.productChosen.value!!.productId,
             )
-        }
+        }// else {
+            //_shouldShowInvalidFieldsError.value = true
+            //?.let {
+            //    it(BiddingStatus.INVALID_INPUTS)
+            //}
+        //}
         return null
     }
 

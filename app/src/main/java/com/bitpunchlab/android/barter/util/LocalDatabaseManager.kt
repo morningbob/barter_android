@@ -81,10 +81,12 @@ object LocalDatabaseManager {
                         val userAndProductOffering = CoroutineScope(Dispatchers.IO).async {
                             BarterRepository.getUserProductsOffering(id)
                         }.await()
-                        if (userAndProductOffering.isNullOrEmpty()) {
+                        if (userAndProductOffering != null && userAndProductOffering.isNotEmpty()) {
                             _userProductsOffering.value =
                                 userAndProductOffering!!.get(0).productsOffering
-
+                            Log.i("local database manager", "got user's products ${userAndProductOffering!!.get(0).productsOffering.size}")
+                        } else {
+                            Log.i("local database manager", "user's product is null or 0")
                         }
                     }
 

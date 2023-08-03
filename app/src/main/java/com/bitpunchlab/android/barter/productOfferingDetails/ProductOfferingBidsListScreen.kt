@@ -36,6 +36,7 @@ import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
 import com.bitpunchlab.android.barter.base.CustomButton
+import com.bitpunchlab.android.barter.base.CustomCard
 import com.bitpunchlab.android.barter.base.LoadImage
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
@@ -52,11 +53,8 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
     ) {
 
     val product by LocalDatabaseManager.productOfferingWithBids.collectAsState()
-
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
-
-    //Log.i("bids list", "no bid in product offering: ${product?.bids?.size}")
 
     LaunchedEffect(key1 = shouldPopBids) {
         if (shouldPopBids) {
@@ -118,6 +116,7 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
 @Composable
 fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
     Surface() {
+        /*
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,6 +125,14 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
             elevation = 10.dp,
             shape = RoundedCornerShape(15.dp),
             border = BorderStroke(3.dp, BarterColor.textGreen)
+        ) {
+
+         */
+        CustomCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(BarterColor.lightGreen)
+                .padding(top = 8.dp, bottom = 8.dp)
         ) {
             Row(
                 modifier = Modifier

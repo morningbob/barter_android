@@ -10,6 +10,7 @@ import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.util.BiddingStatus
 import com.bitpunchlab.android.barter.util.DeleteProductStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import kotlinx.coroutines.CoroutineScope
@@ -40,8 +41,8 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
     val shouldBid : StateFlow<Boolean> get() = _shouldBid.asStateFlow()
 
     // 1 is failed, 2 is succeeded, 3 is invalid info
-    private val _biddingStatus = MutableStateFlow<Int>(0)
-    val biddingStatus : StateFlow<Int> get() = _biddingStatus.asStateFlow()
+    private val _biddingStatus = MutableStateFlow<BiddingStatus>(BiddingStatus.NORMAL)
+    val biddingStatus : StateFlow<BiddingStatus> get() = _biddingStatus.asStateFlow()
 
     // when user clicks view product images, or view asking product images
     // we retrieve the images and put it here
@@ -95,7 +96,7 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
         _triggerImageUpdate.value = trigger
     }
 
-    fun updateBiddingStatus(status: Int) {
+    fun updateBiddingStatus(status: BiddingStatus) {
         _biddingStatus.value = status
     }
 
@@ -168,10 +169,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
         CoroutineScope(Dispatchers.IO).launch {
             if (FirebaseClient.processBidding(product, bid, imagesBitmap)) {
-                _biddingStatus.value = 2
+                _biddingStatus.value = BiddingStatus.SUCCESS
                 _loadingAlpha.value = 0f
             } else {
-                _biddingStatus.value = 1
+                _biddingStatus.value = BiddingStatus.FAILURE
                 _loadingAlpha.value = 0f
             }
         }

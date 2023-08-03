@@ -69,6 +69,16 @@ enum class BiddingStatus {
     SUCCESS,
     FAILURE
 }
+
+enum class AcceptBidStatus {
+    NORMAL,
+    TO_CONFIRM,
+    CONFIRMED,
+    SUCCESS,
+    SERVER_FAILURE,
+    APP_FAILURE
+}
+
 enum class ImageType {
     PRODUCT_IMAGE,
     ASKING_IMAGE

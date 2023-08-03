@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -29,19 +30,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.ChoiceButton
+import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.LoadImage
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.DeleteProductStatus
 import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
 import com.bitpunchlab.android.barter.util.createPlaceholderImage
@@ -65,10 +71,12 @@ fun AskingProductsListScreen(navController: NavHostController,
     //Log.i("asking products list", "no of asking products ${product?.askingProducts?.size}")
 
     val deleteProductStatus by askingProductsListViewModel.deleteProductStatus.collectAsState()
+    val loadingAlpha by askingProductsListViewModel.loadingAlpha.collectAsState()
 
     var productToBeDeleted : ProductAsking? by remember {
         mutableStateOf(null)
     }
+
 
     LaunchedEffect(key1 = shouldDismiss) {
         if (shouldDismiss) {
@@ -169,10 +177,10 @@ fun AskingProductsListScreen(navController: NavHostController,
                         )
                         if (userMode == UserMode.OWNER_MODE) {
                             ChoiceButton(
-                                title = "Delete",
+                                title = stringResource(id = R.string.delete),
                                 onClick = {
                                     productToBeDeleted = product
-                                    askingProductsListViewModel.updateDeleteProductStatus(1)
+                                    askingProductsListViewModel.updateDeleteProductStatus(DeleteProductStatus.CONFIRM)
                                 },
                                 modifier = Modifier
                                     .padding(top = 20.dp)
@@ -181,62 +189,79 @@ fun AskingProductsListScreen(navController: NavHostController,
                     }
                 }
             }
-            if (deleteProductStatus != 0 && productToBeDeleted != null) {
+            if (deleteProductStatus != DeleteProductStatus.NORMAL && productToBeDeleted != null) {
                 ShowDeleteStatus(
                     status = deleteProductStatus,
-                    updateDeleteStatus = { askingProductsListViewModel.updateDeleteProductStatus(it) },
+                    onConfirm = {
+                                askingProductsListViewModel.deleteAskingProduct(LocalDatabaseManager.productChosen.value!!,
+                                productToBeDeleted!!) },
+                    onDismiss = { askingProductsListViewModel.updateDeleteProductStatus(DeleteProductStatus.NORMAL) },
                     productToBeDeleted = productToBeDeleted!!,
-                    deleteProduct = {
-                        ProductInfo.deleteAskingProduct(productToBeDeleted!!)
-                        LocalDatabaseManager.deleteProductAskingLocalDatabase(productToBeDeleted!!)
-                    }
                 )
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(loadingAlpha)
+            ) {
+                CustomCircularProgressBar()
             }
         }
     }
 }
 
-@Composable fun ShowDeleteStatus(status: Int, updateDeleteStatus: (Int) -> Unit, productToBeDeleted: ProductAsking,
-                                 deleteProduct: (ProductAsking) -> Unit) {
+@Composable fun ShowDeleteStatus(status: DeleteProductStatus, onConfirm: (ProductAsking) -> Unit,
+                                 onDismiss: () -> kotlin.Unit, productToBeDeleted: ProductAsking,
+                                 ) {
     when (status) {
-        1 -> ConfirmDeleteProductDialog(
-            updateDeleteStatus = updateDeleteStatus,
+        DeleteProductStatus.CONFIRM -> ConfirmDeleteProductDialog(
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
             productToBeDeleted = productToBeDeleted,
-            deleteProduct = deleteProduct
         )
-        2 -> DeleteProductSuccessDialog(updateDeleteStatus = updateDeleteStatus)
+        DeleteProductStatus.SUCCESS -> DeleteProductSuccessDialog(onDismiss)
+        DeleteProductStatus.FAILURE -> DeleteProductFailureDialog(onDismiss)
+        else -> 0
     }
 }
 
-// 1 : confirm delete
-// 2 : deletion success
-// 3 : deletion failed
 @Composable
-fun ConfirmDeleteProductDialog(updateDeleteStatus: (Int) -> Unit, productToBeDeleted: ProductAsking,
-                        deleteProduct: (ProductAsking) -> Unit) {
+fun ConfirmDeleteProductDialog(onConfirm: (ProductAsking) -> Unit, onDismiss: () -> Unit,
+                               productToBeDeleted: ProductAsking,
+                        ) {
     CustomDialog(
-        title = "Remove Confirmation",
-        message = "Are you sure to remove the product?",
-        positiveText = "Delete",
-        negativeText = "Cancel",
-        onDismiss = { updateDeleteStatus(0) },
+        title = stringResource(R.string.remove_confirmation),
+        message = stringResource(R.string.confirm_remove_product_alert_desc),
+        positiveText = stringResource(R.string.delete),
+        negativeText = stringResource(id = R.string.cancel),
+        onDismiss = { onDismiss() },
         onPositive = {
-            deleteProduct(productToBeDeleted)
-            updateDeleteStatus(0)
+            onConfirm(productToBeDeleted)
+            onDismiss()
         },
-        onNegative = { updateDeleteStatus(0) }
+        onNegative = { onDismiss() }
     )
 }
 
 @Composable
-fun DeleteProductSuccessDialog(updateDeleteStatus: (Int) -> Unit) {
+fun DeleteProductSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Deletion Success",
-        message = "The product was deleted",
-        positiveText = "OK",
-        onDismiss = { updateDeleteStatus(0) },
-        onPositive = {
-            updateDeleteStatus(0)
-        },
+        title = stringResource(R.string.deletion_success),
+        message = stringResource(R.string.product_delete_alert_desc),
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() }
+    )
+}
+
+@Composable
+fun DeleteProductFailureDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = "Deletion Failed",
+        message = "The product was not deleted.  There was an error in the server.  Please also make sure you have wifi.",
+        positiveText = stringResource(id = R.string.ok),
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() },
     )
 }

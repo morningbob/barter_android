@@ -29,7 +29,7 @@ import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-
+//
 @Composable
 fun AcceptBidDetailsScreen(navController: NavHostController,
     acceptBidDetailsViewModel: AcceptBidDetailsViewModel = remember {
