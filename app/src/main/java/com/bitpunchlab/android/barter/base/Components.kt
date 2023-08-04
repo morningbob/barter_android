@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -206,7 +207,6 @@ fun DialogButton(title: String,
         Text(
             text = title,
             fontSize = 18.sp,
-            //fontWeight = FontWeight.Bold,
             color = Color.White
         )
     }
@@ -221,6 +221,28 @@ fun CustomCircularProgressBar() {
         strokeWidth = 10.dp
     )
 }
+
+@Composable
+fun CancelCross(modifier: Modifier = Modifier, onCancel: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 20.dp, top = 20.dp)
+            .then(modifier),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Image(
+            painter = painterResource(id = R.mipmap.cross),
+            contentDescription = "cancel icon",
+            modifier = Modifier
+                .width(40.dp)
+                .clickable {
+                    onCancel()
+                },
+        )
+    }
+}
+
 
 @Composable
 fun <T: Any> CustomDropDown(title: String, shouldExpand: Boolean,
@@ -287,33 +309,18 @@ fun CustomCard(modifier: Modifier = Modifier,
 }
 
 @Composable
-fun TwoButtonsRow(modifier: Modifier, content: @Composable () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.Top,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 20.dp),
+fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifier,
+               product: ProductOffering, onClick: (ProductOffering) -> Unit,
+               backgroundColor: Color) {
 
-        ) {
-        content()
-    }
-}
-
-@Composable
-fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
-               modifier: Modifier = Modifier, backgroundColor: Color) {
-    Card(
-        elevation = 10.dp,
-        shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(3.dp, BarterColor.textGreen)
-    ) {
+    CustomCard(modifier) {
         Column(
             modifier
                 .fillMaxSize()
                 .background(backgroundColor)
                 .padding(bottom = 15.dp)
                 .clickable { onClick.invoke(product) }
-                .then(modifier),
+                .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -351,7 +358,7 @@ fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
                             .padding(top = 5.dp),
                     ) {
                         Text(
-                            text = "Category: ",
+                            text = stringResource(R.string.category_row),
                             color = BarterColor.textGreen,
                             fontSize = 18.sp,
                             textAlign = TextAlign.Start
@@ -374,7 +381,7 @@ fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
                             .padding(top = 5.dp),
                     ) {
                         Text(
-                            text = "Selling Duration: ",
+                            text = stringResource(R.string.selling_duration_row),
                             color = BarterColor.textGreen,
                             fontSize = 18.sp,
                             textAlign = TextAlign.Start
@@ -397,19 +404,7 @@ fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
                             .padding(top = 5.dp),
                     ) {
                         Text(
-                            text = "Asking Products: ",
-                            color = BarterColor.textGreen,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Start
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 5.dp),
-                    ) {
-                        Text(
-                            text = "",
+                            text = stringResource(R.string.asking_products_row),
                             color = BarterColor.textGreen,
                             fontSize = 18.sp,
                             textAlign = TextAlign.Start
@@ -420,14 +415,12 @@ fun ProductRow(product: ProductOffering, onClick: (ProductOffering) -> Unit,
             }
             Row(
                 modifier = Modifier
-                    //.fillMaxWidth()
                     .background(Color.Transparent)
                     .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 DateTimeInfo(
                     dateTimeString = product.dateCreated,
-                    modifier = Modifier
                 )
             }
         }
@@ -452,7 +445,7 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
             )
         } else {
             Text(
-                text = "Date and time info not available",
+                text = stringResource(R.string.date_and_time_info_not_available),
                 fontSize = 18.sp,
                 color = Color.Blue
             )
@@ -553,17 +546,9 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-/*
-        Image(
-            painter = painterResource(id = R.mipmap.recorddetails),
-            contentDescription = "record details icon",
-            modifier = Modifier
-                .width(120.dp)
-        )
 
- */
         Text(
-            text = "Product offered:",
+            text = stringResource(R.string.product_offered_row),
             color = Color.Black,
             fontSize = 20.sp,
             modifier = Modifier
@@ -578,7 +563,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     .padding(top = 20.dp)
             )
             CustomButton(
-                label = "View Images",
+                label = stringResource(R.string.view_images),
                 onClick = {
                     prepareImages(productOfferingImages)
                     updateShouldDisplayImages(true)
@@ -596,7 +581,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             )
         }
         Text(
-            text = "Product in exchange:",
+            text = stringResource(R.string.product_in_exchange_row),
             color = Color.Black,
             fontSize = 20.sp,
             modifier = Modifier
@@ -611,7 +596,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     .padding(top = 20.dp)
             )
             CustomButton(
-                label = "View Images",
+                label = stringResource(id = R.string.view_images),
                 onClick = {
                     prepareImages(productInExchangeImages)
                     updateShouldDisplayImages(true)
@@ -638,7 +623,6 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
 fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
     Row(
         modifier = Modifier
-            //.fillMaxWidth()
             .height(80.dp)
             .padding()
             .then(modifier),
@@ -664,7 +648,6 @@ fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
                 fontWeight = FontWeight.Bold,
                 color = BarterColor.textGreen,
                 modifier = Modifier,
-                //.padding(start = 30.dp, end = 30.dp),
                 textAlign = TextAlign.Start
             )
         }

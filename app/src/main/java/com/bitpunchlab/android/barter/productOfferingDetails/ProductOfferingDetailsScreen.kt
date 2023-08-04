@@ -37,6 +37,7 @@ import com.bitpunchlab.android.barter.AskingProductsList
 import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.ProductOfferingBidsList
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.CustomDialog
@@ -107,21 +108,8 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(BarterColor.lightGreen)
-                            .padding(top = 20.dp, end = 20.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.mipmap.cross),
-                            contentDescription = "Cancel button",
-                            modifier = Modifier
-                                .width(40.dp)
-                                .clickable { productDetailsViewModel.updateShouldPopDetails(true) }
-                        )
-                    }
+                    CancelCross(onCancel = { productDetailsViewModel.updateShouldPopDetails(true) })
+
                     product?.let {
                         LoadedImageOrPlaceholder(
                             imageUrls = product!!.images,

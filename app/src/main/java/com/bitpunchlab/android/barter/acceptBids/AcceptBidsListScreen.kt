@@ -34,18 +34,20 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AcceptBidDetails
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
+import com.bitpunchlab.android.barter.base.CustomCard
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.LocalDatabaseManager
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewModel: AcceptBidsListViewModel =
     remember { AcceptBidsListViewModel() }) {
 
-    val bidsDetail by acceptBidsListViewModel.bidsDetail.collectAsState()
+    val bidsDetail by LocalDatabaseManager.bidsDetail.collectAsState()
     val shouldDisplayDetails by acceptBidsListViewModel.shouldDisplayDetails.collectAsState()
 
     LaunchedEffect(key1 = shouldDisplayDetails) {
@@ -97,19 +99,16 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
 }
 
 @Composable
-fun AcceptBidRow(acceptBid: BidWithDetails, onClick: (BidWithDetails) -> Unit, modifier: Modifier = Modifier) {
-    Card(
-        elevation = 10.dp,
-        shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(3.dp, BarterColor.textGreen)
-    ) {
+fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifier,
+                 acceptBid: BidWithDetails, onClick: (BidWithDetails) -> Unit, ) {
+    CustomCard(modifier) {
         Column(
             modifier
                 .fillMaxSize()
                 .background(BarterColor.lightYellow)
                 .padding(bottom = 15.dp)
                 .clickable { onClick.invoke(acceptBid) }
-                .then(modifier),
+                .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -204,7 +203,6 @@ fun AcceptBidRow(acceptBid: BidWithDetails, onClick: (BidWithDetails) -> Unit, m
             }
             Row(
                 modifier = Modifier
-                    //.fillMaxWidth()
                     .background(Color.Transparent)
                     .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.Center

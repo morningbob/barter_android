@@ -72,4 +72,13 @@
     <string name="confirm_remove_product_alert_desc">Are you sure to remove the product?</string>
     <string name="deletion_success">Deletion Success</string>
     <string name="product_delete_alert_desc">The product was deleted</string>
+    <string name="transaction_details">Transaction Details</string>
+    <string name="confirm_transaction">Confirm Transaction</string>
+    <string name="category_row">"Category: "</string>
+    <string name="selling_duration_row">"Selling Duration: "</string>
+    <string name="asking_products_row">"Asking Products: "</string>
+    <string name="date_and_time_info_not_available">Date and time info not available</string>
+    <string name="product_offered_row">Product offered:</string>
+    <string name="view_images">View Images</string>
+    <string name="product_in_exchange_row">Product in exchange:</string>
 </resources>

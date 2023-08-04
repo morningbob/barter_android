@@ -52,7 +52,6 @@ class AcceptBidsListViewModel : ViewModel() {
     val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
     init {
-        //_bidsDetail.value = acceptedBidsDetail.value
         prepareBidDetails()
         // retrieve all accepted bids and put them in appropriate bids list
         CoroutineScope(Dispatchers.IO).launch {
@@ -65,7 +64,7 @@ class AcceptBidsListViewModel : ViewModel() {
                     Log.i("accept bid list vm", "userAcceptedBids ${userAcceptBids.size}")
                     Log.i("accept bid list vm", "got no accept bids: ${userAcceptBids[0].acceptBids.size}")
                     _acceptBids.value = userAcceptBids[0].acceptBids
-                    //prepareBidDetails(userAcceptBids[0].acceptBids)
+
                 }
             }
         }

@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
 import com.bitpunchlab.android.barter.base.CustomDialog
@@ -93,21 +94,10 @@ fun AskingProductsListScreen(navController: NavHostController,
                 .fillMaxSize()
                 .background(BarterColor.lightGreen)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(top = 20.dp, end = 20.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.cross),
-                    contentDescription = "Cancel button",
-                    modifier = Modifier
-                        .width(40.dp)
-                        .clickable { askingProductsListViewModel.updateShouldDismiss(true) }
-                )
+            CancelCross {
+                askingProductsListViewModel.updateShouldDismiss(true)
             }
+
             if (askingProducts.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier

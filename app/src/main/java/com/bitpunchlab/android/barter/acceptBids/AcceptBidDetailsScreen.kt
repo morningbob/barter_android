@@ -21,15 +21,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicRecordScreen
+import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-//
+
 @Composable
 fun AcceptBidDetailsScreen(navController: NavHostController,
     acceptBidDetailsViewModel: AcceptBidDetailsViewModel = remember {
@@ -39,16 +41,13 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
     val shouldDisplayImages by acceptBidDetailsViewModel.shouldDisplayImages.collectAsState()
     val productOfferingImages by acceptBidDetailsViewModel.productOfferingImages.collectAsState()
     val productInExchangeImages by acceptBidDetailsViewModel.productInExchangeImages.collectAsState()
-    //val deleteImageStatus by acceptBidDetailsViewModel.deleteImageStatus.collectAsState()
     val imagesDisplay = acceptBidDetailsViewModel.imagesDisplay.collectAsState()
-
 
     LaunchedEffect(key1 = shouldPopSelf) {
         if (shouldPopSelf) {
             navController.popBackStack()
         }
     }
-    
     
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -59,27 +58,13 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
                 .padding(bottom = 50.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 40.dp, end = 25.dp, top = 15.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.cross),
-                    contentDescription = "cancel icon",
-                    modifier = Modifier
-                        .width(40.dp)
-                        .clickable {
-                            acceptBidDetailsViewModel.updateShouldPopSelf(true)
-                        },
-                )
+            CancelCross {
+                acceptBidDetailsViewModel.updateShouldPopSelf(true)
             }
 
             TitleRow(
                 iconId = R.mipmap.recorddetails,
-                title = "Transaction Details",
+                title = stringResource(R.string.transaction_details),
                 modifier = Modifier
                     .padding(top = 0.dp)
             )
@@ -94,7 +79,7 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
             )
 
             CustomButton(
-                label = "Confirm Transaction",
+                label = stringResource(R.string.confirm_transaction),
                 onClick = {
                     // send a request to the server, by writing to collection
                     // change product's status to 2, update users and product offerings

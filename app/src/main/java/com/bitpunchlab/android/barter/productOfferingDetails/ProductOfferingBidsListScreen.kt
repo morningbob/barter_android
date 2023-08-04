@@ -35,6 +35,7 @@ import com.bitpunchlab.android.barter.BidDetails
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
+import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomCard
 import com.bitpunchlab.android.barter.base.LoadImage
@@ -72,23 +73,15 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
     Surface(modifier = Modifier.fillMaxSize()) {
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BarterColor.lightGreen)
+
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(BarterColor.lightGreen)
-                    .padding(top = 20.dp, end = 20.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.cross),
-                    contentDescription = "Cancel button",
-                    modifier = Modifier
-                        .width(40.dp)
-                        .clickable { productOfferingBidsListViewModel.updateShouldPopBids(true) }
-                )
+            CancelCross {
+                productOfferingBidsListViewModel.updateShouldPopBids(true)
             }
+
             product?.let {
                 LazyColumn(
                     modifier = Modifier
@@ -116,18 +109,6 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
 @Composable
 fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
     Surface() {
-        /*
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(BarterColor.lightGreen)
-                .padding(top = 8.dp, bottom = 8.dp),
-            elevation = 10.dp,
-            shape = RoundedCornerShape(15.dp),
-            border = BorderStroke(3.dp, BarterColor.textGreen)
-        ) {
-
-         */
         CustomCard(
             modifier = Modifier
                 .fillMaxWidth()

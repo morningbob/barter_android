@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BasicBidScreen
+import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
@@ -44,7 +45,6 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
     val shouldDisplayImages by productOfferingBidDetailsViewModel.shouldDisplayImages.collectAsState()
     val acceptBidStatus by productOfferingBidDetailsViewModel.acceptBidStatus.collectAsState()
     val shouldShowBid by productOfferingBidDetailsViewModel.shouldShowBid.collectAsState()
-    //val deleteImageStatus by productOfferingBidDetailsViewModel.deleteImageStatus.collectAsState()
 
     LaunchedEffect(key1 = shouldShowBid) {
         if (!shouldShowBid) {
@@ -52,74 +52,62 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
         }
     }
 
-        Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BarterColor.lightGreen)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BarterColor.lightGreen)
+                .verticalScroll(rememberScrollState())
+        ) {
+            CancelCross {
+                productOfferingBidDetailsViewModel.updateShouldShowBid(false)
+            }
+
+            // product offered images
+            // Accept or Reject Bid, choosing accept will end the transaction
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(BarterColor.lightGreen)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
+                BasicBidScreen(
+                    productName = chosenBid!!.bidProduct.name,
+                    productCategory = chosenBid!!.bidProduct.category,
+                    images = imagesDisplay.value,
+                    updateShouldDisplayImages = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(it) }
+                )
+                // confirm before execute
+                CustomButton(
+                    label = stringResource(R.string.accept_bid),
+                    onClick = { productOfferingBidDetailsViewModel.acceptBid() },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(BarterColor.lightGreen)
-                        .padding(top = 20.dp, end = 20.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Image(
-                        painter = painterResource(id = R.mipmap.cross),
-                        contentDescription = "Cancel button",
-                        modifier = Modifier
-                            .width(40.dp)
-                            .clickable {
-                                productOfferingBidDetailsViewModel.updateShouldShowBid(
-                                    false
-                                )
-                            }
-                    )
-                }
-                // product offered images
-                // Accept or Reject Bid, choosing accept will end the transaction
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    BasicBidScreen(
-                        productName = chosenBid!!.bidProduct.name,
-                        productCategory = chosenBid!!.bidProduct.category,
-                        images = imagesDisplay.value,
-                        updateShouldDisplayImages = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(it) }
-                    )
-                    // confirm before execute
-                    CustomButton(
-                        label = stringResource(R.string.accept_bid),
-                        onClick = { productOfferingBidDetailsViewModel.acceptBid() },
-                        modifier = Modifier
-                            .padding(top = 20.dp)
-                    )
-                    CustomButton(
-                        label = "Back",
-                        onClick = {
-                            //Log.i("bid details", "should show bid is set to false")
-                            productOfferingBidDetailsViewModel.updateShouldShowBid(false)
-                        }
-                    )
-                }
-                if (shouldDisplayImages) {
-                    ImagesDisplayDialog(
-                        images = imagesDisplay.value,
-                        onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) },
-                    )
-                }
-                if (acceptBidStatus != AcceptBidStatus.NORMAL) {
-                    ShowAcceptBidStatus(status = acceptBidStatus,
-                        onConfirm = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.CONFIRMED) },
-                        onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.NORMAL) }
-                    )
-                }
+                        .padding(top = 20.dp)
+                )
+                CustomButton(
+                    label = "Back",
+                    onClick = {
+                        //Log.i("bid details", "should show bid is set to false")
+                        productOfferingBidDetailsViewModel.updateShouldShowBid(false)
+                    }
+                )
+            }
+            if (shouldDisplayImages) {
+                ImagesDisplayDialog(
+                    images = imagesDisplay.value,
+                    onDismiss = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(false) },
+                )
+            }
+            if (acceptBidStatus != AcceptBidStatus.NORMAL) {
+                ShowAcceptBidStatus(status = acceptBidStatus,
+                    onConfirm = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.CONFIRMED) },
+                    onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.NORMAL) }
+                )
             }
         }
+    }
 }
 
 
