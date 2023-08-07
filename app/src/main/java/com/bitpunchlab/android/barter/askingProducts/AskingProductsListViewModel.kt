@@ -5,9 +5,8 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.sell.AskingProductInfo
 import com.bitpunchlab.android.barter.util.DeleteProductStatus
-import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

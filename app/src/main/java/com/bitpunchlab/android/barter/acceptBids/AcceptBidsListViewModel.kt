@@ -51,8 +51,9 @@ class AcceptBidsListViewModel : ViewModel() {
     private val _imagesDisplay = MutableStateFlow<List<ProductImageToDisplay>>(listOf())
     val imagesDisplay : StateFlow<List<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
+    /*
     init {
-        prepareBidDetails()
+        //prepareBidDetails()
         // retrieve all accepted bids and put them in appropriate bids list
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.userId.collect() { id ->
@@ -62,9 +63,13 @@ class AcceptBidsListViewModel : ViewModel() {
                 }.await()
                 userAcceptBidsFlow?.collect() { userAcceptBids ->
                     Log.i("accept bid list vm", "userAcceptedBids ${userAcceptBids.size}")
-                    Log.i("accept bid list vm", "got no accept bids: ${userAcceptBids[0].acceptBids.size}")
-                    _acceptBids.value = userAcceptBids[0].acceptBids
-
+                    if (userAcceptBids.isNotEmpty()) {
+                        Log.i(
+                            "accept bid list vm",
+                            "got no accept bids: ${userAcceptBids[0].acceptBids.size}"
+                        )
+                        _acceptBids.value = userAcceptBids[0].acceptBids
+                    }
                 }
             }
         }
@@ -103,6 +108,8 @@ class AcceptBidsListViewModel : ViewModel() {
             }
         }
     }
+
+     */
 
     fun updateShouldDisplayDetails(should: Boolean) {
         _shouldDisplayDetails.value = should

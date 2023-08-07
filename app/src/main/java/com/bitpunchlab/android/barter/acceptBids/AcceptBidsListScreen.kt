@@ -1,7 +1,6 @@
 package com.bitpunchlab.android.barter.acceptBids
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -23,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,21 +32,31 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AcceptBidDetails
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
+import com.bitpunchlab.android.barter.base.ChooseTitlesRow
 import com.bitpunchlab.android.barter.base.CustomCard
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
-import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewModel: AcceptBidsListViewModel =
     remember { AcceptBidsListViewModel() }) {
 
-    val bidsDetail by LocalDatabaseManager.bidsDetail.collectAsState()
+    //val bidsDetail by LocalDatabaseManager.bidsDetail.collectAsState()
+    val acceptedBids by LocalDatabaseManager.acceptedBidsDetail.collectAsState()
+    val bidsAccepted by LocalDatabaseManager.bidsAcceptedDetail.collectAsState()
     val shouldDisplayDetails by acceptBidsListViewModel.shouldDisplayDetails.collectAsState()
+    val bidMode = rememberSaveable {
+        mutableStateOf(true)
+    }
+    var bidsDetail = rememberSaveable {
+        acceptedBids
+    }
+    bidsDetail = if (bidMode.value) acceptedBids else bidsAccepted
+
 
     LaunchedEffect(key1 = shouldDisplayDetails) {
         if (shouldDisplayDetails) {
@@ -68,13 +76,23 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                 .padding(top = 20.dp, start = 40.dp, end = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                ChooseTitlesRow(
+                    contentDes = "Accepted Bids",
+                    iconId = R.mipmap.acceptbid,
+                    titleOne = "Accepted Bids",
+                    titleTwo = "Bids Accepted",
+                    onClickOne = { bidMode.value = true },
+                    onClickTwo = { bidMode.value = false },
+                    bidMode = bidMode.value
+                )
+                /*
                 TitleRow(
                     iconId = R.mipmap.acceptbid,
                     title = "Accepted Bids",
                     modifier = Modifier
                         .padding(bottom = 20.dp)
                     )
-
+*/
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize(),

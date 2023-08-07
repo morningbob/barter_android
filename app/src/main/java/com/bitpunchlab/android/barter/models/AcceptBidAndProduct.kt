@@ -10,5 +10,5 @@ data class AcceptBidAndProduct(
         parentColumn = "acceptId",
         entityColumn = "acceptBidId"
     )
-    val product : ProductOffering
+    val product : ProductOffering? = null
 )

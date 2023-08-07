@@ -80,22 +80,6 @@ fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : 
     )
 }
 
-fun convertProductFirebaseToProductAsking(productFirebase: ProductAskingFirebase) : ProductAsking {
-
-    val imagesList = sortElements(productFirebase.images)
-    //val askingProductsFirebase = sortProductsOffering(productFirebase.images)
-    //val askingProducts = askingProductsFirebase.map { each ->
-    //    convertProductFirebaseToProduct(each)
-    //}
-
-    return ProductAsking(
-        productId = productFirebase.id, name = productFirebase.name,
-        productOfferingId = productFirebase.productOfferingId,
-        category = productFirebase.category,
-        images = imagesList
-    )
-}
-
 fun convertProductAskingToFirebase(productAsking: ProductAsking, ) : ProductAskingFirebase {
     val imagesMap = HashMap<String, String>()
 
@@ -108,7 +92,6 @@ fun convertProductAskingToFirebase(productAsking: ProductAsking, ) : ProductAski
         productName = productAsking.name,
         productCategory = productAsking.category,
         productImages = imagesMap,
-        //productUserId = productAsking.userId,
         productOffering = productAsking.productOfferingId
     )
 }
@@ -119,7 +102,6 @@ fun convertProductAskingFirebaseToProductAsking(productAskingFirebase: ProductAs
 
     return ProductAsking(
         productId = productAskingFirebase.id,
-        //userId = productAskingFirebase.userId,
         name = productAskingFirebase.name,
         category = productAskingFirebase.category,
         images = imagesList,

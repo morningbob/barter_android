@@ -1,12 +1,9 @@
-package com.bitpunchlab.android.barter.util
+package com.bitpunchlab.android.barter.database
 
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.bitpunchlab.android.barter.BarterNavigation
-import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
@@ -16,6 +13,7 @@ import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
+import com.bitpunchlab.android.barter.util.ImageHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,8 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.util.UUID
 
 // the manager is responsible to retrieve various data from the local database
@@ -114,10 +110,18 @@ object LocalDatabaseManager {
                                 BarterRepository.getUserAndAcceptBids(id)
                             }.await()
                             userAcceptBidsFlow?.collect() { userAcceptBids ->
-                                Log.i("local database mgr", "userAcceptedBids ${userAcceptBids.size}")
-                                Log.i("local database mgr", "got no accept bids: ${userAcceptBids[0].acceptBids.size}")
-                                _allAcceptBids.value = userAcceptBids[0].acceptBids
-                                //classifyAcceptBids(userAcceptBids[0].acceptBids)
+                                if (userAcceptBids.isNotEmpty()) {
+                                    Log.i(
+                                        "local database mgr",
+                                        "userAcceptedBids ${userAcceptBids.size}"
+                                    )
+                                    Log.i(
+                                        "local database mgr",
+                                        "got no accept bids: ${userAcceptBids[0].acceptBids.size}"
+                                    )
+                                    _allAcceptBids.value = userAcceptBids[0].acceptBids
+                                    //classifyAcceptBids(userAcceptBids[0].acceptBids)
+                                }
                             }
                         }
                     }
@@ -199,9 +203,7 @@ object LocalDatabaseManager {
                                         }
                                     }
                                 }
-
                             }
-
                     }
 
                     // prepare bids within the product offering
@@ -273,10 +275,6 @@ object LocalDatabaseManager {
         BarterRepository.deleteProductsAsking(listOf(productAsking))
     }
 
-    fun classifyAcceptBids(acceptBids: List<AcceptBid>) {
-        //_acceptedBids.value = _allAcceptBids.value.filter { !it.isSeller }
-        //_bidsAccepted.value = _allAcceptBids.value.filter { it.isSeller }
-    }
 
     // we try to retrieve the image from local database
     // and get the imageUrlLocal as uri
@@ -343,11 +341,13 @@ object LocalDatabaseManager {
                         val bidProductDeferred = CoroutineScope(Dispatchers.IO).async {
                             BarterRepository.getAcceptBidAndProductById(theBid.acceptId)
                         }
+
                         val bidBidDeferred = CoroutineScope(Dispatchers.IO).async {
                             BarterRepository.getAcceptBidAndBidById(theBid.acceptId)
                         }
                         val product = bidProductDeferred.await()?.get(0)?.product
-                        Log.i("Local database mgr", "product ${product?.name}")
+                        Log.i("local database, prepare bid details", "got product ${product?.name}")
+                        //Log.i("Local database mgr", "product ${product?.name}")
                         val bid = bidBidDeferred.await()?.get(0)?.bid
                         Log.i("Local database mgr", "bid ${bid?.bidId}")
                         if (product != null && bid != null) {
@@ -357,10 +357,12 @@ object LocalDatabaseManager {
                                 bid = bid
                             )
                             if (theBid.isSeller) {
-                                _bidsDetail.value.add(bidDetails)
-                                Log.i("Local database mgr", "update bids detail")
+                                //_bidsDetail.value.add(bidDetails)
+                                _acceptedBidsDetail.value.add(bidDetails)
+                                Log.i("Local database mgr", "update accepted bids")
                             } else {
                                 _bidsAcceptedDetail.value.add(bidDetails)
+                                Log.i("Local database mgr", "update bids accepted")
                             }
                         }
                     }

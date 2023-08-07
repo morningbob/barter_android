@@ -75,21 +75,19 @@ object FirebaseClient {
             Log.i("auth listener", "got user id ${userId.value}")
             if (createAccount) {
                 _finishedAuthSignup.value = true
-            } //else {
+            }
                 // retrieve user from firestore
-                CoroutineScope(Dispatchers.IO).launch {
-                    //_userId.value = auth.cu
-                    Log.i("auth", "user id: ${auth.currentUser!!.uid}")
-                    val currentUser = retrieveUserFirebase(auth.currentUser!!.uid)
-                    currentUser?.let {
-                        _currentUserFirebase.value = currentUser
-                        saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
-                        prepareProductsOffering()
-                        prepareProductsInUserForLocalDatabase(currentUser)
-                        prepareOpenTransactions(currentUser)
-                        prepareTransactionRecords(currentUser)
-                    }
-               // }
+            CoroutineScope(Dispatchers.IO).launch {
+                Log.i("auth", "user id: ${auth.currentUser!!.uid}")
+                val currentUser = retrieveUserFirebase(auth.currentUser!!.uid)
+                currentUser?.let {
+                    _currentUserFirebase.value = currentUser
+                    saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
+                    prepareProductsOffering()
+                    prepareProductsInUserForLocalDatabase(currentUser)
+                    prepareOpenTransactions(currentUser)
+                    prepareTransactionRecords(currentUser)
+                }
             }
         } else {
             Log.i("fire auth", "auth is null")
@@ -194,6 +192,7 @@ object FirebaseClient {
     }
 
     private fun saveUserLocalDatabase(user: User) {
+        Log.i("saving user", "saving")
         BarterRepository.insertCurrentUser(user)
     }
 
@@ -312,16 +311,17 @@ object FirebaseClient {
     private suspend fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
         ProductOfferingDecomposed
     {
-        //Triple<List<ProductOffering>, List<ProductAsking>, List<Bid>> {
         val askingProducts = mutableListOf<ProductAsking>()
         val bids = mutableListOf<Bid>()
         var productImages = mutableListOf<ProductImageToDisplay>()
         val productsOffering = productsOfferingFirebase.map {
                 product ->
             product.askingProducts.map { (askingKey, asking) ->
+                Log.i("decompose product offering", "got asking product ${asking.name}")
                 askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
             }
             product.currentBids.map { (bidKey, bid) ->
+                Log.i("decompose product offering", "got bid ${bid.userName}")
                 bids.add(convertBidFirebaseToBid(bid))
             }
             // before we create a new product image,
@@ -345,7 +345,6 @@ object FirebaseClient {
             bids = bids,
             images = productImages
         )
-        //return Triple(productsOffering, askingProducts, bids)
     }
 
     private suspend fun processImagesFromProduct(images: List<String>) : List<ProductImageToDisplay> {
@@ -397,7 +396,6 @@ object FirebaseClient {
     private fun prepareOpenTransactions(userFirebase: UserFirebase) {
         // save the product and bid from userFirebase, accepted bids and bidAccepted
         val acceptedBids = mutableListOf<AcceptBid>()
-        //val bidsAccepted = mutableListOf<AcceptBid>()
         val products = mutableListOf<ProductOffering>()
         val bids = mutableListOf<Bid>()
 
@@ -406,22 +404,24 @@ object FirebaseClient {
            //Log.i("prepare open transactions", "the userId of the accept bid ${acceptBid.product?.userId}")
             //Log.i("prepare open transactions", "current userId ${currentUserFirebase.value!!.id}")
             acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId))
-            products.add(convertProductFirebaseToProduct(acceptBid.product!!))
+            //products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
 
         userFirebase.userBidsAccepted.map { (bidKey, acceptBid) ->
             //Log.i("prepare open transactions", "processing one bid accepted")
             acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId))
-            products.add(convertProductFirebaseToProduct(acceptBid.product!!))
+            //products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
 
         CoroutineScope(Dispatchers.IO).launch {
+            Log.i("prepare open transactions", "accept bids ${acceptedBids.size}")
             localDatabase!!.barterDao.insertAcceptBids(*acceptedBids.toTypedArray())
+            //Log.i("prepare open transactions", "bids ${acceptedBids.size}")
             localDatabase!!.barterDao.insertBids(*bids.toTypedArray())
             Log.i("prepare open transactions", "bids to be saved ${bids.size}")
-            localDatabase!!.barterDao.insertProductsOffering(*products.toTypedArray())
+            //localDatabase!!.barterDao.insertProductsOffering(*products.toTypedArray())
         }
     }
 
@@ -738,8 +738,6 @@ object FirebaseClient {
         // update user object (buyers and seller) for waiting transaction
 
         // let buyer and seller send exchange message
-        //
-        //return uploadBidAccepted(convertBidToBidFirebase(bid))
         val acceptBid = AcceptBidFirebase(
             acceptId = UUID.randomUUID().toString(),
             // we provide empty asking products and empty bids
@@ -748,7 +746,6 @@ object FirebaseClient {
             theBid = convertBidToBidFirebase(bid)
         )
         return uploadAcceptBid(acceptBid)
-        //return false
     }
 
     suspend fun processDeleteProduct(product: ProductOffering) : Boolean {

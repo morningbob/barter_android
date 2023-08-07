@@ -655,6 +655,54 @@ fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
 }
 
 @Composable
+fun ChooseTitlesRow(modifier: Modifier = Modifier, contentDes: String, iconId: Int, titleOne: String, titleTwo: String,
+                    onClickOne: () -> Unit, onClickTwo: () -> Unit, bidMode: Boolean) {
+
+    Row(
+        modifier = Modifier
+            .height(80.dp)
+            .padding()
+            .then(modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Image(
+            painter = painterResource(id = iconId),
+            contentDescription = contentDes,
+            modifier = Modifier
+                .width(80.dp)
+                .padding(end = 20.dp)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Text(
+                text = titleOne,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (bidMode) BarterColor.textGreen else BarterColor.medGreen,
+                modifier = Modifier
+                    .clickable { onClickOne.invoke() },
+                textAlign = TextAlign.Start
+            )
+            Text(
+                text = titleTwo,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (bidMode) BarterColor.medGreen else BarterColor.textGreen,
+                modifier = Modifier
+                    .clickable { onClickTwo.invoke() }
+                    .padding(start = 15.dp),
+                textAlign = TextAlign.Start
+            )
+        }
+    }
+}
+
+@Composable
 fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<String>, contentDes: String, ) {
     Column(
         modifier = Modifier

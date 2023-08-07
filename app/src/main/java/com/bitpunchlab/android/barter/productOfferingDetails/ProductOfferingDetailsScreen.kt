@@ -1,10 +1,7 @@
 package com.bitpunchlab.android.barter.productOfferingDetails
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,14 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.AskingProductsList
-import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.ProductOfferingBidsList
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.CancelCross
@@ -50,7 +45,7 @@ import com.bitpunchlab.android.barter.bid.BidFormScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.BiddingStatus
 import com.bitpunchlab.android.barter.util.DeleteProductStatus
-import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

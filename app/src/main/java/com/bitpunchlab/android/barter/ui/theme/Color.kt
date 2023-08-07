@@ -9,6 +9,7 @@ val Teal200 = Color(0xFF03DAC5)
 
 object BarterColor {
     val lightGreen = Color(0xFFbff0bd)
+    val medGreen = Color(0xFF19a10a)
     val green = Color(0xFF0c992b)
     val lightYellow2 = Color(0xFFf7f7b5)
     val errorRed = Color(0xFFf26346)

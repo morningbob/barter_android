@@ -10,13 +10,12 @@ import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.AcceptBidStatus
-import com.bitpunchlab.android.barter.util.LocalDatabaseManager
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class ProductOfferingBidDetailsViewModel : ViewModel() {
@@ -104,7 +103,6 @@ class ProductOfferingBidDetailsViewModel : ViewModel() {
     // it should be retrieved from the server together with the other products bidding.
     fun acceptBid() {
         CoroutineScope(Dispatchers.IO).launch {
-            //combine(LocalDatabaseManager.productChosen, LocalDatabaseManager.bidChosen) { product, bid ->
             if (bidChosen.value != null && productChosen.value != null) {
                 Log.i("bid details vm", "bid and product not null")
                 if (FirebaseClient.processAcceptBid(productChosen.value!!, bidChosen.value!!)) {
@@ -116,7 +114,6 @@ class ProductOfferingBidDetailsViewModel : ViewModel() {
                 Log.i("accept bid", "product info not available")
                 updateAcceptBidStatus(AcceptBidStatus.APP_FAILURE)
             }
-            //}
         }
     }
 
