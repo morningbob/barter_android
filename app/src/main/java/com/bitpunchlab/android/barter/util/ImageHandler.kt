@@ -36,6 +36,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import kotlinx.coroutines.async
 import java.io.IOException
+import java.lang.IllegalStateException
 
 // the image loader is so important for the app to display images
 // keeping a context in it while the app is active
@@ -72,15 +73,10 @@ object ImageHandler {
         for (i in 0..imagesUrl.size - 1) {
             // so before we load the image, we show the placeholder image
 
-            send(Pair(i, ProductImageToDisplay(i.toString(), loadImageFromCloud(imagesUrl[i]), "")))
-            /*
-            CoroutineScope(Dispatchers.IO).launch {
-                loadImage(imagesUrl[i])?.let {
-                    send(Pair(i, ProductImageToDisplay(i.toString(), it, "")))
-                }
-            }
-
-             */
+            send(Pair(i, ProductImageToDisplay(
+                //imageId = i.toString(),
+                //image = loadImageFromCloud(imagesUrl[i]),
+                imageUrlCloud = "")))
         }
         // this is required to keep the channel opened
         awaitClose()
@@ -101,7 +97,6 @@ object ImageHandler {
     }
 
     suspend fun saveImageExternalStorage(displayName: String, bitmap: Bitmap) : Uri? {
-        //val appSpecificExternalDir = File(currentContext!!.getExternalFilesDir(null), "")
 
         val imageCollection = sdk29AndUp {
             // this location allows all apps to access the image
@@ -109,7 +104,7 @@ object ImageHandler {
         } ?: MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "$displayName.jpg")
+            put(MediaStore.Images.Media.DISPLAY_NAME, "${displayName.substring(38, displayName.length)}.jpg")
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.WIDTH, bitmap.width)
             put(MediaStore.Images.Media.HEIGHT, bitmap.height)
@@ -117,9 +112,10 @@ object ImageHandler {
         }
 
          try {
-            val uri = currentContext!!.contentResolver.insert(imageCollection, contentValues)
+             val uri = currentContext!!.contentResolver.insert(imageCollection, contentValues)
              uri?.let {
-                 currentContext!!.contentResolver.openOutputStream(it).use { outputStream ->
+                 currentContext!!.contentResolver.openOutputStream(it, "wt").use { outputStream ->
+                     //outputStream.flush()
                      if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)) {
                          throw IOException("couldn't save image")
                      }
@@ -129,23 +125,20 @@ object ImageHandler {
 
                  contentValues.clear()
                  contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                 //currentContext!!.contentResolver.insert(uri, contentValues)
                  currentContext!!.contentResolver.update(uri, contentValues, null, null)
                  return it
              }
              return null
-            //true
+         } catch (e: IllegalStateException) {
+             Log.i("saving image", "same filename found, not saving it")
+             e.printStackTrace()
+             return null
         } catch (e: IOException) {
-            e.printStackTrace()
-            //false
+             e.printStackTrace()
              return null
         }
     }
-
-    fun retrieveImageExternalStorage(uri: String) : ProductImageToDisplay? {
-
-        return null
-    }
-
 
     fun convertBitmapToBytes(bitmap: Bitmap) : ByteArray {
         val baos = ByteArrayOutputStream()
@@ -157,42 +150,3 @@ object ImageHandler {
         return BitmapFactory.decodeResource(currentContext!!.resources, R.mipmap.imageplaceholder)
     }
 }
-/*
-    // this method has the problem that it return the whole list at one point of time
-    // if this method is in the view model, it can make images available as soon as
-    // they are set.
-    suspend fun prepareImages(imagesUrl: List<String>) : List<ProductImage>  {
-        // retrieve images from cloud storage and store in view model
-        // we need to do like this because Images Display Screen's setup
-        // can't be customized to use Glide to load images as needed
-
-        val images = mutableListOf<ProductImage>()
-
-        for (i in 0..imagesUrl.size - 1) {
-            // so before we load the image, we show the placeholder image
-            //_imagesDisplay.value.add(i, ProductImage(UUID.randomUUID().toString(), com.bitpunchlab.android.barter.util.createPlaceholderImage(context)))
-            images.add(i, ProductImage(UUID.randomUUID().toString(), createPlaceholderImage()))
-            CoroutineScope(Dispatchers.IO).launch {
-                loadImage(imagesUrl[i])?.let {
-                    //_imagesDisplay.value.set(i, ProductImage(i.toString(), it))
-                    images.set(i, ProductImage(i.toString(), it))
-                }
-            }.join()
-        }
-        return images
-
-    }
-
-// Checks if a volume containing external storage is available
-    // for read and write.
-    fun isExternalStorageWritable(): Boolean {
-        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
-    }
-
-    // Checks if a volume containing external storage is available to at least read.
-    fun isExternalStorageReadable(): Boolean {
-        return Environment.getExternalStorageState() in
-                setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
-    }
-
- */

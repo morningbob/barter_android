@@ -85,12 +85,15 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                 .fillMaxSize(),
             Alignment.Center
         ) {
+            /*
             Image(
                 bitmap = image.image!!.asImageBitmap(),
                 contentDescription = "A product image",
                 modifier = Modifier
                     .width(400.dp)
             )
+
+             */
             Card(
                 modifier = Modifier
                     .background(Color.Transparent),
@@ -175,7 +178,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
 
                     ) {
 
-                        items(images.value ?: listOf(), { image -> image.imageId }) { item ->
+                        items(images.value ?: listOf(), { image -> image.imageUrlCloud }) { item ->
                             // remember updated state will renew whenever there is
                             // recomposition, so , if an item is deleted, another
                             // item's position changed, the remember will remember the
@@ -188,6 +191,7 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                                     true
                                 }
                             )
+                            /*
                             Image(
                                 bitmap = item.image!!.asImageBitmap(),
                                 contentDescription = "product image",
@@ -199,6 +203,8 @@ fun <T> ImagesDisplayScreen(viewModel: T) {
                                         shouldDisplayFullImage = true
                                     },
                             )
+
+                             */
 
                         }
 

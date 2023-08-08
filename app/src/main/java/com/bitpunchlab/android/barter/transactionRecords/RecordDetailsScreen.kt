@@ -67,6 +67,7 @@ fun RecordDetailsScreen(navController: NavHostController,
                         .padding(top = 15.dp)
                 )
                 if (productOfferingImages.isNotEmpty()) {
+                    /*
                     Image(
                         bitmap = productOfferingImages[0].image!!.asImageBitmap(),
                         contentDescription = "first product image",
@@ -74,6 +75,8 @@ fun RecordDetailsScreen(navController: NavHostController,
                             .width(200.dp)
                             .padding(top = 20.dp)//, start = 50.dp, end = 50.dp)
                     )
+
+                     */
                     CustomButton(
                         label = "View Images",
                         onClick = {
@@ -100,6 +103,7 @@ fun RecordDetailsScreen(navController: NavHostController,
                         .padding(top = 15.dp)
                 )
                 if (productInExchangeImages.isNotEmpty()) {
+                    /*
                     Image(
                         bitmap = productInExchangeImages[0].image!!.asImageBitmap(),
                         contentDescription = "first product image",
@@ -107,6 +111,8 @@ fun RecordDetailsScreen(navController: NavHostController,
                             .width(200.dp)
                             .padding(top = 20.dp)
                     )
+
+                     */
                     CustomButton(
                         label = "View Images",
                         onClick = {

@@ -42,6 +42,7 @@ import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.CustomTextField
 import com.bitpunchlab.android.barter.base.ErrorText
 import com.bitpunchlab.android.barter.base.TitleText
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.User
@@ -56,7 +57,7 @@ import kotlinx.coroutines.flow.map
 fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     val isLoggedIn by FirebaseClient.isLoggedIn.collectAsState()
-    val currentUser by mainViewModel.currentUser.collectAsState()
+    val currentUser by LocalDatabaseManager.currentUser.collectAsState()
     val mainStatus by mainViewModel.mainStatus.collectAsState()
     val currentPassword by mainViewModel.currentPassword.collectAsState()
     val newPassword by mainViewModel.newPassword.collectAsState()

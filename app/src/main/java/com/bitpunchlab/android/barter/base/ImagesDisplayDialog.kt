@@ -65,12 +65,15 @@ fun ImagesDisplayDialog(
                 .fillMaxSize(),
             Alignment.Center
         ) {
+            /*
             Image(
                 bitmap = image.image!!.asImageBitmap(),
                 contentDescription = "A product image",
                 modifier = Modifier
                     .width(400.dp)
             )
+
+             */
             deleteStatus?.let {
                 Card(
                     modifier = Modifier
@@ -169,7 +172,8 @@ fun ImagesDisplayDialog(
 
                     ) {
 
-                        items(images, { image -> image.imageId }) { item ->
+                        items(images, { image -> image.imageUrlCloud }) { item ->
+                            /*
                             Image(
                                 bitmap = item.image!!.asImageBitmap(),
                                 contentDescription = "product image",
@@ -179,6 +183,8 @@ fun ImagesDisplayDialog(
                                         imageToShow = item
                                     },
                             )
+
+                             */
                         }
                     }  // end of lazy column
                 }

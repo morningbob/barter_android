@@ -100,14 +100,20 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
 
                 ) {
                     items(bidsDetail, { bid -> bid.bid.acceptBidId } ) {bidDetail ->
-                        // for the list, we show the product name and pic only
-                        AcceptBidRow(
-                            acceptBid = bidDetail,
-                            onClick = {
-                                AcceptBidInfo.updateAcceptBid(bidDetail)
-                                acceptBidsListViewModel.updateShouldDisplayDetails(true)
-                            }
-                        )
+                        Column(
+                        modifier = Modifier
+                            .padding(top = 12.dp, bottom = 12.dp)
+                        ) {
+
+                            // for the list, we show the product name and pic only
+                            AcceptBidRow(
+                                acceptBid = bidDetail,
+                                onClick = {
+                                    AcceptBidInfo.updateAcceptBid(bidDetail)
+                                    acceptBidsListViewModel.updateShouldDisplayDetails(true)
+                                }
+                            )
+                        }
                     }
                 }
             }

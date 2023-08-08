@@ -57,9 +57,11 @@ class AcceptBidDetailsViewModel : ViewModel() {
         for (i in 0..productImageList.size - 1) {
             _productOfferingImages.value.add(
                 ProductImageToDisplay(
-                    UUID.randomUUID().toString(),
-                    ImageHandler.createPlaceholderImage(),
-                    ""
+
+                    //image = ImageHandler.createPlaceholderImage(),
+                    imageUrlCloud = "",
+                    //"",
+                    //imageId = UUID.randomUUID().toString(),
                 )
             )
         }
@@ -67,9 +69,9 @@ class AcceptBidDetailsViewModel : ViewModel() {
         for (i in 0..exchangedImageList.size - 1) {
             _productInExchangeImages.value.add(
                 ProductImageToDisplay(
-                    UUID.randomUUID().toString(),
-                    ImageHandler.createPlaceholderImage(),
-                    ""
+                    //imageId = UUID.randomUUID().toString(),
+                    //image = ImageHandler.createPlaceholderImage(),
+                    imageUrlCloud = ""
                 )
             )
         }

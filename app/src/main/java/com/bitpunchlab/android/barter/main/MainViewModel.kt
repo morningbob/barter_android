@@ -50,32 +50,32 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
     private val _mainStatus = MutableStateFlow<MainStatus>(MainStatus.NORMAL)
     val mainStatus : StateFlow<MainStatus> get() = _mainStatus.asStateFlow()
 
-    //private val _readyChangePass = MutableStateFlow<>("")
-    //val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
-
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
 
     init {
+        /*
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.userId.collect() {
                 if (it != "") {
-                    Log.i("mainVM", "userid: $it")
+                    //Log.i("mainVM", "userid: $it")
                     BarterRepository.getCurrentUser(it)?.collect() { currentUserList ->
                         if (currentUserList.isNotEmpty()) {
-                            Log.i("barter repo", "got current user ${currentUserList[0].name}")
+                            Log.i("local database mgr", "got current user ${currentUserList[0].name}")
                             _currentUser.value = currentUserList[0]
                         } else {
-                            Log.i("barter repo", "got empty list of user")
+                            Log.i("local database mgr", "got empty list of user")
                         }
                     }
                 } else {
-                    Log.i("mainVM", "userId is null")
+                    Log.i("local database mgr", "userId is null")
                 }
 
             }
         }
+
+         */
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.currentUserFirebase.collect() {
                 it?.let {
@@ -94,7 +94,6 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
         }
         CoroutineScope(Dispatchers.IO).launch {
             combine(currentPassword, newPassword, confirmPassword, currentPassError, newPassError, confirmPassError ) { flows: Array<String> ->
-                //_mainStatus.value = MainStatus.READY_CHANGE_PASSWORD
                 if (flows[0] != "" && flows[1] != "" && flows[2] != "" && flows[3] == "" && flows[4] == "" && flows[5] == "") {
                     _mainStatus.value = MainStatus.READY_CHANGE_PASSWORD
                 }

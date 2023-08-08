@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
@@ -40,6 +41,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import okhttp3.internal.wait
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.acos
@@ -47,10 +49,9 @@ import kotlin.math.acos
 object FirebaseClient {
 
     private val storageRef = Firebase.storage.reference
+    var localDatabase : BarterDatabase? = null
     // we need the id as soon as it is available from Auth
     private val _userId = MutableStateFlow<String>("")
-
-    var localDatabase : BarterDatabase? = null
     val userId : StateFlow<String> get() = _userId.asStateFlow()
 
     private val _currentUserFirebase = MutableStateFlow<UserFirebase?>(null)
@@ -66,6 +67,8 @@ object FirebaseClient {
     val _finishedAuthSignup = MutableStateFlow<Boolean>(false)
     val finishedAuthSignup : StateFlow<Boolean> get() = _finishedAuthSignup.asStateFlow()
 
+    private var shouldProcessUser = true
+
 
     private var authStateListener = FirebaseAuth.AuthStateListener { auth ->
         if (auth.currentUser != null) {
@@ -76,27 +79,65 @@ object FirebaseClient {
             if (createAccount) {
                 _finishedAuthSignup.value = true
             }
-                // retrieve user from firestore
-            CoroutineScope(Dispatchers.IO).launch {
-                Log.i("auth", "user id: ${auth.currentUser!!.uid}")
-                val currentUser = retrieveUserFirebase(auth.currentUser!!.uid)
-                currentUser?.let {
-                    _currentUserFirebase.value = currentUser
-                    saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
-                    prepareProductsOffering()
-                    prepareProductsInUserForLocalDatabase(currentUser)
-                    prepareOpenTransactions(currentUser)
-                    prepareTransactionRecords(currentUser)
+            // retrieve user from firestore
+            //if (shouldProcessUser) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    Log.i("auth", "user id: ${auth.currentUser!!.uid}")
+                    // here, may not be able to update in time
+                    val currentUser = CoroutineScope(Dispatchers.IO).async {
+                        retrieveUserFirebase(auth.currentUser!!.uid)
+                    }.await()
+                    currentUser?.let {
+                        if (_userId.value == it.id) {
+                            Log.i("auth firebase", "update current user firebase")
+                            //Log.i("auth firebase", "id ${userId.value}")
+                            _currentUserFirebase.value = currentUser
+                            //Log.i("auth firebase", "new user name ${currentUserFirebase.value?.name}")
+                            saveUserLocalDatabase(convertUserFirebaseToUser(currentUser))
+                            prepareProductsOffering()
+                            prepareProductsInUserForLocalDatabase(currentUser)
+                            prepareOpenTransactions(currentUser)
+                            prepareTransactionRecords(currentUser)
+                            saveSampleProductImage()
+                        }
+                    }
                 }
-            }
+                //shouldProcessUser = false
+            //}
         } else {
             Log.i("fire auth", "auth is null")
             isLoggedIn.value = false
+            _userId.value = ""
+            _currentUserFirebase.value = null
         }
     }
 
     init {
         auth.addAuthStateListener(authStateListener)
+    }
+
+    // testing
+    private suspend fun saveSampleProductImage() {
+        val productImage = ProductImageToDisplay(
+            imageUrlCloud = "https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0"
+        )
+        //CoroutineScope(Dispatchers.IO).launch {
+        //    BarterRepository.insertImages(listOf(productImage))
+        //}.join()
+
+        //delay(10000)
+
+        val resultList = CoroutineScope(Dispatchers.IO).async {
+            BarterRepository.getImage("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0")
+        }.await()
+
+        if (resultList.isNullOrEmpty()) {
+            Log.i("firebase", "couldn't get 1111")
+
+        } else {
+            Log.i("firebase", "got 1111")
+            Log.i("firebase", "imageUrlLocal ${resultList[0].imageUrlLocal}")
+        }
     }
 
     suspend fun login(email: String, password: String) : LoginStatus =
@@ -114,6 +155,7 @@ object FirebaseClient {
             }
     }
 
+    // need to reset auth here, so the interfaces display the new user
     fun logout() {
         auth.signOut()
     }
@@ -192,7 +234,7 @@ object FirebaseClient {
     }
 
     private fun saveUserLocalDatabase(user: User) {
-        Log.i("saving user", "saving")
+        //Log.i("saving user", "saving")
         BarterRepository.insertCurrentUser(user)
     }
 
@@ -281,7 +323,7 @@ object FirebaseClient {
         }
 
     // we prepare the asking products, bids,
-    private fun prepareProductsInUserForLocalDatabase(userFirebase: UserFirebase) {
+    private suspend fun prepareProductsInUserForLocalDatabase(userFirebase: UserFirebase) {
         // retrieve the products offering and products bidding info
         // create those objects and save in local database
         // this includes removing the outdated products objects in the database
@@ -302,8 +344,9 @@ object FirebaseClient {
             BarterRepository.insertProductsOffering(decomposed.productsOffering)
             BarterRepository.insertProductsAsking(decomposed.askingProducts)
             BarterRepository.insertBids(decomposed.bids)
+            Log.i("firebase decompose", "got back no of images to be saved ${decomposed.images.size}")
             BarterRepository.insertImages(decomposed.images)
-        }
+        }.join()
         //Log.i("prepare product offering", "no of products asking ${askingProducts.size}")
         //Log.i("prepare product offering", "no of bids ${bids.size}")
     }
@@ -313,32 +356,36 @@ object FirebaseClient {
     {
         val askingProducts = mutableListOf<ProductAsking>()
         val bids = mutableListOf<Bid>()
-        var productImages = mutableListOf<ProductImageToDisplay>()
-        val productsOffering = productsOfferingFirebase.map {
-                product ->
-            product.askingProducts.map { (askingKey, asking) ->
-                Log.i("decompose product offering", "got asking product ${asking.name}")
-                askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
+        val productImages = mutableListOf<ProductImageToDisplay>()
+        val productsOffering = CoroutineScope(Dispatchers.IO).async {
+            productsOfferingFirebase.map { product ->
+                product.askingProducts.map { (askingKey, asking) ->
+                    Log.i("decompose product offering", "processing product ${product.name}")
+                    Log.i("decompose product offering", "got asking product ${asking.name}")
+                    askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
+                }
+                product.currentBids.map { (bidKey, bid) ->
+                    Log.i("decompose product offering", "got bid ${bid.userName}")
+                    bids.add(convertBidFirebaseToBid(bid))
+                }
+                // before we create a new product image,
+                // we try to retrieve the image locally by the imageUrlCloud
+                // if we get back the product image, we do nothing
+                // if not, we create a new product image
+                // retrieve the image from cloud storage
+                // and save locally, we got the local uri and save it in product image's imageUrlLocal
+                val productImagesUrl = product.images.map { (imageKey, imageUrl) ->
+                    imageUrl
+                }
+                val images = CoroutineScope(Dispatchers.IO).async {
+                    processImagesFromProduct(productImagesUrl)
+                }.await()//.toMutableList()
+                BarterRepository.insertImages(images)
+                productImages.addAll(images)
+                convertProductFirebaseToProduct(product)
             }
-            product.currentBids.map { (bidKey, bid) ->
-                Log.i("decompose product offering", "got bid ${bid.userName}")
-                bids.add(convertBidFirebaseToBid(bid))
-            }
-            // before we create a new product image,
-            // we try to retrieve the image locally by the imageUrlCloud
-            // if we get back the product image, we do nothing
-            // if not, we create a new product image
-            // retrieve the image from cloud storage
-            // and save locally, we got the local uri and save it in product image's imageUrlLocal
-            val productImagesUrl = product.images.map { (imageKey, imageUrl) ->
-                imageUrl
-            }
-            productImages = CoroutineScope(Dispatchers.IO).async {
-                processImagesFromProduct(productImagesUrl)
-            }.await().toMutableList()
-
-            convertProductFirebaseToProduct(product)
-        }
+        }.await()
+        Log.i("firebase inside decompose", "no of images to be returned ${productImages.size}")
         return ProductOfferingDecomposed(
             productsOffering = productsOffering,
             askingProducts = askingProducts,
@@ -347,6 +394,8 @@ object FirebaseClient {
         )
     }
 
+    // when we first got the product from firestore, we try to load the image locally,
+    // if the result is null, we download the image from cloud storage and save it.
     private suspend fun processImagesFromProduct(images: List<String>) : List<ProductImageToDisplay> {
         val productImages = mutableListOf<ProductImageToDisplay>()
 
@@ -359,22 +408,23 @@ object FirebaseClient {
                     retrieveImageLocally(imageUrl)
                 }.await()
                 if (result.isNullOrEmpty()) {
-                    Log.i("decompose product offering", "result is null")
+                    Log.i("decompose product offering", "couldn't find in database")
                     // retrieve the image from cloud storage
-                    //val image = ImageHandler.loadImageFromCloud(imageUrl)
                     ImageHandler.loadImageFromCloud(imageUrl)?.let { bitmap ->
-                        Log.i("decompose product offering", "got image")
+                        Log.i("decompose product offering", "got image from cloud")
                         val localUrl = ImageHandler.saveImageExternalStorage(imageUrl, bitmap)
-                        Log.i("decompose product offering", "processing imageUrl ${imageUrl}")
+                        Log.i("decompose product offering", "saving the image from imageUrl ${imageUrl}")
                         localUrl?.let {
                             Log.i("decompose product offering", "got localUrl ${it}")
+                            val uuid = UUID.randomUUID().toString()
                             productImages.add(
                                 ProductImageToDisplay(
-                                    imageId = UUID.randomUUID().toString(),
+                                    //imageId = uuid,
                                     imageUrlCloud = imageUrl,
                                     imageUrlLocal = it.toString()
                                 )
                             )
+                            Log.i("decompose product offering", "image uuid ${uuid}")
                         }
                     }
                 } else {
@@ -545,7 +595,8 @@ object FirebaseClient {
         val downloadUrlList = mutableListOf<String>()
         val imageFilenames = mutableListOf<String>()
 
-        val images = productImages.map { it.image!! }
+        val images = listOf<Bitmap>()
+        //val images = productImages.map { it.image!! }
 
         val pairProductResult = uploadImages(
             productId = productId,
@@ -553,11 +604,6 @@ object FirebaseClient {
 
         downloadUrlList.addAll(pairProductResult.first)
         imageFilenames.addAll(pairProductResult.second)
-
-        //Log.i(
-        //    "process selling",
-        //    "adding downloadUrl to product offering, items: ${downloadUrlList.size}"
-        //)
 
         return Pair(downloadUrlList, imageFilenames)
     }

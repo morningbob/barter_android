@@ -71,7 +71,7 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
 
             BasicRecordScreen(
                 modifier = Modifier
-                    .padding(top = 40.dp),
+                    .padding(top = 20.dp),
                 productOfferingImages = productOfferingImages,
                 productInExchangeImages = productInExchangeImages,
                 prepareImages = { acceptBidDetailsViewModel.prepareImagesDisplay(it) },
@@ -85,7 +85,7 @@ fun AcceptBidDetailsScreen(navController: NavHostController,
                     // change product's status to 2, update users and product offerings
                 },
                 modifier = Modifier
-                    .padding()
+                    .padding(top = 10.dp)
             )
         }
         if (shouldDisplayImages) {

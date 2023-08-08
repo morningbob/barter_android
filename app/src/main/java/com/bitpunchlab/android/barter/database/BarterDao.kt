@@ -74,20 +74,8 @@ interface BarterDao {
     @Query("SELECT * FROM images_table WHERE :url == imageUrlCloud")
     suspend fun getProductImage(url: String) : List<ProductImageToDisplay>
 
-    //@Query("SELECT * from products_offering WHERE :id = productOfferingId")
-    //fun getAskingProducts(id: String) : Flow<List<ProductOffering>>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBids(vararg bid: Bid)
-/*
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAcceptedBids(vararg acceptedBids: AcceptBid)
-
-    @Query("SELECT * FROM accept_bids")
-    fun getAllAcceptedBids() : Flow<List<AcceptBid>>
-*/
-    //@Query("SELECT * FROM products_bidding WHERE :id = productOfferingForBid LIMIT 1")
-    //fun getProductBiddingById(id: String) : ProductBidding
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductsAsking(vararg productAsking: ProductAsking)

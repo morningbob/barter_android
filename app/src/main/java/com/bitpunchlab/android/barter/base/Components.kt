@@ -155,7 +155,7 @@ fun CustomDialog(
              Column(
                  modifier = Modifier
                      .background(BarterColor.lightGreen)
-                     .padding(top = 30.dp, bottom = 30.dp, start = 50.dp, end = 50.dp),
+                     .padding(top = 30.dp, bottom = 30.dp, start = 35.dp, end = 35.dp),
                  horizontalAlignment = Alignment.CenterHorizontally
              ) {
                  Text(
@@ -184,7 +184,7 @@ fun CustomDialog(
                          DialogButton(
                              title = negativeText, onNegative,
                              modifier = Modifier
-                                 .padding(start = 25.dp)
+                                 .padding(start = 20.dp)
                          )
                      }
                  }
@@ -495,6 +495,7 @@ fun BasicBidScreen(productName: String, productCategory: String,
         )
 
         if (images.isNotEmpty()) {
+            /*
             Image(
                 bitmap = images[0].image!!.asImageBitmap(),
                 contentDescription = "product's image",
@@ -502,6 +503,8 @@ fun BasicBidScreen(productName: String, productCategory: String,
                     .padding(top = 30.dp)
                     .width(200.dp)
             )
+
+             */
         } else {
             Image(
                 painter = painterResource(id = R.mipmap.imageplaceholder),
@@ -555,6 +558,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 .padding(top = 15.dp)
         )
         if (productOfferingImages.isNotEmpty()) {
+            /*
             Image(
                 bitmap = productOfferingImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
@@ -562,6 +566,8 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     .width(200.dp)
                     .padding(top = 20.dp)
             )
+
+             */
             CustomButton(
                 label = stringResource(R.string.view_images),
                 onClick = {
@@ -588,6 +594,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 .padding(top = 15.dp)
         )
         if (productInExchangeImages.isNotEmpty()) {
+            /*
             Image(
                 bitmap = productInExchangeImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
@@ -595,6 +602,8 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     .width(200.dp)
                     .padding(top = 20.dp)
             )
+
+             */
             CustomButton(
                 label = stringResource(id = R.string.view_images),
                 onClick = {

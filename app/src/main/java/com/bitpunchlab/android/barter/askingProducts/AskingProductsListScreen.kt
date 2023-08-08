@@ -115,6 +115,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                 )
                             }
                         } else if (askingImages.isNotEmpty()) {
+                            /*
                             if (askingImages[index].isNotEmpty()) {
                                 Image(
                                     bitmap = askingImages[index][0].image!!.asImageBitmap(),
@@ -132,6 +133,8 @@ fun AskingProductsListScreen(navController: NavHostController,
                                         .padding(top = 10.dp)
                                 )
                             }
+
+                             */
                         } else {
                             Image(
                                 painter = painterResource(id = R.mipmap.imageplaceholder),
