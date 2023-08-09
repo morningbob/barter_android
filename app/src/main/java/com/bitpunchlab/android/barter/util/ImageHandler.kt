@@ -74,8 +74,8 @@ object ImageHandler {
             // so before we load the image, we show the placeholder image
 
             send(Pair(i, ProductImageToDisplay(
-                //imageId = i.toString(),
-                //image = loadImageFromCloud(imagesUrl[i]),
+                imageId = i.toString(),
+                image = loadImageFromCloud(imagesUrl[i]),
                 imageUrlCloud = "")))
         }
         // this is required to keep the channel opened

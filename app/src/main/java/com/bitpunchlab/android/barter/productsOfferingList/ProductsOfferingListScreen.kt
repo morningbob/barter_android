@@ -84,7 +84,6 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                     // the bottom navigation bar has 80dp height
                     modifier = Modifier
                         .padding(top = 10.dp, bottom = 110.dp),
-
                     //contentPadding = PaddingValues(horizontal = 0.dp, vertical = 30.dp),
                 ) {
                     items(products.value, { product -> product.productId }) { each ->

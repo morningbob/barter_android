@@ -109,8 +109,8 @@ class AcceptBidsListViewModel : ViewModel() {
         }
     }
 
-     */
 
+     */
     fun updateShouldDisplayDetails(should: Boolean) {
         _shouldDisplayDetails.value = should
     }

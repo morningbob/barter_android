@@ -66,8 +66,8 @@ class AskingProductViewModel : ViewModel() {
 
     fun updateAskingImages(image: Bitmap) {
         val productImage = ProductImageToDisplay(
-            //imageId = UUID.randomUUID().toString(),
-            //image = image,
+            imageId = UUID.randomUUID().toString(),
+            image = image,
             imageUrlCloud = "")
         _askingProductImages.value.add(productImage)
     }

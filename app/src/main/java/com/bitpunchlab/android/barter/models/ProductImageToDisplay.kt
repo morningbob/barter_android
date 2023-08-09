@@ -9,11 +9,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Entity(tableName = "images_table")
-data class ProductImageToDisplay( //@JvmOverloads constructor(
-
-    //@Ignore var image: Bitmap? = null,
-    @PrimaryKey
+data class ProductImageToDisplay @JvmOverloads constructor(
+    @PrimaryKey val imageId : String,
+    @Ignore var image: Bitmap? = null,
     var imageUrlCloud : String,
     var imageUrlLocal : String? = null,
-    //@PrimaryKey val imageId : String,
+
 ) : Parcelable

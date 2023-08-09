@@ -179,8 +179,8 @@ object LocalDatabaseManager {
                     for (i in 0..productOffering.images.size - 1) {
                         _sellerProductImages.value.add(
                             ProductImageToDisplay(
-                                //imageId = UUID.randomUUID().toString(),
-                                //image = ImageHandler.createPlaceholderImage(),
+                                imageId = UUID.randomUUID().toString(),
+                                image = ImageHandler.createPlaceholderImage(),
                                 imageUrlCloud = "placeholder"
                             )
                         )
@@ -262,8 +262,8 @@ object LocalDatabaseManager {
                     for (i in 0..theBid.bidProduct.images.size - 1) {
                         _bidProductImages.value.add(
                             ProductImageToDisplay(
-                                //imageId = UUID.randomUUID().toString(),
-                                //image = ImageHandler.createPlaceholderImage(),
+                                imageId = UUID.randomUUID().toString(),
+                                image = ImageHandler.createPlaceholderImage(),
                                 imageUrlCloud = ""
                             )
                         )
@@ -349,8 +349,8 @@ object LocalDatabaseManager {
                 url?.let { urlBack ->
                     Log.i("database mgr", "saved image to local")
                     productImage = ProductImageToDisplay(
-                        //image = image,
-                        //imageId = UUID.randomUUID().toString(),
+                        image = image,
+                        imageId = UUID.randomUUID().toString(),
                         imageUrlCloud = imageConcerned,
                         imageUrlLocal = urlBack.toString()
                     )
@@ -363,9 +363,9 @@ object LocalDatabaseManager {
             val localUrl = imageList[0].imageUrlLocal
             localUrl?.let {
                 Log.i("loadOrSaveImage", "loading image from local")
-                //productImage!!.image = CoroutineScope(Dispatchers.IO).async {
-                //    ImageHandler.loadImageFromLocal(it)
-                //}.await()
+                productImage!!.image = CoroutineScope(Dispatchers.IO).async {
+                    ImageHandler.loadImageFromLocal(it)
+                }.await()
                 //Log.i("loadOrSaveImage", "product image got from local ${productImage!!.image?.width.toString()}")
             }
         }

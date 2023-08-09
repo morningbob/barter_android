@@ -231,7 +231,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             productDetailsViewModel.deleteProductImage(it)
                         },
                         triggerImageUpdate = { productDetailsViewModel.updateTriggerImageUpdate(it) }
-                    )//
+                    )
                 } else if (shouldDisplayImages) {
                     ImagesDisplayDialog(
                         images = imagesDisplay.value,

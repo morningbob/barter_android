@@ -118,9 +118,9 @@ object FirebaseClient {
 
     // testing
     private suspend fun saveSampleProductImage() {
-        val productImage = ProductImageToDisplay(
-            imageUrlCloud = "https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0"
-        )
+        //val productImage = ProductImageToDisplay(
+        //    imageUrlCloud = "https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0"
+        //)
         //CoroutineScope(Dispatchers.IO).launch {
         //    BarterRepository.insertImages(listOf(productImage))
         //}.join()
@@ -296,6 +296,7 @@ object FirebaseClient {
         BarterRepository.insertProductsOffering(products)
         BarterRepository.insertProductsAsking(askingProducts)
         BarterRepository.insertBids(bids)
+        //BarterRepository.insertImages(images)
     }
 
     private suspend fun retrieveProductsOfferingFirebase() =
@@ -419,7 +420,7 @@ object FirebaseClient {
                             val uuid = UUID.randomUUID().toString()
                             productImages.add(
                                 ProductImageToDisplay(
-                                    //imageId = uuid,
+                                    imageId = uuid,
                                     imageUrlCloud = imageUrl,
                                     imageUrlLocal = it.toString()
                                 )

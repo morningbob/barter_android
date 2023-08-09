@@ -56,8 +56,9 @@ class BidFormViewModel : ViewModel() {
     }
 
     fun updateImagesDisplay(bitmap: Bitmap) {
-        val productImage = ProductImageToDisplay(//imageId = UUID.randomUUID().toString(),
-            //image = bitmap,
+        val productImage = ProductImageToDisplay(
+            imageId = UUID.randomUUID().toString(),
+            image = bitmap,
             imageUrlCloud = "")
         _imagesDisplay.value.add(productImage)
     }

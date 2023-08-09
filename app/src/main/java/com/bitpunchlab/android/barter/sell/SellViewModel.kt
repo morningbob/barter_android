@@ -115,8 +115,8 @@ class SellViewModel : ViewModel() {
 
     fun updateProductImages(image: Bitmap) {
         val productImage = ProductImageToDisplay(
-            //imageId = UUID.randomUUID().toString(),
-            //image = image,
+            imageId = UUID.randomUUID().toString(),
+            image = image,
             imageUrlCloud = "")
         val newList = productImages.value.toMutableStateList()
         newList.add(productImage)

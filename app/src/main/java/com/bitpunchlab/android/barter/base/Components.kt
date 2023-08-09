@@ -16,12 +16,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposableOpenTarget
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,15 +44,22 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.Category
+import com.bitpunchlab.android.barter.util.ImageHandler
+import com.bitpunchlab.android.barter.util.ImageHandler.loadImage
 import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bitpunchlab.android.barter.util.parseDateTime
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.broadcast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.nio.file.attribute.BasicFileAttributeView
@@ -312,7 +321,6 @@ fun CustomCard(modifier: Modifier = Modifier,
 fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifier,
                product: ProductOffering, onClick: (ProductOffering) -> Unit,
                backgroundColor: Color) {
-
     CustomCard(modifier) {
         Column(
             modifier
@@ -453,6 +461,9 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
     }
 }
 
+// we basically load all the required images in local database mgr
+// and display the pics from local database.
+// if we can't get the bitmap, we load it here
 @Composable
 fun LoadImage(url: String): MutableState<Bitmap?> {
     val bitmapState: MutableState<Bitmap?> = remember {
@@ -495,7 +506,6 @@ fun BasicBidScreen(productName: String, productCategory: String,
         )
 
         if (images.isNotEmpty()) {
-            /*
             Image(
                 bitmap = images[0].image!!.asImageBitmap(),
                 contentDescription = "product's image",
@@ -503,8 +513,6 @@ fun BasicBidScreen(productName: String, productCategory: String,
                     .padding(top = 30.dp)
                     .width(200.dp)
             )
-
-             */
         } else {
             Image(
                 painter = painterResource(id = R.mipmap.imageplaceholder),
@@ -558,7 +566,6 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 .padding(top = 15.dp)
         )
         if (productOfferingImages.isNotEmpty()) {
-            /*
             Image(
                 bitmap = productOfferingImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
@@ -566,8 +573,6 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     .width(200.dp)
                     .padding(top = 20.dp)
             )
-
-             */
             CustomButton(
                 label = stringResource(R.string.view_images),
                 onClick = {
@@ -594,7 +599,6 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 .padding(top = 15.dp)
         )
         if (productInExchangeImages.isNotEmpty()) {
-            /*
             Image(
                 bitmap = productInExchangeImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
@@ -602,8 +606,6 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     .width(200.dp)
                     .padding(top = 20.dp)
             )
-
-             */
             CustomButton(
                 label = stringResource(id = R.string.view_images),
                 onClick = {
@@ -712,14 +714,57 @@ fun ChooseTitlesRow(modifier: Modifier = Modifier, contentDes: String, iconId: I
 }
 
 @Composable
-fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<String>, contentDes: String, ) {
+fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<String>, contentDes: String,
+        loadImageViewModel: LoadImageViewModel = remember {
+            LoadImageViewModel()
+        }) {
+
     Column(
         modifier = Modifier
             .then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        var image by remember {
+            mutableStateOf<Bitmap?>(null)
+        }
         if (imageUrls.isNotEmpty()) {
+            LaunchedEffect(key1 = imageUrls[0]) {
+                image = loadImageViewModel.loadImageDatabase(imageUrls[0])
+            }
+            if (image != null) {
+                Log.i("load image or placeholder", "loaded bitmap from storage")
+                Image(
+                    bitmap = image!!.asImageBitmap(),
+                    contentDescription = contentDes,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            } else { // imageUrls is not empty && image = null
+                Log.i("load image or placeholder", "didn't load bitmap yet")
+                var bitmap by remember {
+                    mutableStateOf<Bitmap?>(null)
+                }
+                LaunchedEffect(key1 = imageUrls[0]) {
+                    Log.i("load image or placeholder", "loading bitmap from cloud")
+                    bitmap = loadImage(url = imageUrls[0])
+                }
+                //val bitmap = LoadImage(url = imageUrls[0])
+                if (bitmap != null) {
+                    Log.i("load image or placeholder", "loaded bitmap from cloud")
+                    Image(
+                        bitmap = bitmap!!.asImageBitmap(),
+                        contentDescription = contentDes,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                } else {
+                    PlaceholderImage()
+                }
+            }
+        } else {
+            PlaceholderImage()
+        }
+        /*
             val bitmap = LoadImage(url = imageUrls[0])
             if (bitmap.value != null) {
                 Image(
@@ -727,7 +772,6 @@ fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<Stri
                     contentDescription = contentDes,
                     modifier = Modifier
                         .fillMaxWidth()
-                        //.then(modifier)
                 )
             } else {
                 PlaceholderImage()
@@ -735,6 +779,8 @@ fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<Stri
         } else {
             PlaceholderImage()
         }
+
+         */
     }
 }
 
