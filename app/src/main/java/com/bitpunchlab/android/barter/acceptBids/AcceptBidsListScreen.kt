@@ -52,11 +52,10 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
     val bidMode = rememberSaveable {
         mutableStateOf(true)
     }
-    var bidsDetail = rememberSaveable {
+    var bidsDetail = remember {
         acceptedBids
     }
     bidsDetail = if (bidMode.value) acceptedBids else bidsAccepted
-
 
     LaunchedEffect(key1 = shouldDisplayDetails) {
         if (shouldDisplayDetails) {
@@ -85,17 +84,11 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                     onClickTwo = { bidMode.value = false },
                     bidMode = bidMode.value
                 )
-                /*
-                TitleRow(
-                    iconId = R.mipmap.acceptbid,
-                    title = "Accepted Bids",
-                    modifier = Modifier
-                        .padding(bottom = 20.dp)
-                    )
-*/
+
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .padding(bottom = 100.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
@@ -222,6 +215,21 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
                             textAlign = TextAlign.Start
                         )
                     }
+                    /*
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp),
+                    ) {
+                        DateTimeInfo(
+                            dateTimeString = acceptBid.acceptBid.acceptTime,
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                        )
+                    }
+
+                     */
+
                 }
 
             }
@@ -232,8 +240,9 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
                 horizontalArrangement = Arrangement.Center
             ) {
                 DateTimeInfo(
-                    dateTimeString = acceptBid.bid.bidTime,
+                    dateTimeString = acceptBid.acceptBid.acceptTime,
                     modifier = Modifier
+                        .padding(top = 5.dp)
                 )
             }
         }

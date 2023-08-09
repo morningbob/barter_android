@@ -22,12 +22,6 @@ class ProductsOfferingListViewModel : ViewModel() {
     private var _shouldDisplayDetails = MutableStateFlow<Boolean>(false)
     val shouldDisplayDetails : StateFlow<Boolean> get() = _shouldDisplayDetails.asStateFlow()
 
-    // everytime we trigger this page, for example, from navigation bar,
-    // we clear the productChosen in ProductInfo, so, the product details page wont' be shown
-
-    init {
-        ProductInfo.updateProductChosen(null)
-    }
 
     fun updateShouldDisplayProductDetails(should: Boolean) {
         _shouldDisplayDetails.value = should

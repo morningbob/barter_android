@@ -32,6 +32,7 @@ import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
+import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -454,14 +455,16 @@ object FirebaseClient {
             Log.i("prepare open transactions", "processing one accepted bid")
            //Log.i("prepare open transactions", "the userId of the accept bid ${acceptBid.product?.userId}")
             //Log.i("prepare open transactions", "current userId ${currentUserFirebase.value!!.id}")
-            acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId))
+            acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId,
+                acceptTime = acceptBid.acceptTime))
             //products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
 
         userFirebase.userBidsAccepted.map { (bidKey, acceptBid) ->
             //Log.i("prepare open transactions", "processing one bid accepted")
-            acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId))
+            acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId,
+                acceptTime = acceptBid.acceptTime))
             //products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
@@ -790,7 +793,8 @@ object FirebaseClient {
             // we provide empty asking products and empty bids
             // we only need the other info
             productOffering = convertProductOfferingToFirebase(product, listOf(), listOf()),
-            theBid = convertBidToBidFirebase(bid)
+            theBid = convertBidToBidFirebase(bid),
+            time = getCurrentDateTime()
         )
         return uploadAcceptBid(acceptBid)
     }

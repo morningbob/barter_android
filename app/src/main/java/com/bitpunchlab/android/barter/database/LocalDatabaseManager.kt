@@ -15,6 +15,7 @@ import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ImageHandler
+import com.bitpunchlab.android.barter.util.parseDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -55,9 +56,12 @@ object LocalDatabaseManager {
     val productOfferingWithProductsAsking : StateFlow<ProductOfferingAndProductsAsking?>
         get() = _productOfferingWithProductsAsking.asStateFlow()
 
-    private val _productOfferingWithBids = MutableStateFlow<ProductOfferingAndBids?>(null)
-    val productOfferingWithBids : StateFlow<ProductOfferingAndBids?>
-        get() = _productOfferingWithBids.asStateFlow()
+    //private val _productOfferingWithBids = MutableStateFlow<ProductOfferingAndBids?>(null)
+    //val productOfferingWithBids : StateFlow<ProductOfferingAndBids?>
+    //    get() = _productOfferingWithBids.asStateFlow()
+
+    private val _bids = MutableStateFlow<List<Bid>>(listOf())
+    val bids : StateFlow<List<Bid>> get() = _bids.asStateFlow()
 
     private val _bidChosen = MutableStateFlow<Bid?>(null)
     val bidChosen : StateFlow<Bid?> get() = _bidChosen.asStateFlow()
@@ -82,20 +86,12 @@ object LocalDatabaseManager {
         prepareBidDetails()
     }
     private fun prepare() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val imageList = CoroutineScope(Dispatchers.IO).async {
-                BarterRepository.getImage("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0")
-            }.await()
-            if (imageList.isNullOrEmpty()) {
-                Log.i("loadOrSaveImage", "couldn't retrieve the first image")
-            } else {
-                Log.i("loadOrSaveImage", "got first image")
-            }
-        }
+
         // get all products available for bidding
             CoroutineScope(Dispatchers.IO).launch {
+                // we also sort them here
                 BarterRepository.getAllProductOffering()?.collect() {
-                    _allProductsOffering.value = it
+                    _allProductsOffering.value = sortProductsOffering(it)
                 }
             }
             // get list of products offered by the user
@@ -103,7 +99,7 @@ object LocalDatabaseManager {
                 //FirebaseClient.userId.collect() { id ->
                 FirebaseClient.currentUserFirebase.collect() { userFirebase ->
                     if (userFirebase != null) {
-                        Log.i("authLocal", "got id ${userFirebase.id}")
+                        //Log.i("authLocal", "got id ${userFirebase.id}")
                         CoroutineScope(Dispatchers.IO).launch {
                             BarterRepository.getCurrentUser(userFirebase.id)
                                 ?.collect() { currentUserList ->
@@ -112,10 +108,7 @@ object LocalDatabaseManager {
                                             "authLocal",
                                             "got current user ${currentUserList[0].name}"
                                         )
-                                        //if (FirebaseClient.userId.value == currentUserList[0].id) {
                                         _currentUser.value = currentUserList[0]
-                                        //}
-                                        //Log.i("authLocal", "updated current user")
                                     } else {
                                         Log.i("authLocal", "got empty list of user")
                                     }
@@ -125,9 +118,10 @@ object LocalDatabaseManager {
                             val userAndProductOffering = CoroutineScope(Dispatchers.IO).async {
                                 BarterRepository.getUserProductsOffering(userFirebase.id)
                             }.await()
-                            if (userAndProductOffering != null && userAndProductOffering.isNotEmpty()) {
+                            if (!userAndProductOffering.isNullOrEmpty()) {
+                                // here we sort the products offering,
                                 _userProductsOffering.value =
-                                    userAndProductOffering.get(0).productsOffering
+                                    sortProductsOffering(userAndProductOffering.get(0).productsOffering)
                                 Log.i(
                                     "local database manager",
                                     "got user's products ${userAndProductOffering.get(0).productsOffering.size}"
@@ -152,13 +146,11 @@ object LocalDatabaseManager {
                                         "local database mgr",
                                         "got no accept bids: ${userAcceptBids[0].acceptBids.size}"
                                     )
-                                    _allAcceptBids.value = userAcceptBids[0].acceptBids
+                                    // we sort the accept bids here too
+                                    _allAcceptBids.value = sortAcceptBids(userAcceptBids[0].acceptBids)
                                 }
                             }
                         }
-                    } else { // id is ""
-                        Log.i("authLocal", "reset current user")
-                        _currentUser.value = null
                     }
                 }
             }
@@ -243,8 +235,8 @@ object LocalDatabaseManager {
                     CoroutineScope(Dispatchers.IO).launch {
                         BarterRepository.getProductOfferingWithBids(productOffering.productId)
                             ?.collect() {
-                                //Log.i("product details vm", "getting bids ${it[0].bids.size}")
-                                _productOfferingWithBids.value = it[0]
+                                // we sort the bids here
+                                _bids.value = sortBids(it[0].bids)
                             }
                     }
                 } // end of if product exist
@@ -258,7 +250,6 @@ object LocalDatabaseManager {
         CoroutineScope(Dispatchers.IO).launch {
             bidChosen.collect() { bid ->
                 bid?.let { theBid ->
-                    //val imagesToBeSaved = mutableListOf<ProductImageToDisplay>()
                     for (i in 0..theBid.bidProduct.images.size - 1) {
                         _bidProductImages.value.add(
                             ProductImageToDisplay(
@@ -289,14 +280,20 @@ object LocalDatabaseManager {
 
     } // end of prepare
 
-    fun updateCurrentUser(user: User?) {
-        _currentUser.value = user
-    }
-
     fun resetProduct() {
         _productChosen.value = null
         _productOfferingWithProductsAsking.value = null
-        _productOfferingWithBids.value = null
+        //_productOfferingWithBids.value = null
+        _bids.value = listOf()
+        //_allProductsOffering.value = listOf()
+        //_userProductsOffering.value = listOf()
+        _sellerProductImages.value = mutableStateListOf()
+        _askingProductImages.value = mutableStateListOf()
+        _bidChosen.value = null
+        _bidProductImages.value = mutableStateListOf()
+        //_allAcceptBids.value = listOf()
+        //_acceptedBidsDetail.value = mutableStateListOf()
+        //_bidsAcceptedDetail.value = mutableStateListOf()
     }
 
     fun updateProductChosen(product: ProductOffering?) {
@@ -311,10 +308,17 @@ object LocalDatabaseManager {
         BarterRepository.deleteProductsAsking(listOf(productAsking))
     }
 
-    fun resetAfterLogout() {
-
+    private fun sortProductsOffering(products: List<ProductOffering>) : List<ProductOffering> {
+        return products.sortedByDescending { parseDateTime(it.dateCreated) }
     }
 
+    private fun sortBids(bids: List<Bid>) : List<Bid> {
+        return bids.sortedByDescending { parseDateTime(it.bidTime) }
+    }
+
+    private fun sortAcceptBids(bids: List<AcceptBid>) : List<AcceptBid> {
+        return bids.sortedByDescending { parseDateTime(it.acceptTime) }
+    }
 
     // we try to retrieve the image from local database
     // and get the imageUrlLocal as uri
@@ -413,6 +417,19 @@ object LocalDatabaseManager {
     }
 
 }
+/*
+        CoroutineScope(Dispatchers.IO).launch {
+            val imageList = CoroutineScope(Dispatchers.IO).async {
+                BarterRepository.getImage("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0")
+            }.await()
+            if (imageList.isNullOrEmpty()) {
+                Log.i("loadOrSaveImage", "couldn't retrieve the first image")
+            } else {
+                Log.i("loadOrSaveImage", "got first image")
+            }
+        }
+
+         */
 /*
 //CoroutineScope(Dispatchers.IO).launch {
         // this outer coroutine will wait for the below coroutine to finish

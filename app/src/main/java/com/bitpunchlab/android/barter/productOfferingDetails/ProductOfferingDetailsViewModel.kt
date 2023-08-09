@@ -159,12 +159,10 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
     fun processBidding(product: ProductOffering, bid: Bid, images: List<ProductImageToDisplay>)  {
         _loadingAlpha.value = 100f
-/*
+
         val imagesBitmap = images.map { image ->
             image.image!!
         }
-
-
 
         CoroutineScope(Dispatchers.IO).launch {
             if (FirebaseClient.processBidding(product, bid, imagesBitmap)) {
@@ -175,8 +173,6 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
                 _loadingAlpha.value = 0f
             }
         }
-
- */
     }
 
 

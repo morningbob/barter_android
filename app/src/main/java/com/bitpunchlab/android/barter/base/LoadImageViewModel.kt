@@ -14,13 +14,16 @@ class LoadImageViewModel : ViewModel() {
     suspend fun loadImageDatabase(imageUrl: String) : Bitmap? {
         var productImage : ProductImageToDisplay? = null
         var image : Bitmap? = null
-        productImage = CoroutineScope(Dispatchers.IO).async {
-            BarterRepository.getImage(imageUrl)?.get(0)
+        val productImageList = CoroutineScope(Dispatchers.IO).async {
+            BarterRepository.getImage(imageUrl)
         }.await()
-        if (productImage != null && productImage.imageUrlLocal != null)  {
-            image = CoroutineScope(Dispatchers.IO).async {
-                ImageHandler.loadImageFromLocal(productImage.imageUrlLocal!!)
-            }.await()
+        if (productImageList != null && productImageList.isNotEmpty()) {
+            productImage = productImageList.get(0)
+                if (productImage.imageUrlLocal != null)  {
+                    image = CoroutineScope(Dispatchers.IO).async {
+                        ImageHandler.loadImageFromLocal(productImage.imageUrlLocal!!)
+                    }.await()
+                }
         }
         return image
     }

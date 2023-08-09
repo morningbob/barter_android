@@ -22,10 +22,6 @@ data class ProductOffering(
     var images : List<String> = listOf(),
     var status : Int,
     var acceptBidId : String = ""
-    //var currentBids : List<String> = listOf(),
-    //var productOfferingId : String = "",
-    //@Embedded
-    //var askingProducts : AskingProductsHolder = AskingProductsHolder(listOf())
 ) : Parcelable
 
 @Parcelize

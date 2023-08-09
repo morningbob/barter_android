@@ -25,6 +25,7 @@ import com.bitpunchlab.android.barter.BidDetails
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomCard
+import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.database.LocalDatabaseManager
@@ -36,7 +37,8 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
           remember { ProductOfferingBidsListViewModel() }
     ) {
 
-    val product by LocalDatabaseManager.productOfferingWithBids.collectAsState()
+    //val product by LocalDatabaseManager.productOfferingWithBids.collectAsState()
+    val bids by LocalDatabaseManager.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
 
@@ -65,25 +67,22 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                 productOfferingBidsListViewModel.updateShouldPopBids(true)
             }
 
-            product?.let {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(BarterColor.lightGreen)
-                        .padding(start = 40.dp, end = 40.dp, top = 5.dp)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BarterColor.lightGreen)
+                    .padding(start = 40.dp, end = 40.dp, top = 5.dp)
 
-                ) {
-                    items(product!!.bids, { bid -> bid.bidId }) { bid ->
-                        BidRow(
-                            bid = bid,
-                            onClick = {
-                                LocalDatabaseManager.updateBidChosen(it)
-                                productOfferingBidsListViewModel.updateShouldShowBid(true)
-                            },
-                        )
-                    }
+            ) {
+                items(bids, { bid -> bid.bidId }) { bid ->
+                    BidRow(
+                        bid = bid,
+                        onClick = {
+                            LocalDatabaseManager.updateBidChosen(it)
+                            productOfferingBidsListViewModel.updateShouldShowBid(true)
+                        },
+                    )
                 }
-
             }
         }
     }
@@ -132,6 +131,11 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
                         text = bid.bidProduct?.category ?: "Not Available",
                         color = BarterColor.textGreen,
                         fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(top = 10.dp, start = 20.dp)
+                    )
+                    DateTimeInfo(
+                        dateTimeString = bid.bidTime,
                         modifier = Modifier
                             .padding(top = 10.dp, start = 20.dp)
                     )

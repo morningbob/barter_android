@@ -13,9 +13,8 @@ data class AcceptBid(
     val acceptId : String,
     // true represent seller
     val isSeller : Boolean,
-    val userId : String
-    //val productId : String,
-    //val bidId : String
+    val userId : String,
+    val acceptTime : String
 ) : Parcelable
 /*
 @Parcelize

@@ -448,13 +448,13 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
         if (dateTime != null) {
             Text(
                 text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 color = Color.Blue
             )
         } else {
             Text(
                 text = stringResource(R.string.date_and_time_info_not_available),
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 color = Color.Blue
             )
         }
