@@ -177,44 +177,4 @@ class ProductOfferingDetailsViewModel() : ViewModel() {
 
 
 }
-/*
-        CoroutineScope(Dispatchers.IO).launch {
-            ProductInfo.productChosen.collect() { productOffering ->
-                productOffering?.let {
-                    // preloaded with placeholder images,
-                    // also, for mutable list to set the result at particular index
-                    for (i in 0..productOffering.images.size - 1) {
-                        _imagesDisplay.value.add(
-                            ProductImage(
-                                UUID.randomUUID().toString(),
-                                ImageHandler.createPlaceholderImage()
-                            )
-                        )
-                    }
 
-                    CoroutineScope(Dispatchers.IO).launch {
-                        //CoroutineScope(Dispatchers.IO).launch {
-                        ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
-                            _imagesDisplay.value.set(pairResult.first, pairResult.second)
-                        }
-                    }
-
-                    // prepare bids and asking products associated with the product offering
-                    CoroutineScope(Dispatchers.IO).launch {
-                        BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)
-                            ?.collect() {
-                                ProductInfo.updateProductOfferingWithProductsAsking(it[0])
-                            }
-                    }
-                    CoroutineScope(Dispatchers.IO).launch {
-                        BarterRepository.getProductOfferingWithBids(productOffering.productId)
-                            ?.collect() {
-                                Log.i("product details vm", "getting bids ${it[0].bids.size}")
-                                ProductInfo.updateProductOfferingWithBids(it[0])
-                            }
-                    }
-                }
-            }
-        }
-
-         */

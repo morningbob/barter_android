@@ -66,6 +66,8 @@ enum class DeleteProductStatus {
 enum class BiddingStatus {
     NORMAL,
     INVALID_INPUTS,
+    TO_CONFIRM,
+    CONFIRMED,
     SUCCESS,
     FAILURE
 }

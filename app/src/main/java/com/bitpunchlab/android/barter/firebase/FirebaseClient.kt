@@ -4,11 +4,9 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
-import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
-import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.AcceptBid
@@ -19,7 +17,6 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
-import com.bitpunchlab.android.barter.util.AppStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.LoginStatus
 import com.bitpunchlab.android.barter.util.MainStatus
@@ -35,17 +32,14 @@ import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import okhttp3.internal.wait
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.math.acos
 
 object FirebaseClient {
 
@@ -525,6 +519,7 @@ object FirebaseClient {
                                productImages: List<ProductImageToDisplay>,
         askingProducts: List<ProductAsking>, askingProductImages: List<List<ProductImageToDisplay>>) : Boolean {
 
+        Log.i("firebase, process selling", "product images ${productImages.size} asking images ${askingProductImages.size}")
         val pairResult =
             uploadImagesAndGetDownloadUrl(productOffering, askingProducts, askingProductImages, productImages)
         val semiUpdatedProductOffering = pairResult.first
@@ -599,8 +594,7 @@ object FirebaseClient {
         val downloadUrlList = mutableListOf<String>()
         val imageFilenames = mutableListOf<String>()
 
-        val images = listOf<Bitmap>()
-        //val images = productImages.map { it.image!! }
+        val images = productImages.map { it.image!! }
 
         val pairProductResult = uploadImages(
             productId = productId,
@@ -710,12 +704,14 @@ object FirebaseClient {
     // we modify the product bidding's bids field.  add the bid to it.
     suspend fun processBidding(productOffering: ProductOffering, bid: Bid, images: List<Bitmap>) : Boolean {
 
+        Log.i("process bidding", "no of images of the bid ${images.size}")
         val downloadUrlResult = uploadImages(bid.bidProductId, images)
         val downloadUrls = downloadUrlResult.first
         //val filenames = downloadUrlResult.second
 
         val newBidProduct = bid.bidProduct.copy(images = downloadUrls)
         val newBid = bid.copy(bidProduct = newBidProduct)
+        Log.i("process bidding", "check image after modification ${newBid.bidProduct.images.size}")
         //var newProduct : ProductOfferingFirebase
 
         // retrieve the bids the product has, in the past, add the latest to the end
@@ -813,7 +809,7 @@ object FirebaseClient {
     // and the owner user object.
     // this approach is better for the server to reverse changes
 
-    suspend fun deleteProductFirebase(report: HashMap<String, String>) =
+    private suspend fun deleteProductFirebase(report: HashMap<String, String>) =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
 
         Firebase.firestore

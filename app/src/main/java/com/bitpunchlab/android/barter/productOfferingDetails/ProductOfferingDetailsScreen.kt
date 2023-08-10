@@ -42,11 +42,15 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
 import com.bitpunchlab.android.barter.bid.BidFormScreen
+import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.BiddingStatus
 import com.bitpunchlab.android.barter.util.DeleteProductStatus
 import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.util.UserMode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -251,7 +255,15 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                         ShowDeleteStatus(
                             status = deleteConfirmStatus,
                             product = product,
-                            onConfirm = { productDetailsViewModel.deleteProduct(product) },
+                            onConfirm = {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    productDetailsViewModel.deleteProduct(product)
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        BarterRepository.deleteProductOffering(product)
+                                    }.join()
+                                    LocalDatabaseManager.reloadUserAndProductOffering()
+                                }
+                            },
                             onDismiss = { productDetailsViewModel.updateDeleteProductStatus(DeleteProductStatus.NORMAL) }
                             )
                     }

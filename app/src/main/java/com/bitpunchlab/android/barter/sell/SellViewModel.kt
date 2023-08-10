@@ -149,10 +149,6 @@ class SellViewModel : ViewModel() {
         _shouldShowAsking.value = should
     }
 
-    //fun updateTriggerImageUpdate(trigger: Boolean) {
-    //    _triggerImageUpdate.value = trigger
-    //}
-
     fun prepareAskingProducts() {
         ProductInfo.updateAskingProducts(AskingProductInfo.askingProducts.value)
         ProductInfo.updateAskingImages(AskingProductInfo.askingImages.value)

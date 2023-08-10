@@ -47,6 +47,12 @@ object BarterRepository {
         }
     }
 
+    fun deleteProductOffering(product: ProductOffering) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.deleteProductOffering(product)
+        }
+    }
+
     fun insertProductsAsking(products: List<ProductAsking>) {
         CoroutineScope(Dispatchers.IO).launch {
             database?.barterDao?.insertProductsAsking(*products.toTypedArray())

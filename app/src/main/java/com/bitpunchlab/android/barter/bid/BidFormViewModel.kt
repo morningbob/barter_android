@@ -18,14 +18,17 @@ import java.util.UUID
 
 class BidFormViewModel : ViewModel() {
 
-    private val _bidTime = MutableStateFlow("")
-    val bidTime : StateFlow<String> get() = _bidTime.asStateFlow()
+    //private val _bidTime = MutableStateFlow("")
+    //val bidTime : StateFlow<String> get() = _bidTime.asStateFlow()
 
     private val _bidProductName = MutableStateFlow("")
     val bidProductName : StateFlow<String> get() = _bidProductName.asStateFlow()
 
     private val _bidProductCategory = MutableStateFlow(Category.NOT_SET)
     val bidProductCategory : StateFlow<Category> get() = _bidProductCategory.asStateFlow()
+
+    private val _createdBid = MutableStateFlow<Bid?>(null)
+    val createdBid : StateFlow<Bid?> get() = _createdBid.asStateFlow()
 
     private val _imagesDisplay = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
     val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
@@ -49,6 +52,10 @@ class BidFormViewModel : ViewModel() {
 
     fun updateBidProductCategory(cat: Category) {
         _bidProductCategory.value = cat
+    }
+
+    fun updateCreatedBid(bid: Bid) {
+        _createdBid.value = bid
     }
 
     fun updateShouldExpandCategoryDropdown(should: Boolean) {

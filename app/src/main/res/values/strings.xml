@@ -81,4 +81,6 @@
     <string name="product_offered_row">Product offered:</string>
     <string name="view_images">View Images</string>
     <string name="product_in_exchange_row">Product in exchange:</string>
+    <string name="bid_confirmation">Bid Confirmation</string>
+    <string name="confirm_bid_alert_desc">Please confirm that you want to make the bid.</string>
 </resources>

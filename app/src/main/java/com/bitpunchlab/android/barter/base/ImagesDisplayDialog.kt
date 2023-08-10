@@ -46,7 +46,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun ImagesDisplayDialog(
-    //images: StateFlow<SnapshotStateList<ProductImageToDisplay>>, onDismiss: () -> Unit,
     images: SnapshotStateList<ProductImageToDisplay>, onDismiss: () -> Unit,
     deleteStatus: Int? = null,
     updateDeleteStatus: ((Int) -> Unit)? = null, deleteImage: ((ProductImageToDisplay) -> Unit)? = null,

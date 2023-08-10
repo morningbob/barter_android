@@ -64,6 +64,8 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
     val shouldDisplayImages by bidFormViewModel.shouldDisplayImages.collectAsState()
     val imagesDisplay = bidFormViewModel.imagesDisplay.collectAsState()
     val deleteImageStatus by bidFormViewModel.deleteImageStatus.collectAsState()
+    val createdBid by bidFormViewModel.createdBid.collectAsState()
+
     //val imagesDisplay = bidFormViewModel.imagesDisplay
 
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -74,6 +76,26 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                 Log.i("launcher", "got bitmap")
                 bidFormViewModel.updateImagesDisplay(it)
             }
+        }
+    }
+
+    fun onConfirmBid() {
+        //val bid = bidFormViewModel.createBid()
+        if (product != null && createdBid != null) {
+        //if (bid != null) {
+            updateBiddingStatus(BiddingStatus.CONFIRMED)
+            CoroutineScope(Dispatchers.IO).launch {
+                //Log.i("bid form screen, onConfirmBid", "images ${imagesDisplay.value.size}")
+                processBidding(product!!, createdBid!!, imagesDisplay.value)
+                // I clear form here instead of after if clause
+                // because I want to clear it after the processing has been done.
+                bidFormViewModel.clearForm()
+            }
+        } else {
+            //Log.i("bid screen", "null product or bid")
+            // alert user that the info is invalid
+            bidFormViewModel.clearForm()
+            updateBiddingStatus(BiddingStatus.INVALID_INPUTS)
         }
     }
 
@@ -173,6 +195,16 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         title = stringResource(id = R.string.send),
                         onClick = {
                             val bid = bidFormViewModel.createBid()
+                            if (bid != null) {
+                                bidFormViewModel.updateCreatedBid(bid)
+                                updateBiddingStatus(BiddingStatus.TO_CONFIRM)
+                            } else {
+                                updateBiddingStatus(BiddingStatus.INVALID_INPUTS)
+                            }
+                            //bidFormViewModel.clearForm()
+
+                            /*
+                            val bid = bidFormViewModel.createBid()
                             if (product != null && bid != null) {
                                 CoroutineScope(Dispatchers.IO).launch {
                                     processBidding(product!!, bid, imagesDisplay.value)
@@ -186,6 +218,8 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                                 bidFormViewModel.clearForm()
                                 updateBiddingStatus(BiddingStatus.INVALID_INPUTS)
                             }
+
+                             */
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
@@ -212,7 +246,8 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                 if (biddingStatus != BiddingStatus.NORMAL) {
                     ShowBiddingStatus(
                         status = biddingStatus,
-                        onDismiss = resetStatus
+                        onDismiss = resetStatus,
+                        onConfirm = { onConfirmBid() }
                     )
                 }
             }
@@ -230,11 +265,13 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
 }
 
 @Composable
-fun ShowBiddingStatus(status: BiddingStatus, onDismiss: () -> Unit) {
+fun ShowBiddingStatus(status: BiddingStatus, onDismiss: () -> Unit,
+                      onConfirm: () -> Unit) {
     when (status) {
         BiddingStatus.FAILURE -> { BiddingFailureAlert(onDismiss) }
         BiddingStatus.SUCCESS -> { BiddingSuccessAlert(onDismiss) }
         BiddingStatus.INVALID_INPUTS -> { InvalidInfoAlert(onDismiss) }
+        BiddingStatus.TO_CONFIRM -> { BidConfirmationAlert(onConfirm, onDismiss) }
         else -> 0
     }
 }
@@ -247,6 +284,23 @@ fun InvalidInfoAlert(onDismiss: () -> Unit) {
         positiveText = stringResource(id = R.string.ok),
         onDismiss = { onDismiss() },
         onPositive = { onDismiss() })
+}
+
+@Composable
+fun BidConfirmationAlert(onConfirm: () -> Unit,
+                         onCancel: () -> Unit) {
+    CustomDialog(
+        title = stringResource(R.string.bid_confirmation),
+        message = stringResource(R.string.confirm_bid_alert_desc),
+        positiveText = stringResource(id = R.string.confirm),
+        negativeText = stringResource(id = R.string.cancel),
+        onDismiss = { onCancel() },
+        onPositive = {
+            onConfirm()
+            //onCancel()
+                     },
+        onNegative = { onCancel() }
+    )
 }
 
 @Composable

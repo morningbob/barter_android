@@ -2,12 +2,9 @@ package com.bitpunchlab.android.barter.util
 
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
-import com.bitpunchlab.android.barter.firebase.models.ProductBiddingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
-import com.bitpunchlab.android.barter.models.AskingHolder
 import com.bitpunchlab.android.barter.models.Bid
-import com.bitpunchlab.android.barter.models.BidsHolder
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
@@ -114,6 +115,8 @@ object LocalDatabaseManager {
                                     }
                                 }
                         }
+                        reloadUserAndProductOffering()
+                        /*
                         CoroutineScope(Dispatchers.IO).launch {
                             val userAndProductOffering = CoroutineScope(Dispatchers.IO).async {
                                 BarterRepository.getUserProductsOffering(userFirebase.id)
@@ -130,7 +133,7 @@ object LocalDatabaseManager {
                                 Log.i("local database manager", "user's product is null or 0")
                             }
                         }
-
+                         */
                         CoroutineScope(Dispatchers.IO).launch {
                             Log.i("local database mgr", "preparing user and accept bid, got user id")
                             val userAcceptBidsFlow = CoroutineScope(Dispatchers.IO).async {
@@ -164,6 +167,7 @@ object LocalDatabaseManager {
                 // I also load the bids associated with the product
         CoroutineScope(Dispatchers.IO).launch {
             productChosen.collect() { productOffering ->
+                Log.i("local database mgr", "product was chosen detected")
                 productOffering?.let {
                     _sellerProductImages.value = mutableStateListOf()
                     // preloaded with placeholder images,
@@ -202,28 +206,31 @@ object LocalDatabaseManager {
                             productOffering.productId
                         )
                             ?.collect() { productOfferingWithProductAskingList ->
+
+                                if (productOfferingWithProductAskingList.isNotEmpty()) {
                                 _productOfferingWithProductsAsking.value =
                                     productOfferingWithProductAskingList[0]
 
-                                for (i in 0..productOfferingWithProductAskingList[0].askingProducts.size - 1) {
-                                    _askingProductImages.value.add(mutableListOf())
-                                    for (j in 0..productOfferingWithProductAskingList[0].askingProducts[i].images.size - 1) {
-                                        val (productImage, shouldSave) = CoroutineScope(
-                                            Dispatchers.IO
-                                        ).async {
-                                            loadOrRetrieveProductImage(
-                                                productOfferingWithProductAskingList[0].askingProducts[i].images[j]
-                                            )
-                                        }.await()
+                                    for (i in 0..productOfferingWithProductAskingList[0].askingProducts.size - 1) {
+                                        _askingProductImages.value.add(mutableListOf())
+                                        for (j in 0..productOfferingWithProductAskingList[0].askingProducts[i].images.size - 1) {
+                                            val (productImage, shouldSave) = CoroutineScope(
+                                                Dispatchers.IO
+                                            ).async {
+                                                loadOrRetrieveProductImage(
+                                                    productOfferingWithProductAskingList[0].askingProducts[i].images[j]
+                                                )
+                                            }.await()
 
-                                        productImage?.let {
-                                            Log.i(
-                                                "database mgr",
-                                                "have product image setting to list"
-                                            )
-                                            _askingProductImages.value[i].add(it)
-                                            if (shouldSave) {
-                                                BarterRepository.insertImages(listOf(it))
+                                            productImage?.let {
+                                                Log.i(
+                                                    "database mgr",
+                                                    "have product image setting to list"
+                                                )
+                                                _askingProductImages.value[i].add(it)
+                                                if (shouldSave) {
+                                                    BarterRepository.insertImages(listOf(it))
+                                                }
                                             }
                                         }
                                     }
@@ -235,8 +242,10 @@ object LocalDatabaseManager {
                     CoroutineScope(Dispatchers.IO).launch {
                         BarterRepository.getProductOfferingWithBids(productOffering.productId)
                             ?.collect() {
-                                // we sort the bids here
-                                _bids.value = sortBids(it[0].bids)
+                                if (it.isNotEmpty()) {
+                                    // we sort the bids here
+                                    _bids.value = sortBids(it[0].bids)
+                                }
                             }
                     }
                 } // end of if product exist
@@ -307,8 +316,26 @@ object LocalDatabaseManager {
     fun deleteProductAskingLocalDatabase(productAsking: ProductAsking) {
         BarterRepository.deleteProductsAsking(listOf(productAsking))
     }
+/*
+    fun deleteProductFromAllProducts() {
 
+    }
+
+    fun deleteProductFromUser(product: ProductOffering) {
+        _userProductsOffering.valu
+    }
+
+    fun deleteProductOfferingFromComposable(productList: SnapshotStateList<ProductOffering>,
+                                            productToBeDeleted: ProductOffering) :
+        SnapshotStateList<ProductOffering>
+    {
+        return (productList.filterNot { it.productId == productToBeDeleted.productId }).toMutableStateList()
+    }
+*/
     private fun sortProductsOffering(products: List<ProductOffering>) : List<ProductOffering> {
+        //val result = products.sortedByDescending { parseDateTime(it.dateCreated) }
+        //Log.i("sorting products", "no ${result.size}")
+        //return result
         return products.sortedByDescending { parseDateTime(it.dateCreated) }
     }
 
@@ -320,6 +347,25 @@ object LocalDatabaseManager {
         return bids.sortedByDescending { parseDateTime(it.acceptTime) }
     }
 
+    fun reloadUserAndProductOffering() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val userAndProductOffering = CoroutineScope(Dispatchers.IO).async {
+                BarterRepository.getUserProductsOffering(FirebaseClient.currentUserFirebase.value!!.id)
+            }.await()
+            if (!userAndProductOffering.isNullOrEmpty()) {
+                // here we sort the products offering,
+                _userProductsOffering.value =
+                    sortProductsOffering(userAndProductOffering.get(0).productsOffering)
+                Log.i(
+                    "local database manager",
+                    "got user's products ${userAndProductOffering.get(0).productsOffering.size}"
+                )
+            } else {
+                Log.i("local database manager", "user's product is null or 0")
+            }
+        }
+    }
+
     // we try to retrieve the image from local database
     // and get the imageUrlLocal as uri
     // retrieve the image from uri
@@ -327,6 +373,7 @@ object LocalDatabaseManager {
     // then replace the placeholder with it
     // coroutine scope here , so we can wait for if the image comes back
     private suspend fun loadOrRetrieveProductImage(imageConcerned: String) : Pair<ProductImageToDisplay?, Boolean> {
+        Log.i("loadOrRetrieve", "called")
         var productImage: ProductImageToDisplay? = null
         var imageLoaded: Bitmap? = null
         var shouldSaveImage = false
@@ -380,6 +427,8 @@ object LocalDatabaseManager {
     private fun prepareBidDetails() {
         CoroutineScope(Dispatchers.IO).launch {
             allAcceptBids.collect() { theBids ->
+                _acceptedBidsDetail.value = mutableStateListOf()
+                _bidsAcceptedDetail.value = mutableStateListOf()
                 for (theBid in theBids) {
                     Log.i("local database mgr", "processing the bid ${theBid.acceptId}")
                     CoroutineScope(Dispatchers.IO).launch {

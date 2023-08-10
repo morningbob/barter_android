@@ -75,7 +75,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                 // confirm before execute
                 CustomButton(
                     label = stringResource(R.string.accept_bid),
-                    onClick = { productOfferingBidDetailsViewModel.acceptBid() },
+                    onClick = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.TO_CONFIRM) },
                     modifier = Modifier
                         .padding(top = 20.dp)
                 )
@@ -95,7 +95,10 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
             }
             if (acceptBidStatus != AcceptBidStatus.NORMAL) {
                 ShowAcceptBidStatus(status = acceptBidStatus,
-                    onConfirm = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.CONFIRMED) },
+                    onConfirm = {
+                        productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.CONFIRMED)
+                        productOfferingBidDetailsViewModel.acceptBid()
+                                },
                     onDismiss = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.NORMAL) }
                 )
             }
@@ -121,8 +124,10 @@ fun ConfirmAcceptBid(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         title = stringResource(R.string.accept_bid_confirmation),
         message = stringResource(R.string.confirm_accept_bid_alert_desc),
         positiveText = stringResource(id = R.string.confirm),
+        negativeText = stringResource(id = R.string.cancel),
         onDismiss = { onDismiss() },
-        onPositive = { onConfirm() }
+        onPositive = { onConfirm() },
+        onNegative = { onDismiss() }
     )
 }
 

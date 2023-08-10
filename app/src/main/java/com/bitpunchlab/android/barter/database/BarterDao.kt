@@ -30,6 +30,9 @@ interface BarterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductsOffering(vararg product: ProductOffering)
 
+    @Delete
+    suspend fun deleteProductOffering(vararg product: ProductOffering)
+
     @Query("SELECT * FROM products_offering")
     fun getAllProductOffering() : Flow<List<ProductOffering>>
 
