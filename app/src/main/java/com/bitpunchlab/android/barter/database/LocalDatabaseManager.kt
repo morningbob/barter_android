@@ -23,6 +23,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -82,6 +83,21 @@ object LocalDatabaseManager {
     private val _bidsAcceptedDetail = MutableStateFlow<MutableList<BidWithDetails>>(mutableListOf())
     val bidsAcceptedDetail : StateFlow<MutableList<BidWithDetails>> get() = _bidsAcceptedDetail.asStateFlow()
 
+    private val _currentBids = MutableStateFlow<SnapshotStateList<Bid>>(mutableStateListOf())
+    val currentBids : StateFlow<SnapshotStateList<Bid>> get() = _currentBids.asStateFlow()
+
+    private val _currentBidsDetails = MutableStateFlow<SnapshotStateList<BidWithDetails>>(mutableStateListOf())
+    val currentBidsDetails : StateFlow<SnapshotStateList<BidWithDetails>> get() = _currentBidsDetails.asStateFlow()
+
+    private var _bidProductOfferingImages = MutableStateFlow<SnapshotStateList<ProductImageToDisplay>>(mutableStateListOf())
+    val bidProductOfferingImages : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _bidProductOfferingImages.asStateFlow()
+
+    private val _chosenCurrentBid = MutableStateFlow<BidWithDetails?>(null)
+    val chosenCurrentBid : StateFlow<BidWithDetails?> get() = _chosenCurrentBid.asStateFlow()
+
+    //private val _chosenCurrentBids = MutableStateFlow<SnapshotStateList<Bid>>(mutableStateListOf())
+    //val currentBids : StateFlow<SnapshotStateList<Bid>> get() = _currentBids.asStateFlow()
+
     init {
         prepare()
         prepareBidDetails()
@@ -116,24 +132,8 @@ object LocalDatabaseManager {
                                 }
                         }
                         reloadUserAndProductOffering()
-                        /*
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val userAndProductOffering = CoroutineScope(Dispatchers.IO).async {
-                                BarterRepository.getUserProductsOffering(userFirebase.id)
-                            }.await()
-                            if (!userAndProductOffering.isNullOrEmpty()) {
-                                // here we sort the products offering,
-                                _userProductsOffering.value =
-                                    sortProductsOffering(userAndProductOffering.get(0).productsOffering)
-                                Log.i(
-                                    "local database manager",
-                                    "got user's products ${userAndProductOffering.get(0).productsOffering.size}"
-                                )
-                            } else {
-                                Log.i("local database manager", "user's product is null or 0")
-                            }
-                        }
-                         */
+                        reloadCurrentBids()
+
                         CoroutineScope(Dispatchers.IO).launch {
                             Log.i("local database mgr", "preparing user and accept bid, got user id")
                             val userAcceptBidsFlow = CoroutineScope(Dispatchers.IO).async {
@@ -277,7 +277,6 @@ object LocalDatabaseManager {
                                 Log.i("database mgr", "have bid product image setting to list")
                                 _bidProductImages.value.set(i, it)
                                 if (shouldSave) {
-                                    //imagesToBeSaved.add(it)
                                     BarterRepository.insertImages(listOf(it))
                                 }
                             }
@@ -316,22 +315,7 @@ object LocalDatabaseManager {
     fun deleteProductAskingLocalDatabase(productAsking: ProductAsking) {
         BarterRepository.deleteProductsAsking(listOf(productAsking))
     }
-/*
-    fun deleteProductFromAllProducts() {
 
-    }
-
-    fun deleteProductFromUser(product: ProductOffering) {
-        _userProductsOffering.valu
-    }
-
-    fun deleteProductOfferingFromComposable(productList: SnapshotStateList<ProductOffering>,
-                                            productToBeDeleted: ProductOffering) :
-        SnapshotStateList<ProductOffering>
-    {
-        return (productList.filterNot { it.productId == productToBeDeleted.productId }).toMutableStateList()
-    }
-*/
     private fun sortProductsOffering(products: List<ProductOffering>) : List<ProductOffering> {
         //val result = products.sortedByDescending { parseDateTime(it.dateCreated) }
         //Log.i("sorting products", "no ${result.size}")
@@ -345,6 +329,21 @@ object LocalDatabaseManager {
 
     private fun sortAcceptBids(bids: List<AcceptBid>) : List<AcceptBid> {
         return bids.sortedByDescending { parseDateTime(it.acceptTime) }
+    }
+
+    private fun sortBidWithDetails(bids: List<BidWithDetails>) : List<BidWithDetails> {
+        return bids.sortedByDescending { parseDateTime(it.bid.bidTime) }
+    }
+
+    private fun addAndSortCurrentBidsDetails(bidDetail: BidWithDetails) {
+        if (currentBidsDetails.value.firstOrNull { it.bid.bidId == bidDetail.bid.bidId } == null) {
+            _currentBidsDetails.value.add(bidDetail)
+            _currentBidsDetails.value = sortBidWithDetails(currentBidsDetails.value.toList()).toMutableStateList()
+        }
+    }
+
+    fun updateChosenCurrentBid(bid: BidWithDetails) {
+        _chosenCurrentBid.value = bid
     }
 
     fun reloadUserAndProductOffering() {
@@ -362,6 +361,45 @@ object LocalDatabaseManager {
                 )
             } else {
                 Log.i("local database manager", "user's product is null or 0")
+            }
+        }
+    }
+
+
+    fun reloadCurrentBids() {
+        CoroutineScope(Dispatchers.IO).launch {
+            BarterRepository.getCurrentBidsById(FirebaseClient.currentUserFirebase.value!!.id)?.collect() {
+                userAndCurrentBids ->
+                if (userAndCurrentBids.isNotEmpty()) {
+                    _currentBids.value = userAndCurrentBids[0].currentBids.toMutableStateList()
+                    // retrieve product from local only, if it is not available, show not available
+                    // the product is supposed to be in the product offering available list
+                    // so it should be in the database
+                    retrieveProductOfferingAndBids()
+                }
+            }
+        }
+    }
+
+    private fun retrieveProductOfferingAndBids() {
+        // for each of the current bids, retrieve the product from database
+        // create a bid detail to hold the bid and the product
+        for (bid in currentBids.value) {
+            _currentBidsDetails.value = mutableStateListOf()
+            CoroutineScope(Dispatchers.IO).launch {
+                var product : ProductOffering?
+                var bids : List<Bid>
+                BarterRepository.getProductOfferingWithBids(bid.bidProductId)?.collect() { productWithBidsList ->
+                    if (productWithBidsList.isNotEmpty()) {
+                        product = productWithBidsList[0].productOffering
+                        bids = sortBids(productWithBidsList[0].bids)
+
+                        val bidDetails = BidWithDetails(acceptBid = null, product = product!!,
+                            bid = bid, currentBids = bids)
+                        //_currentBidsDetails.value.add(bidDetails)
+                        addAndSortCurrentBidsDetails(bidDetails)
+                    }
+                }
             }
         }
     }

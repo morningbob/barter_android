@@ -215,23 +215,7 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
                             textAlign = TextAlign.Start
                         )
                     }
-                    /*
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 5.dp),
-                    ) {
-                        DateTimeInfo(
-                            dateTimeString = acceptBid.acceptBid.acceptTime,
-                            modifier = Modifier
-                                .padding(top = 5.dp)
-                        )
-                    }
-
-                     */
-
                 }
-
             }
             Row(
                 modifier = Modifier
@@ -240,7 +224,7 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
                 horizontalArrangement = Arrangement.Center
             ) {
                 DateTimeInfo(
-                    dateTimeString = acceptBid.acceptBid.acceptTime,
+                    dateTimeString = acceptBid.acceptBid!!.acceptTime,
                     modifier = Modifier
                         .padding(top = 5.dp)
                 )

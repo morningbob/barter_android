@@ -7,7 +7,8 @@ import kotlinx.parcelize.Parcelize
 // access of product and bid of the corresponding accept bid more easily
 @Parcelize
 data class BidWithDetails(
-    var acceptBid: AcceptBid,
+    var acceptBid: AcceptBid?,
     var product : ProductOffering,
-    var bid : Bid
+    var bid : Bid,
+    var currentBids : List<Bid> = listOf()
 ) : Parcelable

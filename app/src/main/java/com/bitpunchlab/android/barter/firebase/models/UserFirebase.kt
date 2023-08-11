@@ -10,6 +10,7 @@ class UserFirebase {
     var userAcceptedBids = HashMap<String, AcceptBidFirebase>()
     // The bids that user offered and got accepted
     var userBidsAccepted = HashMap<String, AcceptBidFirebase>()
+    var userCurrentBids = HashMap<String, BidFirebase>()
 
     constructor()
 
@@ -18,7 +19,9 @@ class UserFirebase {
         acceptedBids: HashMap<String, AcceptBidFirebase> =
                     HashMap(),
         bidsAccepted: HashMap<String, AcceptBidFirebase> =
-                    HashMap()) {
+                    HashMap(),
+        currentBids: HashMap<String, BidFirebase> = hashMapOf()
+        ) {
         id = userId
         name = userName
         email = userEmail
@@ -26,5 +29,6 @@ class UserFirebase {
         productsOffering = offering
         userAcceptedBids = acceptedBids
         userBidsAccepted = bidsAccepted
+        userCurrentBids = currentBids
     }
 }

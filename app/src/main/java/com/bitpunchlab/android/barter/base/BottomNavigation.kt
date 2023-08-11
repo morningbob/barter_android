@@ -24,7 +24,7 @@ fun BottomBarNavigation(navController: NavHostController) {
         ProductsOfferingBuyer,
         ProductsOfferingUser,
         AcceptBidsList,
-        Report,
+        CurrentBids,
         Logout
     )
 

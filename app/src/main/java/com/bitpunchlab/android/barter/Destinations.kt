@@ -55,6 +55,24 @@ object AskingProductsList : Destinations {
     override val icon: Int = R.mipmap.productslist
 }
 
+object CurrentBids : Destinations {
+    override val title: String = "Current Bids"
+    override val route: String = "CurrentBids"
+    override val icon: Int = R.mipmap.records
+}
+
+object CurrentBidDetails : Destinations {
+    override val title: String = "Current Bid Details"
+    override val route: String = "CurrentBidDetails"
+    override val icon: Int = R.mipmap.records
+}
+
+object ActiveBids : Destinations {
+    override val title: String = "Active Bids"
+    override val route: String = "ActiveBids"
+    override val icon: Int = R.mipmap.list
+}
+
 object Sell : Destinations {
     override val title: String = "Sell"
     override val route: String = "Sell"
@@ -66,12 +84,6 @@ object Bid : Destinations {
     override val route: String = "Bid"
     override val icon: Int = R.mipmap.auction
 }
-
-//object BidForm : Destinations {
-//    override val title: String = "Bid Form"
-//    override val route: String = "BidForm"
-//    override val icon: Int = R.mipmap.auction
-//}
 
 object BidDetails : Destinations {
     override val title: String = "Bid Details"
@@ -115,11 +127,6 @@ object ReportDetails : Destinations {
     override val icon: Int = R.mipmap.report
 }
 
-object ImagesDisplay : Destinations {
-    override val title: String = "Images Display"
-    override val route: String = "ImagesDisplay"
-    override val icon: Int = R.mipmap.report
-}
 
 object Logout : Destinations {
     override val title: String = "Logout"

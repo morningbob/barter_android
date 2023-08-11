@@ -25,6 +25,9 @@ import androidx.navigation.compose.rememberNavController
 import com.bitpunchlab.android.barter.acceptBids.AcceptBidDetailsScreen
 import com.bitpunchlab.android.barter.acceptBids.AcceptBidsListScreen
 import com.bitpunchlab.android.barter.askingProducts.AskingProductsListScreen
+import com.bitpunchlab.android.barter.currentBids.ActiveBidsScreen
+import com.bitpunchlab.android.barter.currentBids.CurrentBidDetailsScreen
+import com.bitpunchlab.android.barter.currentBids.CurrentBidsScreen
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
@@ -207,11 +210,14 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
         composable(AcceptBidDetails.route) {
             AcceptBidDetailsScreen(navController)
         }
-        composable(Report.route) {
-            RecordsScreen(navController)
+        composable(CurrentBids.route) {
+            CurrentBidsScreen(navController)
         }
-        composable(ReportDetails.route) {
-            RecordDetailsScreen(navController)
+        composable(CurrentBidDetails.route) {
+            CurrentBidDetailsScreen(navController)
+        }
+        composable(ActiveBids.route) {
+            ActiveBidsScreen(navController)
         }
         composable(Logout.route) {
             LogoutScreen(navController)

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -305,13 +306,15 @@ fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifi
 
 @Composable
 fun CustomCard(modifier: Modifier = Modifier,
+               borderWidth: Dp = 3.dp,
+               borderColor: Color = BarterColor.textGreen,
                content: @Composable() () -> Unit,) {
     Card(
         modifier = Modifier
             .then(modifier),
         elevation = 10.dp,
         shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(3.dp, BarterColor.textGreen)
+        border = BorderStroke(borderWidth, borderColor)
     ) {
         content()
     }
@@ -764,23 +767,6 @@ fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<Stri
         } else {
             PlaceholderImage()
         }
-        /*
-            val bitmap = LoadImage(url = imageUrls[0])
-            if (bitmap.value != null) {
-                Image(
-                    bitmap = bitmap.value!!.asImageBitmap(),
-                    contentDescription = contentDes,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            } else {
-                PlaceholderImage()
-            }
-        } else {
-            PlaceholderImage()
-        }
-
-         */
     }
 }
 
