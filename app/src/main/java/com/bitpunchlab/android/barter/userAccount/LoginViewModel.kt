@@ -41,9 +41,6 @@ class LoginViewModel() : ViewModel() {
     private val _loginStatus = MutableStateFlow<LoginStatus>(LoginStatus.LOGGED_OUT)
     val loginStatus : StateFlow<LoginStatus> get() = _loginStatus
 
-    private val _resetPassStatus = MutableStateFlow<Int>(0)
-    val resetPassStatus : StateFlow<Int> get() = _resetPassStatus
-
     private val _loadingAlpha = MutableStateFlow<Float>(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha
 
@@ -69,10 +66,6 @@ class LoginViewModel() : ViewModel() {
 
     fun updateLoginStatus(status: LoginStatus) {
         _loginStatus.value = status
-    }
-
-    fun updateResetPassStatus(status: Int) {
-        _resetPassStatus.value = status
     }
 
     fun updateEmailInput(email: String) {

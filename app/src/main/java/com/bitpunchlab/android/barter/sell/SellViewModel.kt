@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
@@ -207,11 +208,16 @@ class SellViewModel : ViewModel() {
             updatedAskingProducts.add(newProduct)
         }
 
-        return CoroutineScope(Dispatchers.IO).async {
+        val result =  CoroutineScope(Dispatchers.IO).async {
             Log.i("process selling", "got images size: ${productImages.value.size}")
             FirebaseClient.processSelling(productOffering, productImages.value,
                 updatedAskingProducts, AskingProductInfo.askingImages.value)
         }.await()
+
+        // if the result of the operation is successful, we like to reload the products list
+        LocalDatabaseManager.reloadUserAndProductOffering()
+
+        return result
     }
 
     fun prepareImagesDisplay() {

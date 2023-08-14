@@ -11,6 +11,7 @@ object BarterColor {
     val lightGreen = Color(0xFFbff0bd)
     val medGreen = Color(0xFF19a10a)
     val green = Color(0xFF0c992b)
+    val darkGreen = Color(0xFF04470b)
     val lightYellow2 = Color(0xFFf7f7b5)
     val errorRed = Color(0xFFf26346)
     val textGreen = Color(0xFF075e08)

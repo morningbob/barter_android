@@ -2,6 +2,7 @@ package com.bitpunchlab.android.barter.firebase
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.bitpunchlab.android.barter.BarterNavigation
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
@@ -554,6 +555,17 @@ object FirebaseClient {
         )
 
         val resultProduct = resultProductDeferred.await()
+
+        // here we save the convert the product firebase to product
+        // and save it in local database if the resultProduct is true
+        if (resultProduct) {
+            val product = convertProductFirebaseToProduct(productFirebase)
+            // here, we don't need to wait for when it finish
+            // we just want the product offering to show in the user's product list sooner
+            CoroutineScope(Dispatchers.IO).launch {
+                BarterRepository.insertProductsOffering(listOf(product))
+            }
+        }
 
         return resultProduct && resultUpdateUser
     }

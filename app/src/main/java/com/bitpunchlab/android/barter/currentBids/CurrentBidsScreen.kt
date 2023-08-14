@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.currentBids
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,11 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.CurrentBidDetails
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.productOfferingDetails.BidRow
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun CurrentBidsScreen(navController: NavHostController,
                       currentBidsViewModel: CurrentBidsViewModel = remember {
@@ -47,40 +52,47 @@ fun CurrentBidsScreen(navController: NavHostController,
         .fillMaxSize()
         .background(BarterColor.lightGreen)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BarterColor.lightGreen),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Scaffold(
+            bottomBar = { BottomBarNavigation(navController) }
         ) {
-            TitleRow(
-                iconId = R.mipmap.records,
-                title = stringResource(id = R.string.current_bids),
-                modifier = Modifier
-                    .padding(top = 30.dp)
-                    .background(BarterColor.lightGreen)
-            )
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(BarterColor.lightGreen)
-                    .padding(start = 40.dp, end = 40.dp, top = 5.dp)
+                    .background(BarterColor.lightGreen),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TitleRow(
+                    iconId = R.mipmap.records,
+                    title = stringResource(id = R.string.current_bids),
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .background(BarterColor.lightGreen)
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(BarterColor.lightGreen)
+                        .padding(start = 40.dp, end = 40.dp, top = 5.dp, bottom = 100.dp)
                     //.verticalScroll(rememberScrollState())
 
-            ) {
-                items(currentBids.value, { details -> details.bid.bidId }) { details ->
-                    // the bid row shows the product offered in the bid
-                    BidRow(
-                        bid = details.bid,
-                        onClick = {
-                            LocalDatabaseManager.updateChosenCurrentBid(details)
-                            currentBidsViewModel.updateShouldDisplayDetails(true)
-                        },
-                    )
+                ) {
+                    items(currentBids.value, { details -> details.bid.bidId }) { details ->
+                        // the bid row shows the product offered in the bid
+                        BidRow(
+                            bid = details.bid,
+                            product = details.product,
+                            onClick = {
+                                LocalDatabaseManager.updateChosenCurrentBid(details)
+                                currentBidsViewModel.updateShouldDisplayDetails(true)
+                            },
+                            //modifier = Modifier
+                            //.padding(bottom = 8.dp)
+                        )
+                    }
                 }
+
             }
 
         }
-
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.ActiveBids
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomCard
 import com.bitpunchlab.android.barter.base.DateTimeInfo
@@ -43,6 +44,7 @@ fun CurrentBidDetailsScreen(navController: NavHostController,
 
     val chosenCurrentBid by LocalDatabaseManager.chosenCurrentBid.collectAsState()
     val shouldShowActiveBids by currentBidDetailsViewModel.shouldShowActiveBids.collectAsState()
+    val shouldDismiss by currentBidDetailsViewModel.shouldDismiss.collectAsState()
 
     LaunchedEffect(key1 = shouldShowActiveBids) {
         if (shouldShowActiveBids) {
@@ -50,96 +52,111 @@ fun CurrentBidDetailsScreen(navController: NavHostController,
         }
     }
 
+    LaunchedEffect(key1 = shouldDismiss) {
+        if (shouldDismiss) {
+            navController.popBackStack()
+        }
+    }
 
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .background(BarterColor.lightGreen)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BarterColor.lightGreen)
-                .padding(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // show bid details, show product image, show current bids
-            // bid: seller name, buyer name, product image, bid product image
-            // date and time, current bids button, product button, bid button
-            TitleRow(
-                iconId = R.mipmap.law,
-                title = "Current Bid Details",
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(BarterColor.lightGreen)
+            //.padding(top = 20.dp, bottom = 20.dp, start = 40.dp, end = 40.dp)
+            .verticalScroll(rememberScrollState()),) {
+            CancelCross(onCancel = { currentBidDetailsViewModel.updateShouldDismiss(true) })
+
+            Column(
                 modifier = Modifier
-                    //.padding(top = 30.dp)
-            )
-            if (chosenCurrentBid!!.product.images.isNotEmpty()) {
-                CustomCard(
+                    .fillMaxWidth()
+                    .background(BarterColor.lightGreen)
+                    .padding(top = 5.dp, bottom = 20.dp, start = 40.dp, end = 40.dp),
+                //.verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // show bid details, show product image, show current bids
+                // bid: seller name, buyer name, product image, bid product image
+                // date and time, current bids button, product button, bid button
+
+                TitleRow(
+                    iconId = R.mipmap.law,
+                    title = "Current Bid Details",
                     modifier = Modifier
-                        .background(Color.Transparent)
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, start = 60.dp, end = 60.dp),
-                    borderWidth = 25.dp,
-                    borderColor = Color.Yellow
-                ) {
+                    //.padding(top = 30.dp)
+                )
+                if (chosenCurrentBid!!.product.images.isNotEmpty()) {
                     CustomCard(
-                        borderColor = Color.Yellow,
-                        modifier = Modifier//.fillMaxSize()
+                        modifier = Modifier
+                            .background(Color.Transparent)
+                            .fillMaxWidth()
+                            .padding(top = 20.dp, start = 60.dp, end = 60.dp),
+                        borderWidth = 25.dp,
+                        borderColor = Color.Yellow
+                    ) {
+                        CustomCard(
+                            borderColor = Color.Yellow,
+                            modifier = Modifier//.fillMaxSize()
+                        ) {
+                            LoadedImageOrPlaceholder(
+                                imageUrls = chosenCurrentBid!!.product.images,
+                                contentDes = "the product user is currently bidding for",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            )
+                        }
+                    }
+
+                } else {
+                    Log.i("current bid details", "product image is null")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 30.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.mipmap.decree),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .width(80.dp)
+                    )
+
+                    CustomCard(
+                        //borderColor = Color.Yellow
+                        modifier = Modifier
+                            .padding(start = 30.dp)
+                            .width(150.dp)
                     ) {
                         LoadedImageOrPlaceholder(
-                            imageUrls = chosenCurrentBid!!.product.images,
-                            contentDes = "the product user is currently bidding for",
+                            imageUrls = chosenCurrentBid!!.bid.bidProduct.images,
+                            contentDes = "the product user offered",
                             modifier = Modifier
                                 .fillMaxSize()
+                            //.width(150.dp)
                         )
                     }
                 }
-
-            } else {
-                Log.i("current bid details", "product image is null")
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 30.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.decree),
-                    contentDescription = "",
+                DateTimeInfo(
+                    dateTimeString = chosenCurrentBid!!.bid.bidTime,
                     modifier = Modifier
-                        .width(80.dp)
+                        .padding(top = 20.dp)
                 )
 
-                CustomCard(
-                    //borderColor = Color.Yellow
+                CustomButton(
+                    label = "Show Current Bids",
+                    onClick = { currentBidDetailsViewModel.updateShouldShowActiveBids(true) },
                     modifier = Modifier
-                        .padding(start = 30.dp)
-                        .width(150.dp)
-                ) {
-                    LoadedImageOrPlaceholder(
-                        imageUrls = chosenCurrentBid!!.bid.bidProduct.images,
-                        contentDes = "the product user offered",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            //.width(150.dp)
-                    )
-                }
+                        .padding(top = 20.dp)
+                )
+
             }
-            DateTimeInfo(
-                dateTimeString = chosenCurrentBid!!.bid.bidTime,
-                modifier = Modifier
-                    .padding(top = 20.dp)
-            )
-
-            CustomButton(
-                label = "Show Current Bids",
-                onClick = { currentBidDetailsViewModel.updateShouldShowActiveBids(true) },
-                modifier = Modifier
-                    .padding(top = 20.dp)
-            )
-
         }
+
     }
 }

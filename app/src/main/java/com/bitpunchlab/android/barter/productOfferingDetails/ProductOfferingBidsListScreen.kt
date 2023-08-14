@@ -29,6 +29,7 @@ import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.database.LocalDatabaseManager
+import com.bitpunchlab.android.barter.models.ProductOffering
 
 
 @Composable
@@ -89,13 +90,15 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
 }
 
 @Composable
-fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
+fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = null,
+           onClick: (Bid) -> Unit) {
     Surface() {
         CustomCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BarterColor.lightGreen)
                 .padding(top = 8.dp, bottom = 8.dp)
+
         ) {
             Row(
                 modifier = Modifier
@@ -103,6 +106,7 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
                     .background(BarterColor.lightBrown)
                     .padding(start = 20.dp, end = 20.dp)
                     .clickable { onClick.invoke(bid) }
+                    .then(modifier)
             ) {
                 Column(
                     modifier = Modifier
@@ -121,12 +125,12 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
                 }
                 Column() {
                     Text(
-                        text = bid.bidProduct?.name ?: "Not Available",
+                        text = "For ${bid.bidProduct?.name}", //?: "Not Available",
                         color = BarterColor.textGreen,
                         fontSize = 18.sp,
                         modifier = Modifier
                             .padding(top = 10.dp, start = 20.dp)
-                    )
+                    )/*
                     Text(
                         text = bid.bidProduct?.category ?: "Not Available",
                         color = BarterColor.textGreen,
@@ -134,6 +138,26 @@ fun BidRow(bid: Bid, onClick: (Bid) -> Unit) {
                         modifier = Modifier
                             .padding(top = 10.dp, start = 20.dp)
                     )
+                    */
+                    if (product != null) {
+                        Text(
+                            text = "From: ${product.userName}",
+                            color = BarterColor.textGreen,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .padding(top = 10.dp, start = 20.dp)
+                        )
+                    }
+                    /*
+                    Text(
+                        text = bid.bidUserName,
+                        color = BarterColor.textGreen,
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .padding(top = 10.dp, start = 20.dp)
+                    )
+
+                     */
                     DateTimeInfo(
                         dateTimeString = bid.bidTime,
                         modifier = Modifier

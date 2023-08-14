@@ -41,6 +41,7 @@ import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
+import com.bitpunchlab.android.barter.base.MenuBlock
 import com.bitpunchlab.android.barter.bid.BidFormScreen
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
@@ -149,78 +150,59 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 )
                         )
                     }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 50.dp)
-                    ) {
-                        Row(
+                    MenuBlock(modifier = Modifier, barHeight = 250.dp) {
+                        Column(
                             modifier = Modifier
-                                //.padding(top = 30.dp)
+                                .padding(start = 20.dp)
                         ) {
-                            Column(
+                            CustomButton(
+                                label = stringResource(R.string.images),
+                                onClick = {
+                                    productDetailsViewModel.updateShouldDisplayImages(true)
+                                },
                                 modifier = Modifier
-                                    .background(Color.Blue)
-                                    .width(15.dp)
-                                    .height(250.dp)
-                                    .padding(end = 20.dp)
-                            ) {
-
-                            }
-                                Column(
+                                    .padding(top = 0.dp)
+                            )
+                            CustomButton(
+                                label = stringResource(R.string.products_asked),
+                                onClick = {
+                                    ProductInfo.updateUserMode(userMode)
+                                    productDetailsViewModel.prepareAskingProducts()
+                                    productDetailsViewModel.updateShouldDisplayAskingProducts(
+                                        true
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(top = 10.dp)
+                            )
+                            if (userMode == UserMode.OWNER_MODE) {
+                                CustomButton(
+                                    label = stringResource(R.string.current_bids),
+                                    onClick = {
+                                        productDetailsViewModel.updateShouldShowBidsListStatus(1)
+                                    },
                                     modifier = Modifier
-                                        .padding(start = 20.dp)
-                                ) {
-                                    CustomButton(
-                                        label = stringResource(R.string.images),
-                                        onClick = {
-                                            productDetailsViewModel.updateShouldDisplayImages(true)
-                                        },
-                                        modifier = Modifier
-                                            .padding(top = 0.dp)
-                                    )
-                                    CustomButton(
-                                        label = stringResource(R.string.products_asked),
-                                        onClick = {
-                                            ProductInfo.updateUserMode(userMode)
-                                            productDetailsViewModel.prepareAskingProducts()
-                                            productDetailsViewModel.updateShouldDisplayAskingProducts(
-                                                true
-                                            )
-                                        },
-                                        modifier = Modifier
-                                            .padding(top = 10.dp)
-                                    )
-                                    if (userMode == UserMode.OWNER_MODE) {
-                                        CustomButton(
-                                            label = stringResource(R.string.current_bids),
-                                            onClick = {
-                                                productDetailsViewModel.updateShouldShowBidsListStatus(1)
-                                            },
-                                            modifier = Modifier
-                                                .padding(top = 10.dp)
-                                        )
-                                        CustomButton(
-                                            label = stringResource(R.string.delete_product),
-                                            onClick = {
-                                                productDetailsViewModel.confirmDelete()
-                                            },
-                                            modifier = Modifier
-                                                .padding(top = 10.dp)
-                                        )
+                                        .padding(top = 10.dp)
+                                )
+                                CustomButton(
+                                    label = stringResource(R.string.delete_product),
+                                    onClick = {
+                                        productDetailsViewModel.confirmDelete()
+                                    },
+                                    modifier = Modifier
+                                        .padding(top = 10.dp)
+                                )
 
-                                    } else {
-                                        CustomButton(
-                                            label = stringResource(R.string.bid),
-                                            onClick = {
-                                                productDetailsViewModel.updateShouldBid(true)
-                                            },
-                                            modifier = Modifier
-                                                .padding(top = 10.dp)
-                                        )
-                                    }
-                                }
+                            } else {
+                                CustomButton(
+                                    label = stringResource(R.string.bid),
+                                    onClick = {
+                                        productDetailsViewModel.updateShouldBid(true)
+                                    },
+                                    modifier = Modifier
+                                        .padding(top = 10.dp)
+                                )
+                            }
                         }
                     }
                 }

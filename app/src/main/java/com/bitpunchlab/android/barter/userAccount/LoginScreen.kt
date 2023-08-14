@@ -13,6 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,11 +56,18 @@ fun LoginScreen(navController: NavHostController,
     val emailInputError by loginViewModel.emailInputError.collectAsState()
 
     val onSignupClicked = { navController.navigate(Signup.route) }
+    var loading by remember { mutableStateOf(false) }
 
     // LaunchedEffect is used to run code that won't trigger recomposition of the view
     LaunchedEffect(key1 = isLoggedIn) {
         if (isLoggedIn) {
             navController.navigate(Main.route)
+        }
+    }
+
+    LaunchedEffect(key1 = loadingAlpha) {
+        if (loadingAlpha == 100f) {
+            loading = true
         }
     }
 
@@ -134,7 +144,7 @@ fun LoginScreen(navController: NavHostController,
                 CustomButton(
                     label = stringResource(id = R.string.login),
                     onClick = { loginViewModel.login() },
-                    enable = readyLogin,
+                    enable = readyLogin && !loading,
                     modifier = Modifier
                         .padding(top = 15.dp, bottom = 10.dp)
                         .fillMaxWidth()
@@ -166,7 +176,8 @@ fun LoginScreen(navController: NavHostController,
                         emailInputError = emailInputError,
                         updateEmail = { loginViewModel.updateEmailInput(it) },
                         resetPass = { loginViewModel.resetPassword() },
-                        onDismiss = { loginViewModel.updateLoginStatus(LoginStatus.LOGGED_OUT) }
+                        onDismiss = { loginViewModel.updateLoginStatus(LoginStatus.LOGGED_OUT) },
+                        loading = loading
                     )
                 }
             }
@@ -185,7 +196,7 @@ fun LoginScreen(navController: NavHostController,
 
 @Composable
 fun ResetPasswordForm(email: String, emailError: String, updateEmail: (String) -> Unit,
-    onSendClicked: () -> Unit) {
+    onSendClicked: () -> Unit, loading: Boolean = false) {
 
     val enableSend = (email != "" && emailError == "")
 
@@ -209,7 +220,7 @@ fun ResetPasswordForm(email: String, emailError: String, updateEmail: (String) -
         CustomButton(
             label = stringResource(id = R.string.reset_password),
             onClick = { onSendClicked.invoke() },
-            enable = enableSend,
+            enable = enableSend && !loading,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 50.dp)
@@ -221,7 +232,8 @@ fun ResetPasswordForm(email: String, emailError: String, updateEmail: (String) -
 fun ShowLoginStatus(status: LoginStatus, emailInput: String, emailInputError: String,
                     updateEmail: (String) -> Unit,
                     resetPass: () -> Unit,
-                    onDismiss: () -> Unit) {
+                    onDismiss: () -> Unit,
+                    loading: Boolean = false) {
     when (status) {
         LoginStatus.LOGIN_SERVER_ERROR -> {
             LoginFailureDialog(onDismiss)
@@ -231,7 +243,8 @@ fun ShowLoginStatus(status: LoginStatus, emailInput: String, emailInputError: St
                 email = emailInput,
                 emailError = emailInputError,
                 updateEmail = { updateEmail(it) },
-                onSendClicked = { resetPass() }
+                onSendClicked = { resetPass() },
+                loading = loading
             )
         }
         LoginStatus.RESET_PASSWORD_SUCCESS -> {

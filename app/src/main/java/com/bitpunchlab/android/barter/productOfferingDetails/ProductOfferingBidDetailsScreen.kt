@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -23,9 +24,12 @@ import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
+import com.bitpunchlab.android.barter.base.MenuBlock
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.AcceptBidStatus
 import com.bitpunchlab.android.barter.database.LocalDatabaseManager
+import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
+import com.bitpunchlab.android.barter.util.UserMode
 
 @Composable
 fun ProductOfferingBidDetailsScreen(navController: NavHostController,
@@ -33,6 +37,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
         remember {
             ProductOfferingBidDetailsViewModel()
         }) {
+    val userMode by ProductInfo.userMode.collectAsState()
     val chosenBid by LocalDatabaseManager.bidChosen.collectAsState()
     val imagesDisplay = LocalDatabaseManager.bidProductImages.collectAsState()
     val shouldDisplayImages by productOfferingBidDetailsViewModel.shouldDisplayImages.collectAsState()
@@ -72,20 +77,27 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     images = imagesDisplay.value,
                     updateShouldDisplayImages = { productOfferingBidDetailsViewModel.updateShouldDisplayImages(it) }
                 )
-                // confirm before execute
-                CustomButton(
-                    label = stringResource(R.string.accept_bid),
-                    onClick = { productOfferingBidDetailsViewModel.updateAcceptBidStatus(AcceptBidStatus.TO_CONFIRM) },
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                )
-                CustomButton(
-                    label = "Back",
-                    onClick = {
-                        //Log.i("bid details", "should show bid is set to false")
-                        productOfferingBidDetailsViewModel.updateShouldShowBid(false)
+
+                if (userMode == UserMode.OWNER_MODE) {
+                    // confirm before execute
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    )
+                    {
+                        CustomButton(
+                            label = stringResource(R.string.accept_bid),
+                            onClick = {
+                                productOfferingBidDetailsViewModel.updateAcceptBidStatus(
+                                    AcceptBidStatus.TO_CONFIRM
+                                )
+                            },
+                            modifier = Modifier
+                            //.padding()
+                        )
                     }
-                )
+                }
             }
             if (shouldDisplayImages) {
                 ImagesDisplayDialog(

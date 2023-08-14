@@ -58,7 +58,7 @@ object AskingProductsList : Destinations {
 object CurrentBids : Destinations {
     override val title: String = "Current Bids"
     override val route: String = "CurrentBids"
-    override val icon: Int = R.mipmap.records
+    override val icon: Int = R.mipmap.bidbar
 }
 
 object CurrentBidDetails : Destinations {
@@ -106,20 +106,15 @@ object AskProduct : Destinations {
 object AcceptBidsList : Destinations {
     override val title: String = "Accept Bids List"
     override val route: String = "AcceptBidsList"
-    override val icon: Int = R.mipmap.bidbar
+    override val icon: Int = R.mipmap.report
 }
 
 object AcceptBidDetails : Destinations {
     override val title: String = "Accept Bid Details"
     override val route: String = "AcceptBidDetails"
-    override val icon: Int = R.mipmap.bidbar
-}
-
-object Report : Destinations {
-    override val title: String = "Report"
-    override val route: String = "Report"
     override val icon: Int = R.mipmap.report
 }
+
 
 object ReportDetails : Destinations {
     override val title: String = "Report Details"

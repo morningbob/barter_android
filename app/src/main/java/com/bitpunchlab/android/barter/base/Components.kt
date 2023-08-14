@@ -64,6 +64,7 @@ import kotlinx.coroutines.channels.broadcast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.nio.file.attribute.BasicFileAttributeView
+import kotlin.math.min
 import kotlin.reflect.KClass
 
 @Composable
@@ -227,9 +228,35 @@ fun CustomCircularProgressBar() {
     CircularProgressIndicator(
         modifier = Modifier
             .size(80.dp),
-        color = BarterColor.green,
+        color = BarterColor.darkGreen,
         strokeWidth = 10.dp
     )
+}
+
+@Composable
+fun MenuBlock(modifier: Modifier, barHeight: Dp = 100.dp, content: @Composable() () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 50.dp)
+            .then(modifier)
+    ) {
+        Row(
+            modifier = Modifier
+
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(BarterColor.darkGreen)
+                    .width(15.dp)
+                    .height(barHeight)
+                    .padding(end = 20.dp)
+            ) {
+
+            }
+            content()
+        }
+    }
 }
 
 @Composable
@@ -499,7 +526,13 @@ fun BasicBidScreen(productName: String, productCategory: String,
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
+        TitleRow(
+            iconId = R.mipmap.hammer,
+            title = "Bid Details",
+            modifier = Modifier
+                .padding(top = 15.dp)
+        )
+/*
         Image(
             painter = painterResource(id = R.mipmap.hammer),
             contentDescription = "Bid's icon",
@@ -508,6 +541,8 @@ fun BasicBidScreen(productName: String, productCategory: String,
                 .width(120.dp)
         )
 
+
+ */
         if (images.isNotEmpty()) {
             Image(
                 bitmap = images[0].image!!.asImageBitmap(),
@@ -749,9 +784,17 @@ fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<Stri
                 }
                 LaunchedEffect(key1 = imageUrls[0]) {
                     Log.i("load image or placeholder", "loading bitmap from cloud")
-                    bitmap = loadImage(url = imageUrls[0])
+                    bitmap = CoroutineScope(Dispatchers.IO).async {
+                        loadImage(url = imageUrls[0])
+                    }.await()
+                    if (bitmap != null) {
+                        ImageHandler.saveImageExternalStorage(imageUrls[0], bitmap!!)
+                        Log.i("load image or placeholder", "saved image from cloud")
+                    }
                 }
-                //val bitmap = LoadImage(url = imageUrls[0])
+
+                // here, I check the bitmap again, since I can't return composable inside
+                // launch effect
                 if (bitmap != null) {
                     Log.i("load image or placeholder", "loaded bitmap from cloud")
                     Image(
