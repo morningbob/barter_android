@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.util.LoginStatus
+import com.bitpunchlab.android.barter.util.MainStatus
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
 import kotlinx.coroutines.CoroutineScope
@@ -37,19 +38,19 @@ class LoginViewModel() : ViewModel() {
     private val _emailInputError = MutableStateFlow("")
     val emailInputError : StateFlow<String> get() = _emailInputError.asStateFlow()
 
-    // 0 - no login, 1 - failed, 2 - success
     private val _loginStatus = MutableStateFlow<LoginStatus>(LoginStatus.LOGGED_OUT)
     val loginStatus : StateFlow<LoginStatus> get() = _loginStatus
 
     private val _loadingAlpha = MutableStateFlow<Float>(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha
 
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             combine(userEmail, userPassword, emailError, passError) { email, pass, emailEr, passEr ->
                 _readyLogin.value = emailEr == "" && passEr == "" && email != "" && pass != ""
             }.collect() {
-                Log.i("test errors", "ready login ${readyLogin.value}")
+                //Log.i("test errors", "ready login ${readyLogin.value}")
             }
         }
     }

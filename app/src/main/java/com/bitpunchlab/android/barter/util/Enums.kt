@@ -29,7 +29,15 @@ enum class MainStatus {
     SUCCESS,
     FAILED_INCORRECT_PASSWORD,
     FAILED_SERVER_ERROR,
-    FAILED_APPLICATION_ERROR
+    FAILED_APPLICATION_ERROR,
+}
+
+enum class DeleteAccountStatus {
+    NORMAL,
+    CONFIRM_DELETE,
+    CONFIRMED,
+    SUCCESS,
+    FAILURE
 }
 
 enum class LoginStatus {
@@ -41,6 +49,12 @@ enum class LoginStatus {
     RESET_EMAIL_NOT_FOUND,
     RESET_SERVER_ERROR,
     APP_ERROR
+}
+
+enum class SignUpStatus {
+    NORMAL,
+    SUCCESS,
+    FAILURE
 }
 
 enum class SetAskingProductStatus {

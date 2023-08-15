@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.userAccount
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
+import com.bitpunchlab.android.barter.util.SignUpStatus
 import com.bitpunchlab.android.barter.util.validateConfirmPassword
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
@@ -45,6 +46,9 @@ class SignupViewModel() : ViewModel() {
     private val _shouldDismiss = MutableStateFlow<Boolean>(false)
     val shouldDismiss : StateFlow<Boolean> get() = _shouldDismiss.asStateFlow()
 
+    private val _createACStatus = MutableStateFlow<SignUpStatus>(SignUpStatus.NORMAL)
+    val createACStatus : StateFlow<SignUpStatus> get() = _createACStatus.asStateFlow()
+
     // 1 - failed, 2 - success, 0 - no dialog
     //private val _shouldShowStatus = MutableStateFlow(0)
     //val shouldShowStatus : StateFlow<Int> get() = _shouldShowStatus.asStateFlow()
@@ -55,14 +59,19 @@ class SignupViewModel() : ViewModel() {
     init {
         CoroutineScope(Dispatchers.IO).launch {
             combine(
+                name,
+                email,
+                password,
+                confirmPassword,
                 nameError,
                 emailError,
                 passError,
                 confirmPassError
-            ) { name, email, pass, confirmPass ->
-                _readySignup.value = name == "" && email == "" && pass == "" && confirmPass == ""
+            ) { flows: Array<String> ->
+                _readySignup.value = (flows[0] != "" && flows[1] != "" && flows[2] != "" && flows[3] != "" && flows[4] == "" && flows[5] == "" &&
+                        flows[6] == "" && flows[7] == "")
             }.collect() {
-                Log.i("test error", "ready sign up ${readySignup.value}")
+                //Log.i("test error", "ready sign up ${readySignup.value}")
             }
         }
     }
@@ -90,10 +99,13 @@ class SignupViewModel() : ViewModel() {
         _loadingAlpha.value = 100f
         CoroutineScope(Dispatchers.IO).launch {
             if (FirebaseClient.processSignupAuth(name.value, email.value, password.value)) {
-                //_loadingAlpha.value = 0f
-            } else {
+                Log.i("signup", "firebase client processing")
+                _createACStatus.value = SignUpStatus.SUCCESS
                 _loadingAlpha.value = 0f
-                FirebaseClient.updateCreateACStatus(1)
+            } else {
+                Log.i("signup", "firebase client processing")
+                _loadingAlpha.value = 0f
+                _createACStatus.value = SignUpStatus.FAILURE
             }
         }
     }
@@ -104,6 +116,10 @@ class SignupViewModel() : ViewModel() {
 
     fun updateShouldDismiss(should: Boolean) {
         _shouldDismiss.value = should
+    }
+
+    fun updateCreateACStatus(status: SignUpStatus) {
+        _createACStatus.value = status
     }
 
 }

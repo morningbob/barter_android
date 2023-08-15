@@ -55,15 +55,15 @@ object FirebaseClient {
 
     private var auth = FirebaseAuth.getInstance()
     var isLoggedIn = MutableStateFlow<Boolean>(false)
-    var createAccount = false
+    private var createAccount = false
     // 0 - no registration, 1 - failure, 2 - success
-    private val _createACStatus = MutableStateFlow<Int>(0)
-    val createACStatus : StateFlow<Int> get() = _createACStatus.asStateFlow()
+    //private val _createACStatu = MutableStateFlow<Int>(0)
+    //val createACStatus : StateFlow<Int> get() = _createACStatus.asStateFlow()
 
     val _finishedAuthSignup = MutableStateFlow<Boolean>(false)
     val finishedAuthSignup : StateFlow<Boolean> get() = _finishedAuthSignup.asStateFlow()
 
-    private var shouldProcessUser = true
+    //private var shouldProcessUser = true
 
 
     private var authStateListener = FirebaseAuth.AuthStateListener { auth ->
@@ -156,9 +156,9 @@ object FirebaseClient {
         auth.signOut()
     }
 
-    fun updateCreateACStatus(status: Int) {
-        _createACStatus.value = status
-    }
+    //fun updateCreateACStatus(status: Int) {
+    //    _createACStatus.value = status
+    //}
 
     suspend fun signupAuth(email: String, password: String) =
         suspendCancellableCoroutine<Boolean> {cancellableContinuation ->
@@ -176,26 +176,41 @@ object FirebaseClient {
     }
 
     suspend fun processSignupAuth(name: String, email: String, password: String) : Boolean {
+
+
+        //suspendCancellableCoroutine { cancellableContinuation ->
         return CoroutineScope(Dispatchers.IO).async {
             createAccount = true
             if (signupAuth(email, password)) {
                 // pass the info to auth, when it is ready,
-                // we can create user and save to firestore
+                // we can create user and save to firestore\
+                Log.i("process signup auth", "observe auth signup")
                 finishedAuthSignup.collect() { finished ->
                     // reset
                     createAccount = false
+                    var result = false
                     if (finished) {
+                        Log.i("process signup auth", "observed finished $finished")
                         if (processSignupUserObject(name, email)) {
-                            _createACStatus.value = 2
+                            //_createACStatus.value = 2
+                            Log.i("process signup auth", "success")
+                            //cancellableContinuation.resume(true) {}
+                            result = true
                         } else {
-                            _createACStatus.value = 1
+                            //_createACStatus.value = 1
+                            Log.i("process signup auth", "failed")
+                            //cancellableContinuation.resume(false) {}
+                            //result = false
                         }
+                        return@collect result
                     }
                 }
-                true
             } else {
+                Log.i("process signup auth", "failed to sign up auth")
+                //cancellableContinuation.resume(false) {}
                 false
             }
+            //}
         }.await()
     }
 
@@ -875,5 +890,70 @@ object FirebaseClient {
                         cancellableContinuation.resume(false) {}
                     }
                 }
+        }
+
+    // we write the user object and product objects in Delete account collection
+    // I want to save the info here, so I know that it happened
+    // I also need the product info to delete the associated products in productsOffering
+    // It also serves as a backup in case users want to recover their account
+    // I also need to delete it in firebase auth
+    suspend fun processDeleteAccount() : Boolean {
+        if (currentUserFirebase.value != null) {
+            val authResultDeferred = CoroutineScope(Dispatchers.IO).async {
+                deleteAccountFromAuth()
+            }
+            val firestoreResultDeferred = CoroutineScope(Dispatchers.IO).async {
+                deleteAccountFromFirestore()
+            }
+            val authResult = authResultDeferred.await()
+            val firestoreResult = firestoreResultDeferred.await()
+
+            return (authResult && firestoreResult)
+        }
+        return false
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun deleteAccountFromAuth() : Boolean =
+        suspendCancellableCoroutine { cancellableContinuation ->
+        if (auth.currentUser != null) {
+            auth.currentUser!!.delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("delete auth user account", "success")
+                        cancellableContinuation.resume(true) {}
+                    } else {
+                        Log.i("delete auth user account", "failed ${task.exception}")
+                        cancellableContinuation.resume(false) {}
+                    }
+                }
+        } else {
+            Log.i("delete auth user account", "current user is null")
+            cancellableContinuation.resume(false) {}
+        }
+    }
+
+    // write to deleteUsers collection,
+    // cloud function will delete the user and the product offering
+    private suspend fun deleteAccountFromFirestore() : Boolean =
+        suspendCancellableCoroutine { cancellableContinuation ->
+            if (currentUserFirebase.value != null) {
+                Firebase.firestore
+                    .collection("deleteUsers")
+                    .document(currentUserFirebase.value!!.id)
+                    .set(currentUserFirebase.value!!)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.i("delete user object firestore", "success")
+                            cancellableContinuation.resume(true) {}
+                        } else {
+                            Log.i("delete user object firestore", "failed, ${task.exception}")
+                            cancellableContinuation.resume(false) {}
+                        }
+                    }
+            } else {
+                Log.i("delete user object firestore", "current user is null")
+                cancellableContinuation.resume(false) {}
+            }
         }
 }

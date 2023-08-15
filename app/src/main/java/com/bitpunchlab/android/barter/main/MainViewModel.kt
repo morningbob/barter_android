@@ -9,6 +9,7 @@ import com.bitpunchlab.android.barter.database.BarterRepository
 
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.util.DeleteAccountStatus
 import com.bitpunchlab.android.barter.util.MainStatus
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
 import com.bitpunchlab.android.barter.util.validatePassword
@@ -49,6 +50,9 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
     private val _mainStatus = MutableStateFlow<MainStatus>(MainStatus.NORMAL)
     val mainStatus : StateFlow<MainStatus> get() = _mainStatus.asStateFlow()
+
+    private val _deleteACStatus = MutableStateFlow<DeleteAccountStatus>(DeleteAccountStatus.NORMAL)
+    val deleteACStatus : StateFlow<DeleteAccountStatus> get() = _deleteACStatus.asStateFlow()
 
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
@@ -98,7 +102,7 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
                     _mainStatus.value = MainStatus.READY_CHANGE_PASSWORD
                 }
             }.collect() {
-                Log.i("f", "s")
+                //Log.i("f", "s")
             }
         }
     }
@@ -122,6 +126,10 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
         _mainStatus.value = status
     }
 
+    fun updateDeleteAccountStatus(status: DeleteAccountStatus) {
+        _deleteACStatus.value = status
+    }
+
     fun changePassword() {
         _loadingAlpha.value = 100f
         CoroutineScope(Dispatchers.IO).launch {
@@ -132,9 +140,21 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun logout() {
-        FirebaseClient.logout()
+    fun deleteAccount() {
+        _loadingAlpha.value = 100f
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = CoroutineScope(Dispatchers.IO).async {
+                FirebaseClient.processDeleteAccount()
+            }.await()
+            if (result) {
+                _deleteACStatus.value = DeleteAccountStatus.SUCCESS
+            } else {
+                _deleteACStatus.value = DeleteAccountStatus.FAILURE
+            }
+            _loadingAlpha.value = 0f
+        }
     }
+
 }
 
 class MainViewModelFactory(private val application: Application)

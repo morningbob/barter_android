@@ -25,6 +25,7 @@ import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.*
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.SignUpStatus
 
 @Composable
 fun SignupScreen(navController: NavHostController,
@@ -39,7 +40,7 @@ fun SignupScreen(navController: NavHostController,
     val passError by signupViewModel.passError.collectAsState()
     val confirmPassError by signupViewModel.confirmPassError.collectAsState()
     val readySignup by signupViewModel.readySignup.collectAsState()
-    val createACStatus by FirebaseClient.createACStatus.collectAsState()
+    val createACStatus by signupViewModel.createACStatus.collectAsState()
     val loadingAlpha by signupViewModel.loadingAlpha.collectAsState()
     val shouldDismiss by signupViewModel.shouldDismiss.collectAsState()
 
@@ -48,14 +49,12 @@ fun SignupScreen(navController: NavHostController,
     }
 
     LaunchedEffect(key1 = loadingAlpha) {
-        if (loadingAlpha == 100f) {
-            loading = true
-        }
+        loading = loadingAlpha == 100f
     }
 
     // LaunchedEffect is used to run code that won't trigger recomposition of the view
     LaunchedEffect(key1 = createACStatus) {
-        if (createACStatus == 2) {
+        if (createACStatus == SignUpStatus.SUCCESS) {
             navController.navigate(Main.route)
         }
     }
@@ -83,13 +82,13 @@ fun SignupScreen(navController: NavHostController,
                 contentDescription = "Sign up icon",
                 modifier = Modifier
                     .width(120.dp)
-                    .padding(top = 40.dp)
+                    .padding(top = 30.dp)
             )
 
                 TitleText(
                     title = stringResource(R.string.sign_up),
                     modifier = Modifier
-                        .padding(top = 40.dp, bottom = 30.dp)
+                        .padding(top = 20.dp, bottom = 30.dp)
                 )
 
                 CustomTextField(
@@ -97,13 +96,13 @@ fun SignupScreen(navController: NavHostController,
                     textValue = name,
                     onChange = { signupViewModel.updateName(it) },
                     modifier = Modifier
-                        .padding(top = 30.dp, bottom = 3.dp)
+                        .padding(top = 20.dp, bottom = 3.dp)
                         .fillMaxWidth())
 
                 ErrorText(
                     error = nameError,
                     modifier = Modifier
-                        .padding(bottom = 20.dp)
+                        .padding(bottom = 10.dp)
                         .fillMaxWidth()
                 )
 
@@ -118,7 +117,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = emailError,
                     modifier = Modifier
-                        .padding(bottom = 20.dp)
+                        .padding(bottom = 10.dp)
                         .fillMaxWidth()
                 )
 
@@ -126,6 +125,7 @@ fun SignupScreen(navController: NavHostController,
                     label = stringResource(id = R.string.password),
                     textValue = password,
                     onChange = { signupViewModel.updatePassword(it) },
+                    hide = true,
                     modifier = Modifier
                         .padding(bottom = 3.dp)
                         .fillMaxWidth())
@@ -133,7 +133,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = passError,
                     modifier = Modifier
-                        .padding(bottom = 20.dp)
+                        .padding(bottom = 10.dp)
                         .fillMaxWidth()
                 )
 
@@ -141,6 +141,7 @@ fun SignupScreen(navController: NavHostController,
                     label = stringResource(id = R.string.confirm_password),
                     textValue = confirmPassword,
                     onChange = { signupViewModel.updateConfirmPassword(it) },
+                    hide = true,
                     modifier = Modifier
                         .padding(bottom = 3.dp)
                         .fillMaxWidth())
@@ -148,7 +149,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = confirmPassError,
                     modifier = Modifier
-                        .padding(bottom = 20.dp)
+                        .padding(bottom = 10.dp)
                         .fillMaxWidth()
                 )
 
@@ -170,9 +171,12 @@ fun SignupScreen(navController: NavHostController,
                 )
             }
 
-        if (createACStatus != 0) {
+        if (createACStatus != SignUpStatus.NORMAL) {
             signupViewModel.updateLoadingAlpha(0f)
-            ShowStatusDialog(status = createACStatus)
+            ShowStatusDialog(
+                status = createACStatus,
+                onDismiss = { signupViewModel.updateCreateACStatus(SignUpStatus.NORMAL) }
+            )
         }
 
         Box(
@@ -180,7 +184,6 @@ fun SignupScreen(navController: NavHostController,
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(loadingAlpha),
-
         ) {
             CustomCircularProgressBar()
         }
@@ -188,10 +191,10 @@ fun SignupScreen(navController: NavHostController,
 }
 
 @Composable
-fun ShowStatusDialog(status: Int) {
+fun ShowStatusDialog(status: SignUpStatus, onDismiss: () -> Unit) {
     when (status) {
-        2 -> RegistrationSuccessDialog { FirebaseClient.updateCreateACStatus(0) }
-        1 -> RegistrationFailureDialog { FirebaseClient.updateCreateACStatus(0) }
+        SignUpStatus.SUCCESS -> RegistrationSuccessDialog(onDismiss)
+        SignUpStatus.FAILURE -> RegistrationFailureDialog(onDismiss)
         else -> 0
     }
 }
@@ -201,7 +204,7 @@ fun RegistrationSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
         title = stringResource(R.string.registration),
         message = stringResource(R.string.registration_alert_success_desc),
-        positiveText = "OK",
+        positiveText = stringResource(id = R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
     ) {}
@@ -213,7 +216,7 @@ fun RegistrationFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
         title = stringResource(R.string.registration),
         message = stringResource(R.string.registration_alert_failure_desc),
-        positiveText = "OK",
+        positiveText = stringResource(id = R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
     ) {}

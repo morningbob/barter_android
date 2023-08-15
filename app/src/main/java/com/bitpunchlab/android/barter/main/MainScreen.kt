@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -49,6 +50,7 @@ import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.userAccount.LoginViewModel
 import com.bitpunchlab.android.barter.util.AppStatus
+import com.bitpunchlab.android.barter.util.DeleteAccountStatus
 import com.bitpunchlab.android.barter.util.MainStatus
 import kotlinx.coroutines.flow.map
 
@@ -66,10 +68,18 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val newPassError by mainViewModel.newPassError.collectAsState()
     val confirmPassError by mainViewModel.confirmPassError.collectAsState()
     val readyChangePassword = mainStatus == MainStatus.READY_CHANGE_PASSWORD
+    val deleteAccountStatus by mainViewModel.deleteACStatus.collectAsState()
+    var loading by remember { mutableStateOf(false) }
 
     val loadingAlpha by mainViewModel.loadingAlpha.collectAsState()
 
     val userName = currentUser?.name ?: "there!"
+
+    LaunchedEffect(key1 = loadingAlpha) {
+        if (loadingAlpha == 100f) {
+            loading = true
+        }
+    }
 
     LaunchedEffect(key1 = isLoggedIn) {
         if (!isLoggedIn) {
@@ -111,7 +121,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 if (mainStatus == MainStatus.NORMAL) {
                     UserProfile(
                         user = currentUser,
-                        updateStatus = { mainViewModel.updateMainStatus(MainStatus.CHANGE_PASSWORD) },
+                        updateMainStatus = { mainViewModel.updateMainStatus(MainStatus.CHANGE_PASSWORD) },
                         modifier = Modifier
                             .background(BarterColor.lightGreen)
                             .padding(top = 30.dp, bottom = 100.dp)
@@ -119,7 +129,8 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                             .fillMaxHeight(0.6f),
                         contentModifier = Modifier
                             .background(BarterColor.lightGreen)
-                            .padding(top = 30.dp, bottom = 30.dp)
+                            .padding(top = 30.dp, bottom = 30.dp),
+                        updateDeleteStatus = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.CONFIRM_DELETE) }
                     )
 
                 } else {
@@ -145,6 +156,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         contentModifier = Modifier
                             .background(BarterColor.lightGreen)
                             .padding(top = 30.dp, bottom = 30.dp),
+                        loading = loading
                     )
 
                 }
@@ -164,6 +176,28 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 }
             }
 
+            if (deleteAccountStatus != DeleteAccountStatus.NORMAL
+                && deleteAccountStatus != DeleteAccountStatus.CONFIRMED) {
+                when (deleteAccountStatus) {
+                    DeleteAccountStatus.CONFIRM_DELETE -> {
+                        ConfirmDeleteAccountDialog(
+                            onConfirm = {
+                                mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.CONFIRMED)
+                                mainViewModel.deleteAccount()
+                            },
+                            onDismiss = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.NORMAL) }
+                        )
+                    }
+                    DeleteAccountStatus.SUCCESS -> {
+                        DeleteAccountSuccessDialog(onDismiss = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.NORMAL)})
+                    }
+                    DeleteAccountStatus.FAILURE -> {
+                        DeleteAccountFailureDialog(onDismiss = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.NORMAL)})
+                    }
+                    else -> 0
+                }
+            }
+
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -179,11 +213,13 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
 @Composable
 fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modifier,
-                user: User?, updateStatus: () -> Unit) {
+                user: User?, updateMainStatus: () -> Unit, updateDeleteStatus: () -> Unit) {
 
     CustomCard(modifier = Modifier.then(modifier)) {
         Column(
-            modifier = Modifier.then(contentModifier),
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -205,10 +241,19 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
             CustomButton(
                 label = stringResource(R.string.change_password),
                 onClick = {
-                    updateStatus()
+                    updateMainStatus()
                 },
                 modifier = Modifier
                     .padding(top = 20.dp)
+            )
+
+            CustomButton(
+                label = stringResource(R.string.delete_account),
+                onClick = {
+                    updateDeleteStatus()
+                },
+                modifier = Modifier
+                    .padding(top = 10.dp)
             )
         }
     }
@@ -220,7 +265,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                             currentPassError: String, newPassError: String, confirmPassError: String,
                             readyChangePassword: Boolean, updateCurrentPass: (String) -> Unit, updateNewPass: (String) -> Unit,
                             updateConfirmPass: (String) -> Unit, updateStatus: (MainStatus) -> Unit,
-                            changePassword: () -> Unit
+                            changePassword: () -> Unit, loading: Boolean = false
     ) {
     CustomCard(modifier = modifier) {
         Column(
@@ -285,7 +330,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 onClick = {
                     changePassword()
                 },
-                enable = readyChangePassword,
+                enable = readyChangePassword && !loading,
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .padding(top = 20.dp)
@@ -332,6 +377,46 @@ fun ChangePassIncorrectPassDialog(onDismiss: () -> Unit) {
     CustomDialog(
         title = stringResource(R.string.change_password),
         message = stringResource(R.string.change_pass_alert_incorrect_pass_desc),
+        positiveText = stringResource(R.string.ok),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    )
+
+}
+
+@Composable
+fun ConfirmDeleteAccountDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    CustomDialog(
+        title = stringResource(R.string.delete_account_confirmation),
+        message = "Please confirm that you want to delete your account.",
+        positiveText = stringResource(R.string.confirm),
+        negativeText = stringResource(id = R.string.cancel),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = {
+            onConfirm()
+            onDismiss.invoke() },
+        onNegative = { onDismiss() }
+    )
+
+}
+
+@Composable
+fun DeleteAccountSuccessDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = "Delete Account Success",
+        message = "Your account is deleted from the server.",
+        positiveText = stringResource(R.string.ok),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    )
+
+}
+
+@Composable
+fun DeleteAccountFailureDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = "Delete Account Failed",
+        message = "We couldn't process your delete account request now.  There is an error in the server.  Please try again later.",
         positiveText = stringResource(R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
