@@ -314,13 +314,15 @@ fun <T: Any> CustomDropDown(title: String, shouldExpand: Boolean,
 }
 
 @Composable
-fun ChoiceButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun ChoiceButton(modifier: Modifier = Modifier, title: String, enable: Boolean = true,
+                 onClick: () -> Unit, ) {
     Button(
         onClick = { onClick.invoke() },
         modifier = Modifier.then(modifier),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = BarterColor.green
-        )
+        ),
+        enabled = enable
 
     ) {
         Text(

@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewModel() },
     biddingStatus: BiddingStatus, updateBiddingStatus: (BiddingStatus) -> Unit, loadingAlpha: Float, resetStatus: () -> Unit,
     processBidding: (product: ProductOffering, bid: Bid, images: List<ProductImageToDisplay>) -> Unit,
-    updateShouldStartBidding: (Boolean) -> Unit
+    updateShouldStartBidding: (Boolean) -> Unit, loading: Boolean = false
 ) {
 
     val product by LocalDatabaseManager.productChosen.collectAsState()
@@ -201,26 +201,8 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                             } else {
                                 updateBiddingStatus(BiddingStatus.INVALID_INPUTS)
                             }
-                            //bidFormViewModel.clearForm()
-
-                            /*
-                            val bid = bidFormViewModel.createBid()
-                            if (product != null && bid != null) {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    processBidding(product!!, bid, imagesDisplay.value)
-                                    // I clear form here instead of after if clause
-                                    // because I want to clear it after the processing has been done.
-                                    bidFormViewModel.clearForm()
-                                }
-                            } else if (bid == null) {
-                                //Log.i("bid screen", "null product or bid")
-                                // alert user that the info is invalid
-                                bidFormViewModel.clearForm()
-                                updateBiddingStatus(BiddingStatus.INVALID_INPUTS)
-                            }
-
-                             */
                         },
+                        enable = !loading,
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                     )

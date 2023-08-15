@@ -19,11 +19,13 @@ import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.parseDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -335,10 +337,15 @@ object LocalDatabaseManager {
         return bids.sortedByDescending { parseDateTime(it.bid.bidTime) }
     }
 
+    @OptIn(InternalCoroutinesApi::class)
     private fun addAndSortCurrentBidsDetails(bidDetail: BidWithDetails) {
-        if (currentBidsDetails.value.firstOrNull { it.bid.bidId == bidDetail.bid.bidId } == null) {
-            _currentBidsDetails.value.add(bidDetail)
-            _currentBidsDetails.value = sortBidWithDetails(currentBidsDetails.value.toList()).toMutableStateList()
+        val lock = Any()
+        synchronized(lock) {
+            if (currentBidsDetails.value.firstOrNull { it.bid.bidId == bidDetail.bid.bidId } == null) {
+                _currentBidsDetails.value.add(bidDetail)
+                _currentBidsDetails.value =
+                    sortBidWithDetails(currentBidsDetails.value.toList()).toMutableStateList()
+            }
         }
     }
 

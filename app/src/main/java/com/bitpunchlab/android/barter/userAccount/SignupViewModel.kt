@@ -42,6 +42,9 @@ class SignupViewModel() : ViewModel() {
     private val _confirmPassError = MutableStateFlow("")
     val confirmPassError : StateFlow<String> get() = _confirmPassError.asStateFlow()
 
+    private val _shouldDismiss = MutableStateFlow<Boolean>(false)
+    val shouldDismiss : StateFlow<Boolean> get() = _shouldDismiss.asStateFlow()
+
     // 1 - failed, 2 - success, 0 - no dialog
     //private val _shouldShowStatus = MutableStateFlow(0)
     //val shouldShowStatus : StateFlow<Int> get() = _shouldShowStatus.asStateFlow()
@@ -97,6 +100,10 @@ class SignupViewModel() : ViewModel() {
 
     fun updateLoadingAlpha(alpha: Float) {
         _loadingAlpha.value = alpha
+    }
+
+    fun updateShouldDismiss(should: Boolean) {
+        _shouldDismiss.value = should
     }
 
 }

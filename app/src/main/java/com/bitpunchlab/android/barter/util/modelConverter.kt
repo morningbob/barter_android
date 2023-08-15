@@ -60,10 +60,6 @@ fun convertProductOfferingToFirebase(product: ProductOffering, askingProducts: L
 fun convertProductFirebaseToProduct(productFirebase: ProductOfferingFirebase) : ProductOffering {
 
     val imagesList = sortElements(productFirebase.images)
-    //val askingProductsFirebase = sortElements(productFirebase.askingProducts)
-    //val askingProducts = askingProductsFirebase.map { each ->
-    //    convertProductFirebaseToProductAsking(each)
-    //}
 
     return ProductOffering(
         productId = productFirebase.id, name = productFirebase.name,

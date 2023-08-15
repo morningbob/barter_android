@@ -52,10 +52,19 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
     val processSellingStatus by sellViewModel.processSellingStatus.collectAsState()
     val loadingAlpha by sellViewModel.loadingAlpha.collectAsState()
     val shouldShowAsking by sellViewModel.shouldShowAsking.collectAsState()
+    var loading by remember {
+        mutableStateOf(false)
+    }
 
     var shouldCancel by remember { mutableStateOf(false) }
     
     val screenContext = LocalContext.current
+
+    LaunchedEffect(key1 = loadingAlpha) {
+        if (loadingAlpha == 100f) {
+            loading = true
+        }
+    }
 
     LaunchedEffect(key1 = shouldCancel) {
         if (shouldCancel) {
@@ -132,6 +141,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                     ChoiceButton(
                         title = stringResource(id = R.string.send),
                         onClick = { sellViewModel.onSendClicked() },
+                        enable = !loading,
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                         )

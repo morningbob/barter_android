@@ -10,6 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -38,11 +41,28 @@ fun SignupScreen(navController: NavHostController,
     val readySignup by signupViewModel.readySignup.collectAsState()
     val createACStatus by FirebaseClient.createACStatus.collectAsState()
     val loadingAlpha by signupViewModel.loadingAlpha.collectAsState()
+    val shouldDismiss by signupViewModel.shouldDismiss.collectAsState()
+
+    var loading by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = loadingAlpha) {
+        if (loadingAlpha == 100f) {
+            loading = true
+        }
+    }
 
     // LaunchedEffect is used to run code that won't trigger recomposition of the view
     LaunchedEffect(key1 = createACStatus) {
         if (createACStatus == 2) {
             navController.navigate(Main.route)
+        }
+    }
+
+    LaunchedEffect(key1 = shouldDismiss) {
+        if (shouldDismiss) {
+            navController.popBackStack()
         }
     }
 
@@ -136,9 +156,17 @@ fun SignupScreen(navController: NavHostController,
                     label = stringResource(id = R.string.send),
                     onClick = { signupViewModel.signup() },
                     modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .fillMaxWidth(),
+                    enable = readySignup && !loading
+                )
+
+                CustomButton(
+                    label = stringResource(id = R.string.cancel),
+                    onClick = { signupViewModel.updateShouldDismiss(true) },
+                    modifier = Modifier
                         .padding(bottom = 50.dp)
                         .fillMaxWidth(),
-                    enable = readySignup
                 )
             }
 

@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -72,6 +74,16 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
     val deleteImageStatus by productDetailsViewModel.deleteImageStatus.collectAsState()
     val biddingStatus by productDetailsViewModel.biddingStatus.collectAsState()
     val imagesDisplay = productDetailsViewModel.imagesDisplay.collectAsState()
+
+    var loading by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = loadingAlpha) {
+        if (loadingAlpha == 100f) {
+            loading = true
+        }
+    }
 
     LaunchedEffect(key1 = shouldPopDetails) {
         if (shouldPopDetails) {
@@ -260,7 +272,8 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             productDetailsViewModel.processBidding(product, bid, images)
                         },
                         updateBiddingStatus = { productDetailsViewModel.updateBiddingStatus(it) },
-                        updateShouldStartBidding = { productDetailsViewModel.updateShouldBid(it) }
+                        updateShouldStartBidding = { productDetailsViewModel.updateShouldBid(it) },
+                        loading = loading
                     )
                 }
             }
