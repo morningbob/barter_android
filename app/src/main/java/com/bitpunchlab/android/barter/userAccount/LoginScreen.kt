@@ -42,7 +42,9 @@ import com.bitpunchlab.android.barter.util.LoginStatus
 
 @Composable
 fun LoginScreen(navController: NavHostController,
-                 loginViewModel: LoginViewModel = LoginViewModel()) {
+                 loginViewModel: LoginViewModel = remember {
+                     LoginViewModel()
+                 }) {
 
     val userEmail by loginViewModel.userEmail.collectAsState()
     val userPassword by loginViewModel.userPassword.collectAsState()

@@ -71,7 +71,7 @@ class SignupViewModel() : ViewModel() {
                 _readySignup.value = (flows[0] != "" && flows[1] != "" && flows[2] != "" && flows[3] != "" && flows[4] == "" && flows[5] == "" &&
                         flows[6] == "" && flows[7] == "")
             }.collect() {
-                //Log.i("test error", "ready sign up ${readySignup.value}")
+                Log.i("test error", "ready sign up ${readySignup.value}")
             }
         }
     }
@@ -97,17 +97,10 @@ class SignupViewModel() : ViewModel() {
 
     fun signup() {
         _loadingAlpha.value = 100f
-        CoroutineScope(Dispatchers.IO).launch {
-            if (FirebaseClient.processSignupAuth(name.value, email.value, password.value)) {
-                Log.i("signup", "firebase client processing")
-                _createACStatus.value = SignUpStatus.SUCCESS
-                _loadingAlpha.value = 0f
-            } else {
-                Log.i("signup", "firebase client processing")
-                _loadingAlpha.value = 0f
-                _createACStatus.value = SignUpStatus.FAILURE
-            }
-        }
+        //CoroutineScope(Dispatchers.IO).launch {
+            Log.i("signup", "firebase client processing")
+            FirebaseClient.processSignupAuth(name.value, email.value, password.value)
+        //}
     }
 
     fun updateLoadingAlpha(alpha: Float) {
@@ -120,6 +113,13 @@ class SignupViewModel() : ViewModel() {
 
     fun updateCreateACStatus(status: SignUpStatus) {
         _createACStatus.value = status
+    }
+
+    fun clearFields() {
+        _email.value = ""
+        _name.value = ""
+        _password.value = ""
+        _confirmPassword.value = ""
     }
 
 }

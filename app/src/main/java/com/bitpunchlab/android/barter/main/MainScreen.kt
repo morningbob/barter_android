@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.main
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -74,6 +75,8 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val loadingAlpha by mainViewModel.loadingAlpha.collectAsState()
 
     val userName = currentUser?.name ?: "there!"
+
+    Log.i("main", "visited")
 
     LaunchedEffect(key1 = loadingAlpha) {
         if (loadingAlpha == 100f) {

@@ -327,7 +327,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                     updateExpandCat(false)
                 },
                 onDismiss = {  },
-                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
+                items = listOf(Category.DICTIONARY, Category.TOYS, Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp)

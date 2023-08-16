@@ -60,11 +60,15 @@ object FirebaseClient {
     //private val _createACStatu = MutableStateFlow<Int>(0)
     //val createACStatus : StateFlow<Int> get() = _createACStatus.asStateFlow()
 
-    val _finishedAuthSignup = MutableStateFlow<Boolean>(false)
-    val finishedAuthSignup : StateFlow<Boolean> get() = _finishedAuthSignup.asStateFlow()
+    private val _finishedAuthSignup = MutableStateFlow<Boolean>(false)
+    private val finishedAuthSignup : StateFlow<Boolean> get() = _finishedAuthSignup.asStateFlow()
 
-    //private var shouldProcessUser = true
+    private val _signUpResult = MutableStateFlow(0)
+    val signUpResult : StateFlow<Int> get() = _signUpResult.asStateFlow()
 
+    fun updateSignUpResult(result: Int) {
+        _signUpResult.value = result
+    }
 
     private var authStateListener = FirebaseAuth.AuthStateListener { auth ->
         if (auth.currentUser != null) {
@@ -175,12 +179,11 @@ object FirebaseClient {
         }
     }
 
-    suspend fun processSignupAuth(name: String, email: String, password: String) : Boolean {
-
-
+    fun processSignupAuth(name: String, email: String, password: String)  {
         //suspendCancellableCoroutine { cancellableContinuation ->
-        return CoroutineScope(Dispatchers.IO).async {
+        CoroutineScope(Dispatchers.IO).launch {
             createAccount = true
+            //var result = false
             if (signupAuth(email, password)) {
                 // pass the info to auth, when it is ready,
                 // we can create user and save to firestore\
@@ -188,30 +191,35 @@ object FirebaseClient {
                 finishedAuthSignup.collect() { finished ->
                     // reset
                     createAccount = false
-                    var result = false
+
                     if (finished) {
                         Log.i("process signup auth", "observed finished $finished")
                         if (processSignupUserObject(name, email)) {
                             //_createACStatus.value = 2
                             Log.i("process signup auth", "success")
                             //cancellableContinuation.resume(true) {}
-                            result = true
+                            //result = true
+                            _signUpResult.value = 2
                         } else {
                             //_createACStatus.value = 1
                             Log.i("process signup auth", "failed")
                             //cancellableContinuation.resume(false) {}
                             //result = false
+                            _signUpResult.value = 1
                         }
-                        return@collect result
+
                     }
+                    //result
                 }
+                //result
             } else {
                 Log.i("process signup auth", "failed to sign up auth")
                 //cancellableContinuation.resume(false) {}
-                false
+                _signUpResult.value = 1
+                //false
             }
             //}
-        }.await()
+        }
     }
 
     private suspend fun processSignupUserObject(name: String, email: String) : Boolean {

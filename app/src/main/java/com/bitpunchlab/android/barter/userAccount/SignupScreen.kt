@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.userAccount
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,7 +30,7 @@ import com.bitpunchlab.android.barter.util.SignUpStatus
 
 @Composable
 fun SignupScreen(navController: NavHostController,
-                 signupViewModel: SignupViewModel = SignupViewModel()) {
+                 signupViewModel: SignupViewModel = remember { SignupViewModel() }) {
 
     val name by signupViewModel.name.collectAsState()
     val email by signupViewModel.email.collectAsState()
@@ -40,12 +41,28 @@ fun SignupScreen(navController: NavHostController,
     val passError by signupViewModel.passError.collectAsState()
     val confirmPassError by signupViewModel.confirmPassError.collectAsState()
     val readySignup by signupViewModel.readySignup.collectAsState()
+    val signUpStatusFirebase by FirebaseClient.signUpResult.collectAsState()
+
     val createACStatus by signupViewModel.createACStatus.collectAsState()
     val loadingAlpha by signupViewModel.loadingAlpha.collectAsState()
     val shouldDismiss by signupViewModel.shouldDismiss.collectAsState()
 
     var loading by remember {
         mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = signUpStatusFirebase) {
+        if (signUpStatusFirebase == 2) {
+            signupViewModel.clearFields()
+            signupViewModel.updateCreateACStatus(SignUpStatus.NORMAL)
+            //signupViewModel.updateShouldDismiss(false)
+            FirebaseClient.updateSignUpResult(0)
+            navController.navigate(Main.route)
+            Log.i("sign up", "assigned success")
+        } else if (signUpStatusFirebase == 1) {
+            signupViewModel.updateCreateACStatus(SignUpStatus.FAILURE)
+            Log.i("sign up", "assigned failure")
+        }
     }
 
     LaunchedEffect(key1 = loadingAlpha) {
@@ -55,12 +72,13 @@ fun SignupScreen(navController: NavHostController,
     // LaunchedEffect is used to run code that won't trigger recomposition of the view
     LaunchedEffect(key1 = createACStatus) {
         if (createACStatus == SignUpStatus.SUCCESS) {
-            navController.navigate(Main.route)
+            //navController.navigate(Main.route)
         }
     }
 
     LaunchedEffect(key1 = shouldDismiss) {
         if (shouldDismiss) {
+            signupViewModel.updateShouldDismiss(false)
             navController.popBackStack()
         }
     }
@@ -164,14 +182,19 @@ fun SignupScreen(navController: NavHostController,
 
                 CustomButton(
                     label = stringResource(id = R.string.cancel),
-                    onClick = { signupViewModel.updateShouldDismiss(true) },
+                    onClick = {
+                        signupViewModel.updateCreateACStatus(SignUpStatus.NORMAL)
+                        signupViewModel.updateShouldDismiss(true)
+                              },
                     modifier = Modifier
                         .padding(bottom = 50.dp)
                         .fillMaxWidth(),
                 )
             }
 
-        if (createACStatus != SignUpStatus.NORMAL) {
+        //if (createACStatus != SignUpStatus.NORMAL && createACStatus != SignUpStatus.SUCCESS) {
+        if (createACStatus == SignUpStatus.FAILURE) {
+            //Log.i("signup vm", "detected failure")
             signupViewModel.updateLoadingAlpha(0f)
             ShowStatusDialog(
                 status = createACStatus,
@@ -205,8 +228,8 @@ fun RegistrationSuccessDialog(onDismiss: () -> Unit) {
         title = stringResource(R.string.registration),
         message = stringResource(R.string.registration_alert_success_desc),
         positiveText = stringResource(id = R.string.ok),
-        onDismiss = { onDismiss.invoke() },
-        onPositive = { onDismiss.invoke() }
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() }
     ) {}
 
 }
@@ -217,8 +240,8 @@ fun RegistrationFailureDialog(onDismiss: () -> Unit) {
         title = stringResource(R.string.registration),
         message = stringResource(R.string.registration_alert_failure_desc),
         positiveText = stringResource(id = R.string.ok),
-        onDismiss = { onDismiss.invoke() },
-        onPositive = { onDismiss.invoke() }
+        onDismiss = { onDismiss() },
+        onPositive = { onDismiss() }
     ) {}
 
 }

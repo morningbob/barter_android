@@ -157,7 +157,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                             bidFormViewModel.updateShouldExpandCategoryDropdown(false)
                           },
                         onDismiss = { bidFormViewModel.updateShouldExpandCategoryDropdown(false) },
-                        items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
+                        items = listOf(Category.DICTIONARY, Category.TOYS, Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 25.dp)
