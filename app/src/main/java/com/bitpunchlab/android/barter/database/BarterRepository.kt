@@ -12,6 +12,7 @@ import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndAcceptBid
 import com.bitpunchlab.android.barter.models.UserAndBid
+import com.bitpunchlab.android.barter.models.UserAndMessage
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -120,6 +121,11 @@ object BarterRepository {
     suspend fun getCurrentBidsById(id: String) : Flow<List<UserAndBid>>? =
         CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getUserAndBidsById(id)
+        }.await()
+
+    suspend fun getUserAndMessageById(id: String) : Flow<List<UserAndMessage>>? =
+        CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getUserAndMessageById(id)
         }.await()
 }
 

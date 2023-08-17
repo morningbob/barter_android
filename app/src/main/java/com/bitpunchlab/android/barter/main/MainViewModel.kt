@@ -54,6 +54,9 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
     private val _deleteACStatus = MutableStateFlow<DeleteAccountStatus>(DeleteAccountStatus.NORMAL)
     val deleteACStatus : StateFlow<DeleteAccountStatus> get() = _deleteACStatus.asStateFlow()
 
+    private val _shouldNavigateMessages = MutableStateFlow(false)
+    val shouldNavigateMessages : StateFlow<Boolean> get() = _shouldNavigateMessages.asStateFlow()
+
     private val _loadingAlpha = MutableStateFlow(0f)
     val loadingAlpha : StateFlow<Float> get() = _loadingAlpha.asStateFlow()
 
@@ -128,6 +131,10 @@ class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
     fun updateDeleteAccountStatus(status: DeleteAccountStatus) {
         _deleteACStatus.value = status
+    }
+
+    fun updateShouldNavigateMessages(should: Boolean) {
+        _shouldNavigateMessages.value = should
     }
 
     fun changePassword() {

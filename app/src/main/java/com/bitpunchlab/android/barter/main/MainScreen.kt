@@ -34,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Login
+import com.bitpunchlab.android.barter.MessageList
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChoiceButton
@@ -71,12 +72,11 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val readyChangePassword = mainStatus == MainStatus.READY_CHANGE_PASSWORD
     val deleteAccountStatus by mainViewModel.deleteACStatus.collectAsState()
     var loading by remember { mutableStateOf(false) }
+    val shouldNavigateMessages by mainViewModel.shouldNavigateMessages.collectAsState()
 
     val loadingAlpha by mainViewModel.loadingAlpha.collectAsState()
 
     val userName = currentUser?.name ?: "there!"
-
-    Log.i("main", "visited")
 
     LaunchedEffect(key1 = loadingAlpha) {
         if (loadingAlpha == 100f) {
@@ -91,6 +91,12 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     inclusive = false
                 }
             }
+        }
+    }
+
+    LaunchedEffect(key1 = shouldNavigateMessages) {
+        if (shouldNavigateMessages) {
+            navController.navigate(MessageList.route)
         }
     }
 
@@ -118,6 +124,11 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     title = "Hello, ${userName}!",
                     modifier = Modifier
                         .padding(top = 30.dp)
+                )
+
+                ChoiceButton(
+                    title = "Messages",
+                    onClick = { mainViewModel.updateShouldNavigateMessages(true) }
                 )
 
                 // display change password input field only upon the button clicked

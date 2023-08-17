@@ -1,7 +1,6 @@
 package com.bitpunchlab.android.barter
 
 import android.Manifest
-import android.app.Instrumentation.ActivityResult
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -9,8 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -19,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.bitpunchlab.android.barter.acceptBids.AcceptBidDetailsScreen
 import com.bitpunchlab.android.barter.acceptBids.AcceptBidsListScreen
 import com.bitpunchlab.android.barter.askingProducts.AskingProductsListScreen
@@ -34,16 +33,15 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.main.MainScreen
 import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
+import com.bitpunchlab.android.barter.messages.MessageDetailsScreen
+import com.bitpunchlab.android.barter.messages.MessageListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidDetailsScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidsListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
 import com.bitpunchlab.android.barter.productsOfferingList.ProductsOfferingListScreen
 import com.bitpunchlab.android.barter.sell.AskingProductScreen
 import com.bitpunchlab.android.barter.sell.SellScreen
 import com.bitpunchlab.android.barter.sell.SellViewModel
-import com.bitpunchlab.android.barter.transactionRecords.RecordDetailsScreen
-import com.bitpunchlab.android.barter.transactionRecords.RecordsScreen
 import com.bitpunchlab.android.barter.ui.theme.BarterTheme
 import com.bitpunchlab.android.barter.userAccount.LoginScreen
 import com.bitpunchlab.android.barter.userAccount.LogoutScreen
@@ -204,12 +202,20 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
         composable(BidDetails.route) {
             ProductOfferingBidDetailsScreen(navController)
         }
-        composable(AcceptBidsList.route) {
+        composable(AcceptBidsList.route)
+         {
             AcceptBidsListScreen(navController)
         }
-        composable(AcceptBidDetails.route) {
-            AcceptBidDetailsScreen(navController)
+
+        composable("AcceptBidDetails/{bidMode}",
+            arguments = listOf(navArgument("bidMode") {
+                type = NavType.StringType
+                defaultValue = true.toString()
+            }))
+            { backStackEntry ->
+            AcceptBidDetailsScreen(navController, backStackEntry.arguments?.getString("bidMode"))
         }
+
         composable(CurrentBids.route) {
             CurrentBidsScreen(navController)
         }
@@ -219,6 +225,20 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
         composable(ActiveBids.route) {
             ActiveBidsScreen(navController)
         }
+
+        composable(MessageList.route) {
+            MessageListScreen(navController)
+        }
+
+        composable("MessageDetails/{messageMode}",
+            arguments = listOf(navArgument("messageMode") {
+                type = NavType.BoolType
+                defaultValue = true
+            }))
+        { navBackStackEntry ->
+            MessageDetailsScreen(navController, navBackStackEntry.arguments?.getBoolean("messageMode"))
+        }
+
         composable(Logout.route) {
             LogoutScreen(navController)
         }

@@ -7,11 +7,13 @@ import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
+import com.bitpunchlab.android.barter.firebase.models.MessageFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.Message
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -25,6 +27,7 @@ import com.bitpunchlab.android.barter.util.ProductOfferingDecomposed
 import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
+import com.bitpunchlab.android.barter.util.convertMessageToMessageFirebase
 import com.bitpunchlab.android.barter.util.convertProductAskingFirebaseToProductAsking
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
 import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
@@ -964,4 +967,29 @@ object FirebaseClient {
                 cancellableContinuation.resume(false) {}
             }
         }
+
+    suspend fun processSendMessage(message: Message) : Boolean {
+        val messageFirebase = convertMessageToMessageFirebase(message)
+        return CoroutineScope(Dispatchers.IO).async {
+            sendMessageFirebase(messageFirebase)
+        }.await()
+    }
+
+    private suspend fun sendMessageFirebase(messageFirebase: MessageFirebase) : Boolean =
+        suspendCancellableCoroutine { cancellableContinuation ->
+            Firebase.firestore
+                .collection("messagingUser")
+                .document(messageFirebase.id)
+                .set(messageFirebase)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("send message firebase", "success")
+                        cancellableContinuation.resume(true) {}
+                    } else {
+                        Log.i("send message firebase", "failed ${task.exception}")
+                        cancellableContinuation.resume(false) {}
+                }
+        }
+
+    }
 }

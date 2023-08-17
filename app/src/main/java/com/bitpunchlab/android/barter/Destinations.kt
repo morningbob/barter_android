@@ -122,6 +122,18 @@ object ReportDetails : Destinations {
     override val icon: Int = R.mipmap.report
 }
 
+object MessageList : Destinations {
+    override val title: String = "Message List"
+    override val route: String = "MessageList"
+    override val icon: Int = R.mipmap.report
+}
+
+object MessageDetails : Destinations {
+    override val title: String = "Message Details"
+    override val route: String = "MessageDetails"
+    override val icon: Int = R.mipmap.report
+}
+
 
 object Logout : Destinations {
     override val title: String = "Logout"

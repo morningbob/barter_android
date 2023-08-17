@@ -1,10 +1,12 @@
 package com.bitpunchlab.android.barter.util
 
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
+import com.bitpunchlab.android.barter.firebase.models.MessageFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductOfferingFirebase
 import com.bitpunchlab.android.barter.firebase.models.UserFirebase
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.Message
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.User
@@ -129,6 +131,22 @@ fun convertBidToBidFirebase(bid: Bid) : BidFirebase {
         time = bid.bidTime,
         acceptId = bid.acceptBidId,
         biddingProductId = bid.bidProductId
+    )
+}
+
+fun convertMessageToMessageFirebase(message: Message) : MessageFirebase {
+    return MessageFirebase(messageId = message.id, message = message.messageText,
+        ownerId = message.ownerUserId, otherId = message.otherUserId,
+        senderFlag = message.sender, ownerUser = message.ownerName, otherUser = message.otherName,
+        time = message.date)
+}
+
+fun convertMessageFirebaseToMessage(messageFirebase: MessageFirebase) : Message {
+    return Message(id = messageFirebase.id, messageText = messageFirebase.messageText,
+        ownerUserId = messageFirebase.ownerUserId,
+        otherUserId = messageFirebase.otherUserId, sender = messageFirebase.sender,
+        ownerName = messageFirebase.ownerName, otherName = messageFirebase.otherName,
+        date = messageFirebase.date
     )
 }
 

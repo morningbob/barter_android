@@ -18,15 +18,21 @@ import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.parseDateTime
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.internal.synchronized
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.UUID
 
 // the manager is responsible to retrieve various data from the local database
@@ -170,7 +176,7 @@ object LocalDatabaseManager {
     }
 
     @OptIn(InternalCoroutinesApi::class)
-    private fun addAndSortCurrentBidsDetails(bidDetail: BidWithDetails) {
+    private fun addAndSortCurrentBidsDetail(bidDetail: BidWithDetails) {
         val lock = Any()
         synchronized(lock) {
             if (currentBidsDetails.value.firstOrNull { it.bid.bidId == bidDetail.bid.bidId } == null) {
@@ -227,6 +233,7 @@ object LocalDatabaseManager {
             BarterRepository.getCurrentBidsById(FirebaseClient.currentUserFirebase.value!!.id)?.collect() {
                 userAndCurrentBids ->
                 if (userAndCurrentBids.isNotEmpty()) {
+                    Log.i("reload current bids", "loaded current bids")
                     _currentBids.value = userAndCurrentBids[0].currentBids.toMutableStateList()
                     // retrieve product from local only, if it is not available, show not available
                     // the product is supposed to be in the product offering available list
@@ -304,8 +311,6 @@ object LocalDatabaseManager {
                 }
             }
         }// end of first for loop
-
-
     }
 
     fun reloadProductAskingProduct(productOffering: ProductOffering) {
@@ -395,26 +400,75 @@ object LocalDatabaseManager {
         } // end of bid coroutine
     }
 
-    private fun retrieveProductOfferingAndBids() {
+    // as I get each new bid details, I store them in a temp list
+    // after I collect all bid details, I sort them
+    // it is then I update the currentBidsDetails
+    private suspend fun retrieveProductOfferingAndBids() {
         // for each of the current bids, retrieve the product from database
         // create a bid detail to hold the bid and the product
-        for (bid in currentBids.value) {
-            _currentBidsDetails.value = mutableStateListOf()
-            CoroutineScope(Dispatchers.IO).launch {
-                var product : ProductOffering?
-                var bids : List<Bid>
-                BarterRepository.getProductOfferingWithBids(bid.bidProductId)?.collect() { productWithBidsList ->
-                    if (productWithBidsList.isNotEmpty()) {
-                        product = productWithBidsList[0].productOffering
-                        bids = sortBids(productWithBidsList[0].bids)
+        val tempBidDetails = mutableListOf<BidWithDetails>()
+        val deferredList = mutableListOf<Deferred<Unit?>>()
+        CoroutineScope(Dispatchers.IO).launch {
+            for (bid in currentBids.value) {
+                Log.i("retrieve", "processing 1 bid")
+                deferredList.add(CoroutineScope(Dispatchers.IO).async {
+                    var product: ProductOffering?
+                    var bids: List<Bid>
+                    var gotResult = false
+                    BarterRepository.getProductOfferingWithBids(bid.bidProductId)
+                        ?.take(1)?.collect() { productWithBidsList ->
+                            if (productWithBidsList.isNotEmpty()) {
+                                product = productWithBidsList[0].productOffering
+                                bids = sortBids(productWithBidsList[0].bids)
 
-                        val bidDetails = BidWithDetails(acceptBid = null, product = product!!,
-                            bid = bid, currentBids = bids)
-                        //_currentBidsDetails.value.add(bidDetails)
-                        addAndSortCurrentBidsDetails(bidDetails)
-                    }
-                }
+                                val bidDetails = BidWithDetails(
+                                    acceptBid = null, product = product!!,
+                                    bid = bid, currentBids = bids
+                                )
+                                Log.i("retrieve and create bid", "added a bid")
+                                tempBidDetails.add(bidDetails)
+                                //_currentBidsDetails.value.add(bidDetails)
+                                //addAndSortCurrentBidsDetails(bidDetails)
+                                gotResult = true
+                            }
+
+                        }
+                })
             }
+            //Log.i("retrieve ", "finished for loop")
+            //Log.i("retrieve and create bid", "started all cor, waiting for result")
+            deferredList.awaitAll()
+            Log.i("retrieve", "got all bid result, assign to current bids")
+            // after the coroutine finish, we sort and update
+            //Log.i("retrieve", "no of temp bid ${tempBidDetails.size}")
+            _currentBidsDetails.value = sortBidWithDetails(tempBidDetails).toMutableStateList()
+        }
+    }
+
+    private suspend fun createBidDetails() =
+        suspendCancellableCoroutine<List<BidWithDetails>> { cancellableContinuation ->
+            val tempBidDetails = mutableListOf<BidWithDetails>()
+            for (bid in currentBids.value) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    var product: ProductOffering?
+                    var bids: List<Bid>
+                    BarterRepository.getProductOfferingWithBids(bid.bidProductId)
+                        ?.collect() { productWithBidsList ->
+                            if (productWithBidsList.isNotEmpty()) {
+                                product = productWithBidsList[0].productOffering
+                                bids = sortBids(productWithBidsList[0].bids)
+
+                                val bidDetails = BidWithDetails(
+                                    acceptBid = null, product = product!!,
+                                    bid = bid, currentBids = bids
+                                )
+                                //Log.i("retrieve and create bid", "added a bid")
+                                tempBidDetails.add(bidDetails)
+                                _currentBidsDetails.value.add(bidDetails)
+                                //addAndSortCurrentBidsDetails(bidDetails)
+                            }
+                        }
+                }
         }
     }
 

@@ -85,4 +85,7 @@
     <string name="confirm_bid_alert_desc">Please confirm that you want to make the bid.</string>
     <string name="delete_account">Delete Account</string>
     <string name="delete_account_confirmation">Delete Account Confirmation</string>
+    <string name="messages_received">Messages Received</string>
+    <string name="messages_sent">Messages Sent</string>
+    <string name="send_message">Send Message</string>
 </resources>

@@ -59,7 +59,7 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
 
     LaunchedEffect(key1 = shouldDisplayDetails) {
         if (shouldDisplayDetails) {
-            navController.navigate(AcceptBidDetails.route)
+            navController.navigate("AcceptBidDetails/{a}".replace(oldValue = "{a}", newValue = bidMode.value.toString()))
         }
     }
 

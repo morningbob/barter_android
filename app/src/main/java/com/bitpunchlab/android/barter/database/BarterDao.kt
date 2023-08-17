@@ -5,6 +5,7 @@ import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.Message
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -13,6 +14,7 @@ import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.models.UserAndAcceptBid
 import com.bitpunchlab.android.barter.models.UserAndBid
+import com.bitpunchlab.android.barter.models.UserAndMessage
 import com.bitpunchlab.android.barter.models.UserAndProductOffering
 import kotlinx.coroutines.flow.Flow
 
@@ -121,5 +123,19 @@ interface BarterDao {
     @Transaction
     @Query("SELECT * FROM users WHERE :id == id")
     fun getUserAndBidsById(id: String) : Flow<List<UserAndBid>>
+
+    @Transaction
+    @Query("SELECT * FROM users")
+    fun getUserAndMessage() : List<UserAndMessage>
+
+    @Transaction
+    @Query("SELECT * FROM users WHERE :id == id")
+    fun getUserAndMessageById(id: String) : Flow<List<UserAndMessage>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertMessages(vararg message: Message)
+
+    //@Query("SELECT * FROM messages")
+    //fun getAllMessages
 
 }

@@ -120,7 +120,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = nameError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .padding(bottom = 10.dp, start = 15.dp)
                         .fillMaxWidth()
                 )
 
@@ -135,7 +135,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = emailError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .padding(bottom = 10.dp, start = 15.dp)
                         .fillMaxWidth()
                 )
 
@@ -151,7 +151,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = passError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .padding(bottom = 10.dp, start = 15.dp)
                         .fillMaxWidth()
                 )
 
@@ -167,7 +167,7 @@ fun SignupScreen(navController: NavHostController,
                 ErrorText(
                     error = confirmPassError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .padding(bottom = 10.dp, start = 15.dp)
                         .fillMaxWidth()
                 )
 

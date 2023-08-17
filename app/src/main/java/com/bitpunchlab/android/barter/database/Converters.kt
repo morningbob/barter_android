@@ -2,6 +2,7 @@ package com.bitpunchlab.android.barter.database
 
 import androidx.room.TypeConverter
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.Message
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.google.gson.Gson
@@ -31,6 +32,16 @@ class Converters {
         return Gson().toJson(productsAsking)
     }
 
+    @TypeConverter
+    fun MessagesFromString(messagesString: String) : List<Message> {
+        val objectType = object : TypeToken<List<Message>>() {}.type
+        return Gson().fromJson<List<Message>>(messagesString, objectType)
+    }
+
+    @TypeConverter
+    fun MessagesToString(messages: List<Message>) : String {
+        return Gson().toJson(messages)
+    }
 
     @TypeConverter
     fun imagesFromString(imagesString: String) : List<String> {
