@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.database
 
 import com.bitpunchlab.android.barter.askingProducts.ConfirmDeleteProductDialog
+import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
@@ -41,6 +42,12 @@ object BarterRepository {
     fun getAllProductOffering(): Flow<List<ProductOffering>>? {
         return database?.barterDao?.getAllProductOffering()
 
+    }
+
+    suspend fun getProductOfferingById(id: String) : ProductOffering? {
+        return CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getProductOfferingById(id)
+        }.await()
     }
 
     fun insertProductsOffering(products: List<ProductOffering>) {
@@ -101,6 +108,12 @@ object BarterRepository {
         CoroutineScope(Dispatchers.IO).launch {
             database?.barterDao?.insertBids(*bids.toTypedArray())
         }
+    }
+
+    suspend fun getAcceptBidById(id: String) : AcceptBid? {
+        return CoroutineScope(Dispatchers.IO).async {
+            database?.barterDao?.getAcceptBidById(id)
+        }.await()
     }
 
     suspend fun getUserAndAcceptBids(id: String): Flow<List<UserAndAcceptBid>>? =

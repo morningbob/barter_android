@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.util.ImageHandler
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,9 @@ class AcceptBidDetailsViewModel : ViewModel() {
     private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
     val productInExchangeImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _productInExchangeImages.asStateFlow()
 
+    val _chosenBid = MutableStateFlow<AcceptBid?>(null)
+    val chosenBid : StateFlow<AcceptBid?> get() = _chosenBid.asStateFlow()
+
     val _shouldPopSelf = MutableStateFlow<Boolean>(false)
     val shouldPopSelf : StateFlow<Boolean> get() = _shouldPopSelf.asStateFlow()
 
@@ -39,6 +43,9 @@ class AcceptBidDetailsViewModel : ViewModel() {
 
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
+
+    val _shouldNavigateSend = MutableStateFlow<Boolean>(false)
+    val shouldNavigateSend : StateFlow<Boolean> get() = _shouldNavigateSend.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -101,6 +108,10 @@ class AcceptBidDetailsViewModel : ViewModel() {
         _shouldPopImages.value = should
     }
 
+    fun updateShouldNavigateSend(should: Boolean) {
+        _shouldNavigateSend.value = should
+    }
+
     fun prepareImagesDisplay(images: List<ProductImageToDisplay>) {
         _imagesDisplay.value = images.toMutableStateList()
     }
@@ -114,5 +125,9 @@ class AcceptBidDetailsViewModel : ViewModel() {
 
     fun updateDeleteImageStatus(status: Int) {
         _deleteImageStatus.value = status
+    }
+
+    fun getAcceptBid(id: String) {
+
     }
 }

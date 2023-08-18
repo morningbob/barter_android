@@ -21,12 +21,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
+import com.bitpunchlab.android.barter.SendMessage
 import com.bitpunchlab.android.barter.base.BasicRecordScreen
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomButton
 import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
+import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -42,16 +44,28 @@ fun AcceptBidDetailsScreen(
     val productOfferingImages by acceptBidDetailsViewModel.productOfferingImages.collectAsState()
     val productInExchangeImages by acceptBidDetailsViewModel.productInExchangeImages.collectAsState()
     val imagesDisplay = acceptBidDetailsViewModel.imagesDisplay.collectAsState()
+    val shouldNavigateSend by acceptBidDetailsViewModel.shouldNavigateSend.collectAsState()
 
-    Log.i("accept bid detail screen", "got bid mode $bidMode")
+    //Log.i("accept bid detail screen", "got bid mode $bidMode")
 
     val userParty = if (bidMode == "true") "Buyer" else "Seller"
+
+    val bidDetails = navController.previousBackStackEntry?.arguments?.getParcelable<BidWithDetails>("bidDetails")
 
     LaunchedEffect(key1 = shouldPopSelf) {
         if (shouldPopSelf) {
             navController.popBackStack()
         }
     }
+
+    LaunchedEffect(key1 = shouldNavigateSend) {
+        if (shouldNavigateSend) {
+            //navController.navigate("SendMessage/{a}".replace("{a}")
+            navController.currentBackStackEntry?.arguments?.putParcelable("product", bidDetails?.product)
+            navController.navigate(SendMessage.route)
+        }
+    }
+
     
     Surface(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -94,7 +108,7 @@ fun AcceptBidDetailsScreen(
                     onClick = {
                         // send a request to the server, by writing to collection
                         // change product's status to 2, update users and product offerings
-
+                        acceptBidDetailsViewModel.updateShouldNavigateSend(true)
                     },
                     modifier = Modifier
                         .padding(top = 10.dp)

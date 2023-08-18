@@ -35,6 +35,7 @@ import com.bitpunchlab.android.barter.main.MainViewModel
 import com.bitpunchlab.android.barter.main.MainViewModelFactory
 import com.bitpunchlab.android.barter.messages.MessageDetailsScreen
 import com.bitpunchlab.android.barter.messages.MessageListScreen
+import com.bitpunchlab.android.barter.messages.SendMessageScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidDetailsScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingBidsListScreen
 import com.bitpunchlab.android.barter.productOfferingDetails.ProductOfferingDetailsScreen
@@ -208,12 +209,16 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
         }
 
         composable("AcceptBidDetails/{bidMode}",
-            arguments = listOf(navArgument("bidMode") {
-                type = NavType.StringType
-                defaultValue = true.toString()
-            }))
+            arguments = listOf(
+                navArgument("bidMode") {
+                    type = NavType.StringType
+                    defaultValue = true.toString()
+                }))
+                    //navArgument("bidDetails") { type = NavType.StringType }
+                //}))
             { backStackEntry ->
             AcceptBidDetailsScreen(navController, backStackEntry.arguments?.getString("bidMode"))
+                //backStackEntry.arguments?.getString("acceptBidId"))
         }
 
         composable(CurrentBids.route) {
@@ -239,6 +244,18 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
             MessageDetailsScreen(navController, navBackStackEntry.arguments?.getBoolean("messageMode"))
         }
 
+        composable(SendMessage.route) {
+            SendMessageScreen(navController)
+        }
+/*
+        composable("SendMessage/{productId}",
+            arguments = listOf(navArgument("productId") {
+                type = NavType.StringType
+                //defaultValue = true
+            })) { navBackStackEntry ->
+            SendMessageScreen(navController, navBackStackEntry.arguments?.getString("productId"))
+        }
+*/
         composable(Logout.route) {
             LogoutScreen(navController)
         }

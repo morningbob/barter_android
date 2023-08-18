@@ -97,6 +97,12 @@ enum class AcceptBidStatus {
     APP_FAILURE
 }
 
+enum class SendMessageStatus {
+    NORMAL,
+    SUCCESS,
+    FAILURE
+}
+
 enum class ImageType {
     PRODUCT_IMAGE,
     ASKING_IMAGE

@@ -49,6 +49,7 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
     val acceptedBids by LocalDatabaseManager.acceptedBidsDetail.collectAsState()
     val bidsAccepted by LocalDatabaseManager.bidsAcceptedDetail.collectAsState()
     val shouldDisplayDetails by acceptBidsListViewModel.shouldDisplayDetails.collectAsState()
+
     val bidMode = rememberSaveable {
         mutableStateOf(true)
     }
@@ -56,10 +57,20 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
         acceptedBids
     }
     bidsDetail = if (bidMode.value) acceptedBids else bidsAccepted
+    val chosenBidDetails = rememberSaveable {
+        mutableStateOf<BidWithDetails?>(null)
+    }
 
     LaunchedEffect(key1 = shouldDisplayDetails) {
         if (shouldDisplayDetails) {
-            navController.navigate("AcceptBidDetails/{a}".replace(oldValue = "{a}", newValue = bidMode.value.toString()))
+            navController.currentBackStackEntry?.arguments?.apply {
+                putParcelable("bidDetails", chosenBidDetails.value)
+            }
+            navController.navigate(
+                "AcceptBidDetails/{mode}"
+                    .replace(oldValue = "{mode}", newValue = bidMode.value.toString())
+                    //.replace(oldValue = "{id}", newValue = chosenBidDetails.value!!.acceptBid!!.acceptId)
+            )
         }
     }
 
@@ -103,6 +114,7 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                                 acceptBid = bidDetail,
                                 onClick = {
                                     AcceptBidInfo.updateAcceptBid(bidDetail)
+                                    chosenBidDetails.value = bidDetail
                                     acceptBidsListViewModel.updateShouldDisplayDetails(true)
                                 }
                             )

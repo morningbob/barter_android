@@ -36,6 +36,9 @@ interface BarterDao {
     @Delete
     suspend fun deleteProductOffering(vararg product: ProductOffering)
 
+    @Query("SELECT * FROM products_offering WHERE :id == productId LIMIT 1")
+    fun getProductOfferingById(id: String) : ProductOffering
+
     @Query("SELECT * FROM products_offering")
     fun getAllProductOffering() : Flow<List<ProductOffering>>
 
@@ -91,6 +94,9 @@ interface BarterDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAcceptBids(vararg bid: AcceptBid)
+
+    @Query("SELECT * FROM accept_bids WHERE :id == acceptId LIMIT 1")
+    suspend fun getAcceptBidById(id: String) : AcceptBid
 
     @Transaction
     @Query("SELECT * FROM accept_bids")
