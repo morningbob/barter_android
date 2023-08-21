@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.base
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.database.BarterRepository
@@ -11,6 +12,7 @@ import kotlinx.coroutines.async
 
 class LoadImageViewModel : ViewModel() {
 
+    @SuppressLint("SuspiciousIndentation")
     suspend fun loadImageDatabase(imageUrl: String) : Bitmap? {
         var productImage : ProductImageToDisplay? = null
         var image : Bitmap? = null

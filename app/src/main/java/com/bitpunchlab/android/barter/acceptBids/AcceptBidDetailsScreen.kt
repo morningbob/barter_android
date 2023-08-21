@@ -52,6 +52,10 @@ fun AcceptBidDetailsScreen(
 
     val bidDetails = navController.previousBackStackEntry?.arguments?.getParcelable<BidWithDetails>("bidDetails")
 
+    val otherUserId = if (bidMode == "true") bidDetails?.bid?.bidUserId else bidDetails?.product?.userId
+
+    val otherUserName = if (bidMode == "true") bidDetails?.bid?.bidUserName else bidDetails?.product?.userName
+
     LaunchedEffect(key1 = shouldPopSelf) {
         if (shouldPopSelf) {
             navController.popBackStack()
@@ -59,10 +63,16 @@ fun AcceptBidDetailsScreen(
     }
 
     LaunchedEffect(key1 = shouldNavigateSend) {
-        if (shouldNavigateSend) {
-            //navController.navigate("SendMessage/{a}".replace("{a}")
-            navController.currentBackStackEntry?.arguments?.putParcelable("product", bidDetails?.product)
+        if (shouldNavigateSend && otherUserId != null && otherUserName != null) {
+            navController.navigate(
+                "SendMessage/{id}/{name}"
+                    .replace("{id}", otherUserId)
+                    .replace("{name}", otherUserName)
+            )
+            //navController.currentBackStackEntry?.arguments?.putParcelable("product", bidDetails?.product)
             navController.navigate(SendMessage.route)
+        } else {
+            // app error, should restart app
         }
     }
 

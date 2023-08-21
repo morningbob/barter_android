@@ -27,6 +27,7 @@ import com.bitpunchlab.android.barter.util.ProductOfferingDecomposed
 import com.bitpunchlab.android.barter.util.convertBidFirebaseToBid
 import com.bitpunchlab.android.barter.util.convertBidToBidFirebase
 import com.bitpunchlab.android.barter.util.convertBitmapToBytes
+import com.bitpunchlab.android.barter.util.convertMessageFirebaseToMessage
 import com.bitpunchlab.android.barter.util.convertMessageToMessageFirebase
 import com.bitpunchlab.android.barter.util.convertProductAskingFirebaseToProductAsking
 import com.bitpunchlab.android.barter.util.convertProductAskingToFirebase
@@ -101,6 +102,7 @@ object FirebaseClient {
                             prepareProductsInUserForLocalDatabase(currentUser)
                             prepareOpenTransactions(currentUser)
                             prepareTransactionRecords(currentUser)
+                            prepareMessages(currentUser)
                             saveSampleProductImage()
                         }
                     }
@@ -498,6 +500,24 @@ object FirebaseClient {
             Log.i("prepare open transactions", "bids to be saved ${bids.size}")
             //localDatabase!!.barterDao.insertProductsOffering(*products.toTypedArray())
         }
+    }
+
+    // extract messages received and message sent from user firebase
+    // convert the messages
+    // save in local database
+    private fun prepareMessages(currentUser: UserFirebase) {
+
+        val messagesReceived = currentUser.userMessagesReceived.map { (messageKey, messageValue) ->
+            messageValue.sender = false
+            convertMessageFirebaseToMessage(messageValue)
+        }
+        val messagesSent = currentUser.userMessagesSent.map { (messageKey, messageValue) ->
+            messageValue.sender = true
+            convertMessageFirebaseToMessage(messageValue)
+        }
+        val allMessages = messagesReceived + messagesSent
+        Log.i("firebase prepare messages", "saving ${allMessages.size} to local.")
+        BarterRepository.insertMessages(allMessages)
     }
 
     // after we successfully created an user in FirebaseAuth,
@@ -970,9 +990,13 @@ object FirebaseClient {
 
     suspend fun processSendMessage(message: Message) : Boolean {
         val messageFirebase = convertMessageToMessageFirebase(message)
-        return CoroutineScope(Dispatchers.IO).async {
+        val firestoreResult = CoroutineScope(Dispatchers.IO).async {
             sendMessageFirebase(messageFirebase)
         }.await()
+        if (firestoreResult) {
+            BarterRepository.insertMessages(listOf(message))
+        }
+        return firestoreResult
     }
 
     private suspend fun sendMessageFirebase(messageFirebase: MessageFirebase) : Boolean =

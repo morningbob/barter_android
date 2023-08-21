@@ -244,18 +244,28 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
             MessageDetailsScreen(navController, navBackStackEntry.arguments?.getBoolean("messageMode"))
         }
 
-        composable(SendMessage.route) {
-            SendMessageScreen(navController)
-        }
-/*
-        composable("SendMessage/{productId}",
-            arguments = listOf(navArgument("productId") {
+        //composable(SendMessage.route) {
+        //    SendMessageScreen(navController)
+        //}
+
+        composable("SendMessage/{otherUserId}/{otherUserName}",
+            arguments = listOf(
+                navArgument("otherUserId") {
                 type = NavType.StringType
                 //defaultValue = true
-            })) { navBackStackEntry ->
-            SendMessageScreen(navController, navBackStackEntry.arguments?.getString("productId"))
+            },
+                navArgument("otherUserName") {
+                    type = NavType.StringType
+                    //defaultValue = true
+                },
+                )) { navBackStackEntry ->
+            SendMessageScreen(
+                navController,
+                navBackStackEntry.arguments?.getString("otherUserId"),
+                navBackStackEntry.arguments?.getString("otherUserName")
+            )
         }
-*/
+
         composable(Logout.route) {
             LogoutScreen(navController)
         }

@@ -96,6 +96,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     LaunchedEffect(key1 = shouldNavigateMessages) {
         if (shouldNavigateMessages) {
+            mainViewModel.updateShouldNavigateMessages(false)
             navController.navigate(MessageList.route)
         }
     }

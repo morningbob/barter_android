@@ -9,6 +9,7 @@ import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.BidWithDetails
+import com.bitpunchlab.android.barter.models.Message
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -18,6 +19,7 @@ import com.bitpunchlab.android.barter.models.User
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.parseDateTime
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -99,9 +101,19 @@ object LocalDatabaseManager {
     private val _chosenCurrentBid = MutableStateFlow<BidWithDetails?>(null)
     val chosenCurrentBid : StateFlow<BidWithDetails?> get() = _chosenCurrentBid.asStateFlow()
 
+    private val _allMessages = MutableStateFlow<SnapshotStateList<Message>>(mutableStateListOf<Message>())
+    val allMessages : StateFlow<SnapshotStateList<Message>> get() = _allMessages.asStateFlow()
+
+    private val _messagesReceived = MutableStateFlow<SnapshotStateList<Message>>(mutableStateListOf<Message>())
+    val messagesReceived : StateFlow<SnapshotStateList<Message>> get() = _messagesReceived.asStateFlow()
+
+    private val _messagesSent = MutableStateFlow<SnapshotStateList<Message>>(mutableStateListOf<Message>())
+    val messagesSent : StateFlow<SnapshotStateList<Message>> get() = _messagesSent.asStateFlow()
+
     init {
         prepare()
         prepareBidDetails()
+        //prepareMessages()
     }
     private fun prepare() {
 
@@ -112,6 +124,7 @@ object LocalDatabaseManager {
                 _allProductsOffering.value = sortProductsOffering(it)
             }
         }
+
         // get list of products offered by the user
         CoroutineScope(Dispatchers.IO).launch {
             FirebaseClient.currentUserFirebase.collect() { userFirebase ->
@@ -121,6 +134,7 @@ object LocalDatabaseManager {
                     reloadUserAndProductOffering()
                     reloadCurrentBids()
                     reloadUserAndAcceptBid()
+                    reloadMessages()
                 }
             }
         }
@@ -175,16 +189,8 @@ object LocalDatabaseManager {
         return bids.sortedByDescending { parseDateTime(it.bid.bidTime) }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
-    private fun addAndSortCurrentBidsDetail(bidDetail: BidWithDetails) {
-        val lock = Any()
-        synchronized(lock) {
-            if (currentBidsDetails.value.firstOrNull { it.bid.bidId == bidDetail.bid.bidId } == null) {
-                _currentBidsDetails.value.add(bidDetail)
-                _currentBidsDetails.value =
-                    sortBidWithDetails(currentBidsDetails.value.toList()).toMutableStateList()
-            }
-        }
+    private fun sortMessages(messages: List<Message>) : List<Message> {
+        return messages.sortedByDescending { parseDateTime(it.date) }
     }
 
     fun updateChosenCurrentBid(bid: BidWithDetails) {
@@ -365,6 +371,22 @@ object LocalDatabaseManager {
         }
     }
 
+    private fun reloadMessages() {
+        CoroutineScope(Dispatchers.IO).launch {
+            //prepareMessages()
+            BarterRepository.getUserAndMessageById(FirebaseClient.currentUserFirebase.value!!.id)?.collect() {
+                    userAndMessageList ->
+                if (userAndMessageList.isNotEmpty()) {
+                    _allMessages.value = sortMessages(userAndMessageList[0].messages).toMutableStateList()
+                    Log.i("reload messages", "got messages")
+                } else {
+                    Log.i("reload messages", "got no messages")
+                }
+
+            }
+        }
+    }
+
     private fun observeBidChosenAndProcess() {
         // this second big coroutine is to observe the bid chosen
         // whenever a bid is chosen, I load the corresponding bid product images in it
@@ -442,33 +464,6 @@ object LocalDatabaseManager {
             // after the coroutine finish, we sort and update
             //Log.i("retrieve", "no of temp bid ${tempBidDetails.size}")
             _currentBidsDetails.value = sortBidWithDetails(tempBidDetails).toMutableStateList()
-        }
-    }
-
-    private suspend fun createBidDetails() =
-        suspendCancellableCoroutine<List<BidWithDetails>> { cancellableContinuation ->
-            val tempBidDetails = mutableListOf<BidWithDetails>()
-            for (bid in currentBids.value) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    var product: ProductOffering?
-                    var bids: List<Bid>
-                    BarterRepository.getProductOfferingWithBids(bid.bidProductId)
-                        ?.collect() { productWithBidsList ->
-                            if (productWithBidsList.isNotEmpty()) {
-                                product = productWithBidsList[0].productOffering
-                                bids = sortBids(productWithBidsList[0].bids)
-
-                                val bidDetails = BidWithDetails(
-                                    acceptBid = null, product = product!!,
-                                    bid = bid, currentBids = bids
-                                )
-                                //Log.i("retrieve and create bid", "added a bid")
-                                tempBidDetails.add(bidDetails)
-                                _currentBidsDetails.value.add(bidDetails)
-                                //addAndSortCurrentBidsDetails(bidDetails)
-                            }
-                        }
-                }
         }
     }
 
@@ -557,7 +552,6 @@ object LocalDatabaseManager {
                                 bid = bid
                             )
                             if (theBid.isSeller) {
-                                //_bidsDetail.value.add(bidDetails)
                                 _acceptedBidsDetail.value.add(bidDetails)
                                 Log.i("Local database mgr", "update accepted bids")
                             } else {
@@ -571,350 +565,15 @@ object LocalDatabaseManager {
         }
     }
 
-}
-/*
+    private fun prepareMessages() {
         CoroutineScope(Dispatchers.IO).launch {
-            val imageList = CoroutineScope(Dispatchers.IO).async {
-                BarterRepository.getImage("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0")
-            }.await()
-            if (imageList.isNullOrEmpty()) {
-                Log.i("loadOrSaveImage", "couldn't retrieve the first image")
-            } else {
-                Log.i("loadOrSaveImage", "got first image")
+            allMessages.collect() { messages ->
+                if (messages.isNotEmpty()) {
+                    _messagesReceived.value = messages.filter { !it.sender }.toMutableStateList()
+                    _messagesSent.value = messages.filter { it.sender }.toMutableStateList()
+                }
             }
         }
+    }
 
-         */
-/*
-//CoroutineScope(Dispatchers.IO).launch {
-        // this outer coroutine will wait for the below coroutine to finish
-            //val imagesToBeSaved = mutableListOf<ProductImageToDisplay>()
-            // this outer coroutine will wait for the three parts to finish before
-            // the outmost coroutine saves the new product images to local database
-            // I use this one big coroutine to enclose the other 3 small coroutine is
-            // because I need the 3 small coroutines runs at the same time
-            // i can't just use .join() in the 3 small coroutines
-            // because then, they won't run at the same time
-CoroutineScope(Dispatchers.IO).launch {
-                            var productImage: ProductImageToDisplay? = null
-                            var imageLoaded: Bitmap? = null
-
-                            val imageList = CoroutineScope(Dispatchers.IO).async {
-                                BarterRepository.getImage(productOffering.images[i])
-                            }.await()
-                            // load it from cloud
-                            // and save it locally
-                            if (imageList.isNullOrEmpty()) {
-                                Log.i("database mgr", "can't retrieve image from local database")
-                                //_sellerProductImages.value[i] = imageList[0]
-                                imageLoaded = CoroutineScope(Dispatchers.IO).async {
-                                    ImageHandler.loadImageFromCloud(productOffering.images[i])
-                                }.await()
-
-                                imageLoaded?.let { image ->
-                                    Log.i("database mgr", "loaded image from cloud")
-                                    val url = CoroutineScope(Dispatchers.IO).async {
-                                        ImageHandler.saveImageExternalStorage(
-                                            productOffering.images[i],
-                                            image
-                                        )
-                                    }.await()
-                                    url?.let {
-                                        Log.i("database mgr", "saved image to local")
-                                        productImage = ProductImageToDisplay(
-                                            image = image,
-                                            imageId = UUID.randomUUID().toString(),
-                                            imageUrlCloud = productOffering.images[i],
-                                            imageUrlLocal = it.toString()
-                                        )
-                                        //BarterRepository.insertImages(images = listOf(productImage!!))
-                                        imagesToBeSaved.add(productImage!!)
-                                    }
-                                }
-
-                            } else {
-                                Log.i("database mgr", "got product image object from local")
-                                productImage = imageList[0]
-                                val localUrl = imageList[0].imageUrlLocal
-                                localUrl?.let {
-                                    Log.i("database mgr", "loading image from local")
-                                    productImage!!.image = ImageHandler.loadImageFromLocal(it)
-                                }
-
-                                //productImage = productImageLoaded.copy()
-                            }
-                            productImage?.let {
-                                Log.i("database mgr", "have product image setting to list")
-                                _sellerProductImages.value.set(i, it)
-                            }
-                        }
-                    }
-                    CoroutineScope(Dispatchers.IO).launch {
-                            BarterRepository.getProductOfferingWithProductsAsking(productOffering.productId)
-                                ?.collect() { productOfferingWithProductAskingList ->
-                                    //ProductInfo.updateProductOfferingWithProductsAsking(it[0])
-                                    //val imagesToBeSaved = mutableListOf<ProductImageToDisplay>()
-                                    _productOfferingWithProductsAsking.value =
-                                        productOfferingWithProductAskingList[0]
-                                    // prepare asking product's images
-                                    for (i in 0..productOfferingWithProductAskingList[0].askingProducts.size - 1) {
-                                        _askingProductImages.value.add(mutableListOf())
-                                        for (j in 0..productOfferingWithProductAskingList[0].askingProducts[i].images.size - 1) {
-                                            _askingProductImages.value[i].add(
-                                                ProductImageToDisplay(
-                                                    UUID.randomUUID().toString(),
-                                                    ImageHandler.createPlaceholderImage(),
-                                                    ""
-                                                )
-                                            )
-
-                                            CoroutineScope(Dispatchers.IO).launch {
-                                                var productImage: ProductImageToDisplay? = null
-                                                var imageLoaded: Bitmap? = null
-                                                val imageList =
-                                                    CoroutineScope(Dispatchers.IO).async {
-                                                        BarterRepository.getImage(
-                                                            productOfferingWithProductAskingList[0].askingProducts[i].images[j]
-                                                        )
-                                                    }.await()
-                                                // load it from cloud
-                                                // and save it locally
-                                                if (imageList.isNullOrEmpty()) {
-                                                    Log.i(
-                                                        "database mgr",
-                                                        "can't retrieve image from local database"
-                                                    )
-                                                    //_sellerProductImages.value[i] = imageList[0]
-                                                    imageLoaded =
-                                                        CoroutineScope(Dispatchers.IO).async {
-                                                            ImageHandler.loadImageFromCloud(
-                                                                productOfferingWithProductAskingList[0].askingProducts[i].images[j]
-                                                            )
-                                                        }.await()
-
-                                                    imageLoaded?.let { image ->
-                                                        Log.i(
-                                                            "database mgr",
-                                                            "loaded image from cloud"
-                                                        )
-                                                        val url =
-                                                            CoroutineScope(Dispatchers.IO).async {
-                                                                ImageHandler.saveImageExternalStorage(
-                                                                    productOfferingWithProductAskingList[0].askingProducts[i].images[j],
-                                                                    image
-                                                                )
-                                                            }.await()
-                                                        url?.let {
-                                                            Log.i(
-                                                                "database mgr",
-                                                                "saved image to local"
-                                                            )
-                                                            productImage = ProductImageToDisplay(
-                                                                image = image,
-                                                                imageId = UUID.randomUUID()
-                                                                    .toString(),
-                                                                imageUrlCloud = productOfferingWithProductAskingList[0].askingProducts[i].images[j],
-                                                                imageUrlLocal = it.toString()
-                                                            )
-                                                            imagesToBeSaved.add(productImage!!)
-                                                        }
-                                                    }
-                                                } else {
-                                                    Log.i(
-                                                        "database mgr",
-                                                        "got product image object from local"
-                                                    )
-                                                    productImage = imageList[0]
-                                                    val localUrl = imageList[0].imageUrlLocal
-                                                    localUrl?.let {
-                                                        Log.i(
-                                                            "database mgr",
-                                                            "loading image from local"
-                                                        )
-                                                        productImage!!.image =
-                                                            ImageHandler.loadImageFromLocal(it)
-                                                    }
-                                                }
-                                                productImage?.let {
-                                                    Log.i(
-                                                        "database mgr",
-                                                        "have product image setting to list"
-                                                    )
-                                                    _askingProductImages.value[i].set(j, it)
-                                                }
-                                            }
-                                        }
-
-
-                                        //CoroutineScope(Dispatchers.IO).launch {
-                                        //    for (i in 0..it[0].askingProducts.size - 1) {
-                                        //        ImageHandler.loadedImagesFlow(it[0].askingProducts[i].images).collect() { pairResult ->
-                                        //            _askingProductImages.value[i].set(pairResult.first, pairResult.second)
-                                        //        }
-                                        //    }
-                                        //}
-                                    }
-                                }
-                        } // end of coroutine scope
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                                    var productImage: ProductImageToDisplay? = null
-                                    var imageLoaded: Bitmap? = null
-                                    val imageList = CoroutineScope(Dispatchers.IO).async {
-                                        BarterRepository.getImage(it.bidProduct.images[i])
-                                    }.await()
-                                    // load it from cloud
-                                    // and save it locally
-                                    if (imageList.isNullOrEmpty()) {
-                                        Log.i(
-                                            "database mgr",
-                                            "can't retrieve image from local database"
-                                        )
-                                        //_sellerProductImages.value[i] = imageList[0]
-                                        imageLoaded = CoroutineScope(Dispatchers.IO).async {
-                                            ImageHandler.loadImageFromCloud(it.bidProduct.images[i])
-                                        }.await()
-
-                                        imageLoaded?.let { image ->
-                                            Log.i("database mgr", "loaded image from cloud")
-                                            val url = CoroutineScope(Dispatchers.IO).async {
-                                                ImageHandler.saveImageExternalStorage(
-                                                    it.bidProduct.images[i],
-                                                    image
-                                                )
-                                            }.await()
-
-                                            url?.let { urlBack ->
-                                                Log.i("database mgr", "saved image to local")
-                                                productImage = ProductImageToDisplay(
-                                                    image = image,
-                                                    imageId = UUID.randomUUID().toString(),
-                                                    imageUrlCloud = it.bidProduct.images[i],
-                                                    imageUrlLocal = urlBack.toString()
-                                                )
-                                            }
-                                        }
-                                    } else {
-                                        Log.i("database mgr", "got product image object from local")
-                                        productImage = imageList[0]
-                                        val localUrl = imageList[0].imageUrlLocal
-                                        localUrl?.let {
-                                            Log.i("database mgr", "loading image from local")
-                                            productImage!!.image =
-                                                ImageHandler.loadImageFromLocal(it)
-                                            imagesToBeSaved.add(productImage!!)
-                                        }
-                                    }
-                                    productImage?.let {
-                                        Log.i("database mgr", "have product image setting to list")
-                                        _bidProductImages.value.set(i, it)
-                                    }
-
-                                }.join()
- */
-//CoroutineScope(Dispatchers.IO).launch {
-//    ImageHandler.loadedImagesFlow(productOffering.images).collect() { pairResult ->
-//        _sellerProductImages.value.set(pairResult.first, pairResult.second)
-//    }
-//}
-/*
-        // get the bitmap of the images associated with the product
-        // we first try to retrieve the product image locally by the imageUrlCloud
-        // if we got null, we send a request to Cloud Storage
-
-                // this coroutine is used to observe the product offering chosen
-                // when I got the product offering, I load the product's images
-                // and the asking product images
-                // I also load the bids associated with the product
-
-        CoroutineScope(Dispatchers.IO).launch {
-            productChosen.collect() { productOffering ->
-                Log.i("local database mgr", "product was chosen detected")
-                productOffering?.let {
-                    _sellerProductImages.value = mutableStateListOf()
-                    // preloaded with placeholder images,
-                    // also, for mutable list to set the result at particular index
-                    for (i in 0..productOffering.images.size - 1) {
-                        _sellerProductImages.value.add(
-                            ProductImageToDisplay(
-                                imageId = UUID.randomUUID().toString(),
-                                image = ImageHandler.createPlaceholderImage(),
-                                imageUrlCloud = "placeholder"
-                            )
-                        )
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val (productImage, shouldSave) = CoroutineScope(Dispatchers.IO).async {
-                                Log.i("loadingImagesLocal", "dealing with url ${productOffering.images[i]}")
-                                loadOrRetrieveProductImage(productOffering.images[i])
-                            }.await()
-
-                            productImage?.let {
-                                Log.i(
-                                    "database mgr",
-                                    "have asking product image setting to list"
-                                )
-                                _sellerProductImages.value.set(i, it)
-                                if (shouldSave) {
-                                    BarterRepository.insertImages(listOf(it))
-                                }
-                            }
-                        }
-                    }// end of first for loop
-
-                    // prepare bids and asking products associated with the product offering
-                    CoroutineScope(Dispatchers.IO).launch {
-                        BarterRepository.getProductOfferingWithProductsAsking(
-                            productOffering.productId
-                        )
-                            ?.collect() { productOfferingWithProductAskingList ->
-
-                                if (productOfferingWithProductAskingList.isNotEmpty()) {
-                                _productOfferingWithProductsAsking.value =
-                                    productOfferingWithProductAskingList[0]
-
-                                    for (i in 0..productOfferingWithProductAskingList[0].askingProducts.size - 1) {
-                                        _askingProductImages.value.add(mutableListOf())
-                                        for (j in 0..productOfferingWithProductAskingList[0].askingProducts[i].images.size - 1) {
-                                            val (productImage, shouldSave) = CoroutineScope(
-                                                Dispatchers.IO
-                                            ).async {
-                                                loadOrRetrieveProductImage(
-                                                    productOfferingWithProductAskingList[0].askingProducts[i].images[j]
-                                                )
-                                            }.await()
-
-                                            productImage?.let {
-                                                Log.i(
-                                                    "database mgr",
-                                                    "have product image setting to list"
-                                                )
-                                                _askingProductImages.value[i].add(it)
-                                                if (shouldSave) {
-                                                    BarterRepository.insertImages(listOf(it))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                    }
-
-                    // prepare bids within the product offering
-                    CoroutineScope(Dispatchers.IO).launch {
-                        BarterRepository.getProductOfferingWithBids(productOffering.productId)
-                            ?.collect() {
-                                if (it.isNotEmpty()) {
-                                    // we sort the bids here
-                                    _bids.value = sortBids(it[0].bids)
-                                }
-                            }
-                    }
-                } // end of if product exist
-            }
-
-            //observeBidChosenAndProcess()
-
-        } // end of the product chosen collect() coroutine
-
-         */
+}

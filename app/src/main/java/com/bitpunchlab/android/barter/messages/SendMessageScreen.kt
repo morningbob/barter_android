@@ -3,6 +3,7 @@ package com.bitpunchlab.android.barter.messages
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,25 +27,29 @@ import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.ChoiceButton
+import com.bitpunchlab.android.barter.base.CustomCircularProgressBar
+import com.bitpunchlab.android.barter.base.CustomDialog
 import com.bitpunchlab.android.barter.base.CustomTextArea
 import com.bitpunchlab.android.barter.base.CustomTextField
 import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
+import com.bitpunchlab.android.barter.util.SendMessageStatus
 
 @Composable
 fun SendMessageScreen(navController: NavHostController,
-                      //productId: String?,
+                      otherUserId: String?, otherUserName: String?,
                       sendMessageViewModel: SendMessageViewModel
     = remember {
         SendMessageViewModel()
     }) {
 
     val shouldDismiss by sendMessageViewModel.shouldDismiss.collectAsState()
-    //val product by sendMessageViewModel.product.collectAsState()
     val messageText by sendMessageViewModel.messageText.collectAsState()
+    val sendMessageStatus by sendMessageViewModel.sendMessageStatus.collectAsState()
+    val loadingAlpha by sendMessageViewModel.loadingAlpha.collectAsState()
 
-    val product = navController.previousBackStackEntry?.arguments?.getParcelable<ProductOffering>("product")
+    //val product = navController.previousBackStackEntry?.arguments?.getParcelable<ProductOffering>("product")
 
     LaunchedEffect(key1 = shouldDismiss) {
         if (shouldDismiss) {
@@ -51,19 +57,12 @@ fun SendMessageScreen(navController: NavHostController,
         }
     }
 
+    //LaunchedEffect(key1 = product) {
+    //    if (product == null) {
+    //        navController.popBackStack()
+    //    }
+    //}
 
-    //LaunchedEffect(key1 = , block = )
-/*
-    LaunchedEffect(key1 = productId) {
-        if (productId != null) {
-            navController.popBackStack()
-        } else {
-            Log.i("send message screen", "retrieving product")
-            sendMessageViewModel.getProduct(productId!!)
-        }
-    }
-
- */
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -98,8 +97,8 @@ fun SendMessageScreen(navController: NavHostController,
                 )
 
                 Text(
-                    text = "To: ${product?.userName ?: "Not Available"}",
-                    fontSize = 18.sp,
+                    text = "To: ${otherUserName ?: "Loading"}",
+                    fontSize = 22.sp,
                     color = BarterColor.textGreen,
                     modifier = Modifier
                         .padding(top = 40.dp, bottom = 40.dp)
@@ -113,13 +112,86 @@ fun SendMessageScreen(navController: NavHostController,
                         .padding(top = 10.dp)
                 )
 
-                ChoiceButton(
-                    title = "Send",
-                    onClick = { sendMessageViewModel.sendMessage(messageText) },
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                )
+                if (otherUserId != null && otherUserName != null) {
+                    ChoiceButton(
+                        title = "Send",
+                        onClick = {
+                            sendMessageViewModel.sendMessage(
+                                text = messageText,
+                                otherUserId = otherUserId,
+                                otherUserName = otherUserName
+                            )
+                        },
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                    )
+                }
+            }
+
+            if (sendMessageStatus != SendMessageStatus.NORMAL) {
+                when (sendMessageStatus) {
+                    SendMessageStatus.SUCCESS -> {
+                        SendMessageSuccessDialog(
+                            onDismiss = { sendMessageViewModel.updateSendMessageStatus(SendMessageStatus.NORMAL) })
+                    }
+                    SendMessageStatus.FAILURE -> {
+                        SendMessageFailureDialog {
+                            sendMessageViewModel.updateSendMessageStatus(SendMessageStatus.NORMAL)
+                        }
+                    }
+                    SendMessageStatus.INVALID_INPUT -> {
+                        SendMessageInvalidDataDialog {
+                            sendMessageViewModel.updateSendMessageStatus(SendMessageStatus.NORMAL)
+                        }
+                    }
+                    else -> 0
+                }
+            }
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(loadingAlpha)
+            ) {
+                CustomCircularProgressBar()
             }
         }
     }
+}
+
+@Composable
+fun SendMessageInvalidDataDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = "Send Message",
+        message = "The message must not be empty.",
+        positiveText = stringResource(R.string.ok),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    )
+
+}
+
+@Composable
+fun SendMessageSuccessDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = "Send Message Success",
+        message = "The message was successfully sent to the server.  The server will send it to the user.",
+        positiveText = stringResource(R.string.ok),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    )
+
+}
+
+@Composable
+fun SendMessageFailureDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = "Send Message Failed",
+        message = "The message was not sent to the server.  There is an error.  Please make sure you have wifi and try again.",
+        positiveText = stringResource(R.string.ok),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    )
+
 }

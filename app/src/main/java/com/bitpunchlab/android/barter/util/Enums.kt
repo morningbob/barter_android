@@ -99,6 +99,7 @@ enum class AcceptBidStatus {
 
 enum class SendMessageStatus {
     NORMAL,
+    INVALID_INPUT,
     SUCCESS,
     FAILURE
 }

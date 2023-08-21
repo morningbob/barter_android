@@ -5,6 +5,7 @@ import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct
 import com.bitpunchlab.android.barter.models.Bid
+import com.bitpunchlab.android.barter.models.Message
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
@@ -140,6 +141,12 @@ object BarterRepository {
         CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getUserAndMessageById(id)
         }.await()
+
+    fun insertMessages(messages: List<Message>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database?.barterDao?.insertMessages(*messages.toTypedArray())
+        }
+    }
 }
 
 

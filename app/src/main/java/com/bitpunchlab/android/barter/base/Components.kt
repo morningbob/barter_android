@@ -255,8 +255,8 @@ fun CustomTextArea(modifier: Modifier = Modifier, textInput: String, onChange: (
                 visualTransformation = VisualTransformation.None,
                 interactionSource = interactionSource,
                 contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-                    top = 10.dp,
-                    bottom = 10.dp
+                    start = 25.dp,
+                    end = 25.dp
                 ),
             )
     }

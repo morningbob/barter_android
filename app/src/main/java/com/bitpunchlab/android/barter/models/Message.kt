@@ -1,9 +1,12 @@
 package com.bitpunchlab.android.barter.models
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "messages")
+@Parcelize
 data class Message(
     @PrimaryKey
     val id: String,
@@ -17,4 +20,4 @@ data class Message(
     val ownerName: String,
     val otherName: String,
     val date: String
-)
+) : Parcelable
