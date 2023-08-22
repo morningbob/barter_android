@@ -7,6 +7,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
+import com.bitpunchlab.android.barter.util.BidStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,10 +25,7 @@ class AcceptBidDetailsViewModel : ViewModel() {
     private val _productInExchangeImages = MutableStateFlow<MutableList<ProductImageToDisplay>>(mutableListOf())
     val productInExchangeImages : StateFlow<MutableList<ProductImageToDisplay>> get() = _productInExchangeImages.asStateFlow()
 
-    val _chosenBid = MutableStateFlow<AcceptBid?>(null)
-    val chosenBid : StateFlow<AcceptBid?> get() = _chosenBid.asStateFlow()
-
-    val _shouldPopSelf = MutableStateFlow<Boolean>(false)
+    private val _shouldPopSelf = MutableStateFlow<Boolean>(false)
     val shouldPopSelf : StateFlow<Boolean> get() = _shouldPopSelf.asStateFlow()
 
     private val _shouldDisplayImages = MutableStateFlow<Boolean>(false)
@@ -41,10 +39,13 @@ class AcceptBidDetailsViewModel : ViewModel() {
     )
     val imagesDisplay : StateFlow<SnapshotStateList<ProductImageToDisplay>> get() = _imagesDisplay.asStateFlow()
 
+    private val _bidStatus = MutableStateFlow(BidStatus.NORMAL)
+    val bidStatus : StateFlow<BidStatus> get() = _bidStatus.asStateFlow()
+
     private val _deleteImageStatus = MutableStateFlow(0)
     val deleteImageStatus : StateFlow<Int> get() = _deleteImageStatus.asStateFlow()
 
-    val _shouldNavigateSend = MutableStateFlow<Boolean>(false)
+    private val _shouldNavigateSend = MutableStateFlow<Boolean>(false)
     val shouldNavigateSend : StateFlow<Boolean> get() = _shouldNavigateSend.asStateFlow()
 
     init {
@@ -96,6 +97,30 @@ class AcceptBidDetailsViewModel : ViewModel() {
         }
     }
 
+    // modify the accept bid object's status
+    // that includes parse the int status from the accept bid object
+    // also includes convert the status to int and save in accept bid
+    // update status in firestore
+    //
+    fun updateBidStatus(status: BidStatus, acceptBid: AcceptBid) {
+
+        val newStatus = when (status) {
+            BidStatus.NORMAL -> BidStatus.REQUESTED_CLOSE
+            BidStatus.REQUESTED_CLOSE -> BidStatus.REQUESTED_CLOSE
+            BidStatus.TO_CONFIRM_CLOSE -> BidStatus.CLOSED
+            BidStatus.CLOSED -> BidStatus.CLOSED
+        }
+
+        // update the status and send to firestore
+        if (newStatus != status) {
+            val statusInt = newStatus.ordinal
+            Log.i("update bid status", "status ${newStatus} ordinal $statusInt")
+            _bidStatus.value = newStatus
+        }
+
+        
+    }
+
     fun updateShouldPopSelf(should: Boolean) {
         _shouldPopSelf.value = should
     }
@@ -127,7 +152,8 @@ class AcceptBidDetailsViewModel : ViewModel() {
         _deleteImageStatus.value = status
     }
 
-    fun getAcceptBid(id: String) {
-
+    fun updateBidStatus(status: BidStatus) {
+        _bidStatus.value = status
     }
+
 }

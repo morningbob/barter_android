@@ -1,6 +1,6 @@
 package com.bitpunchlab.android.barter.util
 
-enum class Category(var label: String) {//}, var number: Int) {
+enum class Category(var label: String) {
     NOT_SET(label = "not set"),
     DICTIONARY(label = "Dictionary"),
     TOYS(label = "Toys"),
@@ -102,6 +102,13 @@ enum class SendMessageStatus {
     INVALID_INPUT,
     SUCCESS,
     FAILURE
+}
+
+enum class BidStatus(var label: String) {
+    NORMAL(label = "Request Close Transaction"),
+    REQUESTED_CLOSE(label = "Waiting for Transaction Close"),
+    TO_CONFIRM_CLOSE(label = "Confirm Close Transaction"),
+    CLOSED(label = "Transaction Closed")
 }
 
 enum class ImageType {

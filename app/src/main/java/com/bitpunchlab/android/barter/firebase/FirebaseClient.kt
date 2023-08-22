@@ -479,7 +479,7 @@ object FirebaseClient {
            //Log.i("prepare open transactions", "the userId of the accept bid ${acceptBid.product?.userId}")
             //Log.i("prepare open transactions", "current userId ${currentUserFirebase.value!!.id}")
             acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = true, userId = acceptBid.product!!.userId,
-                acceptTime = acceptBid.acceptTime))
+                acceptTime = acceptBid.acceptTime, status = acceptBid.status))
             //products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
@@ -487,7 +487,7 @@ object FirebaseClient {
         userFirebase.userBidsAccepted.map { (bidKey, acceptBid) ->
             //Log.i("prepare open transactions", "processing one bid accepted")
             acceptedBids.add(AcceptBid(acceptId = acceptBid.id, isSeller = false, userId = acceptBid.bid!!.userId,
-                acceptTime = acceptBid.acceptTime))
+                acceptTime = acceptBid.acceptTime, status = acceptBid.status))
             //products.add(convertProductFirebaseToProduct(acceptBid.product!!))
             bids.add(convertBidFirebaseToBid(acceptBid.bid!!))
         }
@@ -848,7 +848,8 @@ object FirebaseClient {
             // we only need the other info
             productOffering = convertProductOfferingToFirebase(product, listOf(), listOf()),
             theBid = convertBidToBidFirebase(bid),
-            time = getCurrentDateTime()
+            time = getCurrentDateTime(),
+            stat = 0
         )
         return uploadAcceptBid(acceptBid)
     }

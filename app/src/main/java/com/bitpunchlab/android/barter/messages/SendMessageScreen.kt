@@ -38,7 +38,7 @@ import com.bitpunchlab.android.barter.util.SendMessageStatus
 
 @Composable
 fun SendMessageScreen(navController: NavHostController,
-                      otherUserId: String?, otherUserName: String?,
+                      id: String?, name: String?,
                       sendMessageViewModel: SendMessageViewModel
     = remember {
         SendMessageViewModel()
@@ -97,7 +97,7 @@ fun SendMessageScreen(navController: NavHostController,
                 )
 
                 Text(
-                    text = "To: ${otherUserName ?: "Loading"}",
+                    text = "To: ${name ?: "Loading"}",
                     fontSize = 22.sp,
                     color = BarterColor.textGreen,
                     modifier = Modifier
@@ -112,14 +112,14 @@ fun SendMessageScreen(navController: NavHostController,
                         .padding(top = 10.dp)
                 )
 
-                if (otherUserId != null && otherUserName != null) {
+                if (id != null && name != null) {
                     ChoiceButton(
                         title = "Send",
                         onClick = {
                             sendMessageViewModel.sendMessage(
                                 text = messageText,
-                                otherUserId = otherUserId,
-                                otherUserName = otherUserName
+                                otherUserId = id,
+                                otherUserName = name
                             )
                         },
                         modifier = Modifier

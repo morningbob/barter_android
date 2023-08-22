@@ -14,7 +14,8 @@ data class AcceptBid(
     // true represent seller
     val isSeller : Boolean,
     val userId : String,
-    val acceptTime : String
+    val acceptTime : String,
+    var status : Int
 ) : Parcelable
 /*
 @Parcelize

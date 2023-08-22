@@ -108,7 +108,12 @@ fun parseDateTime(dateTimeString: String) : LocalDateTime? {
     return dateTime
 }
 
-
+val acceptBidStatusMap = mapOf<Int, BidStatus>(
+    0 to BidStatus.NORMAL,
+    1 to BidStatus.REQUESTED_CLOSE,
+    2 to BidStatus.TO_CONFIRM_CLOSE,
+    3 to BidStatus.CLOSED
+)
 
 data class SortHelpObject<T>(
     var key : Int,

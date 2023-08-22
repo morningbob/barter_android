@@ -101,8 +101,8 @@ object LocalDatabaseManager {
     private val _chosenCurrentBid = MutableStateFlow<BidWithDetails?>(null)
     val chosenCurrentBid : StateFlow<BidWithDetails?> get() = _chosenCurrentBid.asStateFlow()
 
-    private val _allMessages = MutableStateFlow<SnapshotStateList<Message>>(mutableStateListOf<Message>())
-    val allMessages : StateFlow<SnapshotStateList<Message>> get() = _allMessages.asStateFlow()
+    private val _allMessages = MutableStateFlow<List<Message>>(mutableStateListOf<Message>())
+    val allMessages : StateFlow<List<Message>> get() = _allMessages.asStateFlow()
 
     private val _messagesReceived = MutableStateFlow<SnapshotStateList<Message>>(mutableStateListOf<Message>())
     val messagesReceived : StateFlow<SnapshotStateList<Message>> get() = _messagesReceived.asStateFlow()
@@ -377,7 +377,11 @@ object LocalDatabaseManager {
             BarterRepository.getUserAndMessageById(FirebaseClient.currentUserFirebase.value!!.id)?.collect() {
                     userAndMessageList ->
                 if (userAndMessageList.isNotEmpty()) {
-                    _allMessages.value = sortMessages(userAndMessageList[0].messages).toMutableStateList()
+                    //_allMessages.value = sortMessages(userAndMessageList[0].messages)
+                    val messages = sortMessages(userAndMessageList[0].messages)
+                    _messagesReceived.value = messages.filter { !it.sender }.toMutableStateList()
+                    _messagesSent.value = messages.filter { it.sender }.toMutableStateList()
+
                     Log.i("reload messages", "got messages")
                 } else {
                     Log.i("reload messages", "got no messages")

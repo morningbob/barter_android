@@ -127,10 +127,7 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         .padding(top = 30.dp)
                 )
 
-                ChoiceButton(
-                    title = "Messages",
-                    onClick = { mainViewModel.updateShouldNavigateMessages(true) }
-                )
+
 
                 // display change password input field only upon the button clicked
                 if (mainStatus == MainStatus.NORMAL) {
@@ -139,14 +136,16 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         updateMainStatus = { mainViewModel.updateMainStatus(MainStatus.CHANGE_PASSWORD) },
                         modifier = Modifier
                             .background(BarterColor.lightGreen)
-                            .padding(top = 30.dp, bottom = 100.dp)
+                            .padding(top = 30.dp, bottom = 70.dp)
                             .fillMaxWidth(0.8f)
                             .fillMaxHeight(0.6f),
                         contentModifier = Modifier
                             .background(BarterColor.lightGreen)
                             .padding(top = 30.dp, bottom = 30.dp),
-                        updateDeleteStatus = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.CONFIRM_DELETE) }
+                        updateDeleteStatus = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.CONFIRM_DELETE) },
+                        updateShouldNavigateMessages = { mainViewModel.updateShouldNavigateMessages(true) }
                     )
+
 
                 } else {
                     ChangePasswordComponent(
@@ -228,7 +227,8 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
 @Composable
 fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modifier,
-                user: User?, updateMainStatus: () -> Unit, updateDeleteStatus: () -> Unit) {
+                user: User?, updateMainStatus: () -> Unit, updateDeleteStatus: () -> Unit,
+                updateShouldNavigateMessages: () -> Unit) {
 
     CustomCard(modifier = Modifier.then(modifier)) {
         Column(
@@ -249,6 +249,13 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
                 text = user?.email ?: "Loading...",
                 fontSize = 20.sp,
                 color = BarterColor.textGreen,
+                modifier = Modifier
+                    .padding(top = 20.dp)
+            )
+
+            ChoiceButton(
+                title = stringResource(R.string.messages),
+                onClick = { updateShouldNavigateMessages() },
                 modifier = Modifier
                     .padding(top = 20.dp)
             )
@@ -438,4 +445,14 @@ fun DeleteAccountFailureDialog(onDismiss: () -> Unit) {
     )
 
 }
+
+/*
+                    ChoiceButton(
+                        title = stringResource(R.string.messages),
+                        onClick = { mainViewModel.updateShouldNavigateMessages(true)},
+                        modifier = Modifier
+                            .padding(top = 30.dp)
+                    )
+
+                     */
 

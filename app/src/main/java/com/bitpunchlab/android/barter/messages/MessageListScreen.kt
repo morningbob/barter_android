@@ -47,8 +47,8 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
         MessageListViewModel()
     }) {
 
-    val messagesReceived by LocalDatabaseManager.allMessages.collectAsState()
-    val messagesSent by LocalDatabaseManager.messagesReceived.collectAsState()
+    val messagesReceived by LocalDatabaseManager.messagesReceived.collectAsState()
+    val messagesSent by LocalDatabaseManager.messagesSent.collectAsState()
     val shouldDismiss by messageListViewModel.shouldDismiss.collectAsState()
     val shouldShowDetails by messageListViewModel.shouldShowDetails.collectAsState()
     val chosenMessage by messageListViewModel.chosenMessage.collectAsState()
@@ -68,7 +68,9 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
     LaunchedEffect(key1 = shouldShowDetails) {
         if (shouldShowDetails) {
             navController.currentBackStackEntry?.arguments?.putParcelable("message", chosenMessage)
-            navController.navigate(MessageDetails.route)
+            navController.navigate(
+                "MessageDetails?messageMode=${messageMode.value}"
+            )
         }
     }
 
@@ -106,7 +108,10 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp, bottom = 8.dp)
-                            .clickable { messageListViewModel.updateShouldShowDetails(true) },
+                            .clickable {
+                                messageListViewModel.updateChosenMessage(message)
+                                messageListViewModel.updateShouldShowDetails(true)
+                                       },
                     ) {
                         CustomCard(
                             Modifier
