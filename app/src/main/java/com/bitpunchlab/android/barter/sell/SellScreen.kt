@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -80,6 +81,15 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
         }
     }
 
+    LaunchedEffect(key1 = shouldSetAskingProduct) {
+        if (shouldSetAskingProduct) {
+            //Log.i("should set", "about to navigate")
+            sellViewModel.updateShouldSetProduct(false)
+            navController.navigate(AskProduct.route)
+        }
+        //Log.i("should set", "is false")
+    }
+
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -103,7 +113,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 50.dp, end = 50.dp)
+                    .padding(horizontal = dimensionResource(id = R.dimen.sell_screen_left_right_padding))
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -112,25 +122,38 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 Image(
                     painter = painterResource(id = R.mipmap.healthcheck),
                     modifier = Modifier
-                        .padding(top = 30.dp)
-                        .width(100.dp),
+                        .padding(top = dimensionResource(id = R.dimen.icon_padding))
+                        .width(dimensionResource(id = R.dimen.icon_size)),
                     contentDescription = "Selling page icon"
                 )
 
                 TitleText(
                     title = "Sell",
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
 
                 // a form to get the product's detail
                 ProductForm(
-                    productName, pickImageLauncher, shouldExpandCategory,
-                    productCategory, numOfImages,
-                    shouldExpandDuration, sellingDuration, sellViewModel,
-                    shouldSetAskingProduct,
-                    numOfProducts.value,
-                    Modifier.padding(top = 25.dp), navController
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding)),
+                    productName = productName,
+                    pickImageLauncher = pickImageLauncher,
+                    shouldExpandCat = shouldExpandCategory,
+                    productCategory = productCategory,
+                    numOfImages = numOfImages,
+                    shouldExpandDuration = shouldExpandDuration,
+                    sellingDuration = sellingDuration,
+                    updateName = { sellViewModel.updateName(it) },
+                    updateShouldExpandCat = { sellViewModel.updateShouldExpandCategory(it) },
+                    updateCat = { sellViewModel.updateCategory(it) },
+                    prepareImages = { sellViewModel.prepareImagesDisplay() },
+                    updateShouldDisplayImages = { sellViewModel.updateShouldDisplayImages(it) },
+                    updateShouldExpandDuration = { sellViewModel.updateShouldExpandDuration(it) },
+                    updateSellingDuration = { sellViewModel.updateSellingDuration(it) },
+                    prepareAskingProducts = { sellViewModel.prepareAskingProducts() },
+                    updateShouldShowAsking = { sellViewModel.updateShouldShowAsking(true) },
+                    updateShouldSetProduct = { sellViewModel.updateShouldSetProduct(true) },
+                    numOfProducts = numOfProducts.value,
                 )
 
                 Row(
@@ -185,21 +208,20 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 // product category, name, images, asked products (3), selling duration (like how many days)
 // 
 @Composable
-fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
+fun ProductForm(modifier: Modifier = Modifier, productName: String,
+                pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
                 shouldExpandCat: Boolean, productCategory: Category, numOfImages: MutableState<Int>,
                 shouldExpandDuration: Boolean, sellingDuration: SellingDuration,
-                sellViewModel: SellViewModel, shouldSetProduct: Boolean,
+                updateName: (String) -> Unit, updateShouldExpandCat: (Boolean) -> Unit,
+                updateCat: (Category) -> Unit, prepareImages: () -> Unit,
+                updateShouldDisplayImages: (Boolean) -> Unit,
+                updateShouldExpandDuration: (Boolean) -> Unit,
+                updateSellingDuration: (SellingDuration) -> Unit,
+                prepareAskingProducts: () -> Unit,
+                updateShouldShowAsking: (Boolean) -> Unit,
+                updateShouldSetProduct: (Boolean) -> Unit,
                 numOfProducts: Int,
-                modifier: Modifier = Modifier, navController: NavHostController) {
-
-    LaunchedEffect(key1 = shouldSetProduct) {
-        if (shouldSetProduct) {
-            //Log.i("should set", "about to navigate")
-            sellViewModel.updateShouldSetProduct(false)
-            navController.navigate(AskProduct.route)
-        }
-        //Log.i("should set", "is false")
-    }
+                ) {
 
     Column(
         modifier = Modifier.then(modifier)
@@ -209,12 +231,12 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
             productCategory = productCategory,
             shouldExpandCat = shouldExpandCat,
             pickImageLauncher = pickImageLauncher,
-            updateName = { name: String -> sellViewModel.updateName(name) },
-            updateExpandCat = { expand: Boolean -> sellViewModel.updateShouldExpandCategory(expand) },
-            updateCat = { cat: Category -> sellViewModel.updateCategory(cat) },
-            prepareImages = { sellViewModel.prepareImagesDisplay() },
+            updateName = updateName,
+            updateShouldExpandCat = updateShouldExpandCat,
+            updateCat = updateCat,
+            prepareImages = prepareImages,
             numOfImages = numOfImages.value,
-            updateShouldDisplayImages = { display: Boolean -> sellViewModel.updateShouldDisplayImages(display) }
+            updateShouldDisplayImages = updateShouldDisplayImages
         )
 
             Row(
@@ -235,10 +257,12 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
                 CustomDropDown(
                     title = "Duration",
                     shouldExpand = shouldExpandDuration,
-                    onClickButton = { sellViewModel.updateShouldExpandDuration(!shouldExpandDuration) },
+                    onClickButton = {
+                                    updateShouldExpandDuration(!shouldExpandDuration)
+                                    },
                     onClickItem = {
-                        sellViewModel.updateSellingDuration(it)
-                        sellViewModel.updateShouldExpandDuration(false)
+                        updateSellingDuration(it)
+                        updateShouldExpandDuration(false)
                     },
                     onDismiss = { },
                     items = listOf(SellingDuration.ONE_DAY, SellingDuration.TWO_DAYS),
@@ -260,8 +284,8 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
                         // show a list of asking products that were already set
                         // we need to prepare the asking products list in ProductInfo's asking products
                         // the asking products list screen depends on this variable
-                        sellViewModel.prepareAskingProducts()
-                        sellViewModel.updateShouldShowAsking(true)
+                        prepareAskingProducts()
+                        updateShouldShowAsking(true)
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
@@ -269,7 +293,7 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
                 ChoiceButton(
                     title = "Add",
                     onClick = {
-                        sellViewModel.updateShouldSetProduct(true)
+                              updateShouldSetProduct(true)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -283,7 +307,7 @@ fun ProductForm(productName: String, pickImageLauncher: ManagedActivityResultLau
 fun BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
                      pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
                      updateName: (String) -> Unit,
-                     updateExpandCat: (Boolean) -> Unit,
+                     updateShouldExpandCat: (Boolean) -> Unit,
                      updateCat: (Category) -> Unit,
                      numOfImages: Int,
                      prepareImages: () -> Unit,
@@ -304,7 +328,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp),
+                .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding)),
             horizontalArrangement = Arrangement.Start
 
         ) {
@@ -313,31 +337,31 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                 textValue = productCategory.label,
                 onChange = {},
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
             )
 
             CustomDropDown(
                 title = stringResource(R.string.category),
                 shouldExpand = shouldExpandCat,
                 onClickButton = {
-                    updateExpandCat(!shouldExpandCat)
+                    updateShouldExpandCat(!shouldExpandCat)
                 },
                 onClickItem =  {
                     updateCat(it)
-                    updateExpandCat(false)
+                    updateShouldExpandCat(false)
                 },
                 onDismiss = {  },
                 items = listOf(Category.DICTIONARY, Category.TOYS, Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp)
+                    .padding(start = dimensionResource(id = R.dimen.sell_screen_in_between_element_padding))
             )
         }
         Row(
             verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp),
+                .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding)),
 
             ) {
             CustomButton(
@@ -347,7 +371,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                     updateShouldDisplayImages(true)
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.5f),
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width)),
 
                 )
             ChoiceButton(
@@ -355,7 +379,10 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                 onClick = { pickImageLauncher.launch("image/*") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, bottom = 20.dp)
+                    .padding(
+                        start = dimensionResource(id = R.dimen.sell_screen_in_between_element_padding),
+                        bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
+                    )
             )
         }
     }
@@ -408,95 +435,6 @@ fun ProcessSellingInvalidFieldDialog(onDismiss: () -> Unit) {
         onDismiss = { onDismiss() },
         onPositive = { onDismiss() })
 }
-/*
-@Composable
-fun <T: Any> BaseProductForm(productName: String, productCategory: Category, shouldExpandCat: Boolean,
-    viewModel: T, pickImageLauncher: ManagedActivityResultLauncher<String, Uri?>,
-    ) {
-
-    val viewModelCollection = viewModel::class.members
-    val viewModelUpdateName = viewModelCollection.first { it.name == "updateName" }
-    val viewModelUpdateCategory = viewModelCollection.first { it.name == "updateCategory" }
-    val viewModelUpdateShouldExpandCategory = viewModelCollection.first { it.name == "updateShouldExpandCategory" }
-    val viewModelPrepareImagesDisplay = viewModelCollection.first { it.name == "prepareImagesDisplay" }
-    val viewModelUpdateShouldDisplayImages = viewModelCollection.first { it.name == "updateShouldDisplayImages" }
-
-    Column() {
-        CustomTextField(
-            label = "Product name",
-            textValue = productName,
-            onChange = {
-                viewModelUpdateName.call(viewModel, it)
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Start
-
-        ) {
-            CustomTextField(
-                label = "Category",
-                textValue = productCategory.label,
-                onChange = {},
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-            )
-
-            CustomDropDown(
-                title = "Category",
-                shouldExpand = shouldExpandCat,
-                onClickButton = {
-                    viewModelUpdateShouldExpandCategory.call(viewModel, !shouldExpandCat)
-                    //sellViewModel.updateShouldExpandCategory(!shouldExpandCat)
-                },
-                onClickItem =  {
-                    viewModelUpdateCategory.call(viewModel, it)
-                    viewModelUpdateShouldExpandCategory.call(viewModel, false)
-                },
-                onDismiss = {  },
-                items = listOf(Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp)
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-
-        ) {
-            CustomButton(
-                label = "Images",
-                onClick = {
-                    //Log.i("base product form", "set should display image true")
-                    viewModelPrepareImagesDisplay.call(viewModel)
-                    viewModelUpdateShouldDisplayImages.call(viewModel, true)
-                },
-                modifier = Modifier
-                    .fillMaxWidth(0.5f),
-
-            )
-            ChoiceButton(
-                title = "Upload",
-                onClick = { pickImageLauncher.launch("image/*") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, bottom = 20.dp)
-            )
-        }
-    }
-}
-
- */
- */
-
 
 
 

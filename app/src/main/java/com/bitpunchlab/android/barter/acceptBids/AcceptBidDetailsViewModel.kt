@@ -5,10 +5,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
+import com.bitpunchlab.android.barter.util.BidMode
 import com.bitpunchlab.android.barter.util.BidStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
+import com.bitpunchlab.android.barter.util.acceptBidStatusMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -116,9 +119,22 @@ class AcceptBidDetailsViewModel : ViewModel() {
             val statusInt = newStatus.ordinal
             Log.i("update bid status", "status ${newStatus} ordinal $statusInt")
             _bidStatus.value = newStatus
+
+            acceptBid.status = statusInt
+
+            // send to firestore before saving in database
+            CoroutineScope(Dispatchers.IO).launch {
+                //FirebaseClient.uploadAcceptBid(acceptBid.)
+                //val bidMode = if (newStatus == BidStatus.REQUESTED_CLOSE) BidMode.REQUEST
+                if (FirebaseClient.processTransaction(acceptBid.acceptId, newStatus)) {
+                    Log.i("process update bid status", "success")
+                } else {
+                    Log.i("process update bid status", "failed")
+                }
+            }
         }
 
-        
+
     }
 
     fun updateShouldPopSelf(should: Boolean) {

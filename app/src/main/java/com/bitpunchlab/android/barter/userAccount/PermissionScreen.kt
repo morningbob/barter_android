@@ -15,9 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Login
+import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.ChoiceButton
 import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
@@ -48,18 +51,22 @@ fun PermissionScreen(navController: NavHostController,
 
         ) {
             TitleText(
-                title = "Please grant read and write files permissions to the app.  The app needs the permissions to run normally.",
+                title = stringResource(R.string.permission_intro),
                 modifier = Modifier
-                    .padding(top = 80.dp, start = 60.dp, end = 60.dp)
+                    .padding(
+                        top = 100.dp,
+                        start = dimensionResource(id = R.dimen.left_right_element_padding),
+                        end = dimensionResource(id = R.dimen.left_right_element_padding)
+                    )
             )
 
             ChoiceButton(
-                title = "Grant Permission",
+                title = stringResource(R.string.grant_permission),
                 onClick = {
                           permissionViewModel.updateShouldRequestPermission(true)
                   },
                 modifier = Modifier
-                    .padding(top = 60.dp)
+                    .padding(top = dimensionResource(id = R.dimen.left_right_element_padding))
             )
         }
     }

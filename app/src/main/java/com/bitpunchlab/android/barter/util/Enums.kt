@@ -111,6 +111,13 @@ enum class BidStatus(var label: String) {
     CLOSED(label = "Transaction Closed")
 }
 
+enum class BidMode {
+    ACCEPT,
+    REQUEST,
+    CONFIRM,
+    CLOSE
+}
+
 enum class ImageType {
     PRODUCT_IMAGE,
     ASKING_IMAGE

@@ -20,6 +20,8 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
+import com.bitpunchlab.android.barter.util.BidMode
+import com.bitpunchlab.android.barter.util.BidStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.LoginStatus
 import com.bitpunchlab.android.barter.util.MainStatus
@@ -906,12 +908,13 @@ object FirebaseClient {
         return false
     }
 
-    private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase) =
+    suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase)
+                                         =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
 
             Firebase.firestore
                 .collection("acceptBids")
-                .document()
+                .document(acceptBidFirebase.id)
                 .set(acceptBidFirebase)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -1016,5 +1019,30 @@ object FirebaseClient {
                 }
         }
 
+    }
+
+    suspend fun processTransaction(id: String, bidStatus: BidStatus) : Boolean =
+        //val path = when (bidMode) {
+        //    BidMode.REQUEST -> "requestTransaction"
+        //    BidMode.CONFIRM -> "confirmTransaction"
+       //     BidMode.CLOSE -> "closeTransaction"
+        //    else -> ""
+        //}
+        suspendCancellableCoroutine { cancellableContinuation ->
+        //CoroutineScope(Dispatchers.IO).async {
+            Firebase.firestore
+                .collection("processTransactionStatus")
+                .document(id)
+                .set(mapOf("id" to id, "status" to bidStatus.ordinal.toString()))
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i("transaction processes", "success")
+                        cancellableContinuation.resume(true) {}
+                    } else {
+                        Log.i("transaction processes", "failed ${task.exception}")
+                        cancellableContinuation.resume(false) {}
+                    }
+                }
+        //}
     }
 }

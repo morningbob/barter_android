@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -82,7 +83,7 @@ fun AskingProductScreen(navController: NavHostController,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BarterColor.lightGreen)
-                    .padding(start = 50.dp, end = 50.dp)
+                    .padding(horizontal = dimensionResource(id = R.dimen.sell_screen_left_right_padding))
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -91,14 +92,14 @@ fun AskingProductScreen(navController: NavHostController,
                     painter = painterResource(id = R.mipmap.productreview),
                     contentDescription = "asking product's icon",
                     modifier = Modifier
-                        .width(120.dp)
-                        .padding(top = 40.dp)
+                        .width(dimensionResource(id = R.dimen.icon_size))
+                        .padding(top = dimensionResource(id = R.dimen.icon_padding))
                 )
 
                 TitleText(
-                    title = "Set Asking Product",
+                    title = stringResource(R.string.set_asking_product),
                     modifier = Modifier
-                        .padding(top = 40.dp, bottom = 30.dp)
+                        .padding(vertical = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
 
                 BaseProductForm(
@@ -107,7 +108,7 @@ fun AskingProductScreen(navController: NavHostController,
                     shouldExpandCat = shouldExpandCategory,
                     pickImageLauncher = pickImageLauncher,
                     updateName = { name: String -> askingProductViewModel.updateName(name) },
-                    updateExpandCat = { expand: Boolean -> askingProductViewModel.updateShouldExpandCategory(expand) },
+                    updateShouldExpandCat = { expand: Boolean -> askingProductViewModel.updateShouldExpandCategory(expand) },
                     updateCat = { cat: Category -> askingProductViewModel.updateCategory(cat) },
                     numOfImages = productImages.size,
                     prepareImages = { sellViewModel.prepareImagesDisplay() },
@@ -117,29 +118,32 @@ fun AskingProductScreen(navController: NavHostController,
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 30.dp),
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding)),
                     horizontalArrangement = Arrangement.SpaceEvenly
 
                 ) {
                     ChoiceButton(
-                        title = "Done",
+                        title = stringResource(R.string.done),
                         onClick = {
                             // save to database
                             askingProductViewModel.processAskingProduct()
                         },
                         modifier = Modifier
-                            .fillMaxWidth(0.48f)
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
 
                     )
                     ChoiceButton(
-                        title = "Cancel",
+                        title = stringResource(id = R.string.cancel),
                         onClick = {
                             // pop stack
                             popCurrent = true
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 20.dp, bottom = 50.dp)
+                            .padding(
+                                start = dimensionResource(id = R.dimen.sell_screen_left_right_padding),
+                                bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
+                            )
                     )
                 }
             }

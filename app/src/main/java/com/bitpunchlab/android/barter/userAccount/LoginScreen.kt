@@ -1,6 +1,7 @@
 package com.bitpunchlab.android.barter.userAccount
 
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -73,9 +76,12 @@ fun LoginScreen(navController: NavHostController,
         }
     }
 
+    //val config = LocalConfiguration.current
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        /*
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -86,28 +92,32 @@ fun LoginScreen(navController: NavHostController,
                     contentScale = ContentScale.FillBounds
                 )
         ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 70.dp,
-                    end = 70.dp
-                )
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+
+         */
+        //if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BarterColor.lightGreen)
+                    .padding(
+                        start = dimensionResource(id = R.dimen.left_right_element_padding),
+                        end = dimensionResource(id = R.dimen.left_right_element_padding)
+                    )
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Image(
                     painter = painterResource(id = com.bitpunchlab.android.barter.R.mipmap.enter),
                     contentDescription = "Login icon",
                     modifier = Modifier
-                        .padding(top = 40.dp)
-                        .width(120.dp)
+                        .padding(top = dimensionResource(id = R.dimen.icon_padding))
+                        .width(dimensionResource(id = R.dimen.icon_size))
                 )
 
                 TitleText(
                     title = stringResource(id = R.string.login),
                     modifier = Modifier
-                        .padding(top = 40.dp, bottom = 30.dp)
+                        .padding(vertical = dimensionResource(id = R.dimen.icon_padding))
                 )
 
                 CustomTextField(
@@ -115,14 +125,18 @@ fun LoginScreen(navController: NavHostController,
                     textValue = userEmail,
                     onChange = { loginViewModel.updateEmail(it) },
                     modifier = Modifier
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_error_padding))
                         .fillMaxWidth()
                 )
 
                 ErrorText(
                     error = emailError,
                     modifier = Modifier
-                        .padding(bottom = 20.dp, start = 20.dp)
+                        .padding(
+                            bottom = dimensionResource(id = R.dimen.top_bottom_element_padding),
+                            start = dimensionResource(id = R.dimen.left_right_error_padding),
+                            end = dimensionResource(id = R.dimen.left_right_error_padding)
+                        )
                         .fillMaxWidth()
                 )
 
@@ -132,15 +146,17 @@ fun LoginScreen(navController: NavHostController,
                     onChange = { loginViewModel.updatePassword(it) },
                     hide = true,
                     modifier = Modifier
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_error_padding))
                         .fillMaxWidth()
                 )
 
                 ErrorText(
                     error = passError,
                     modifier = Modifier
-                        .padding(bottom = 20.dp, start = 20.dp)
-
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_element_padding),
+                            start = dimensionResource(id = R.dimen.left_right_error_padding),
+                            end = dimensionResource(id = R.dimen.left_right_error_padding)
+                        )
                 )
 
                 CustomButton(
@@ -148,26 +164,26 @@ fun LoginScreen(navController: NavHostController,
                     onClick = { loginViewModel.login() },
                     enable = readyLogin && !loading,
                     modifier = Modifier
-                        .padding(top = 15.dp, bottom = 10.dp)
+                        //.padding(bottom = 10.dp)
                         .fillMaxWidth()
                 )
 
                 CustomButton(
-                    label = "Sign Up",
+                    label = stringResource(id = R.string.sign_up),
                     onClick = {
                         onSignupClicked.invoke()
                     },
                     modifier = Modifier
-                        .padding(bottom = 0.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
                         .fillMaxWidth(),
                 )
 
                 Text(
                     text = stringResource(R.string.forgot_password),
                     color = BarterColor.textGreen,
-                    fontSize = 18.sp,
+                    fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
                         .clickable { loginViewModel.updateLoginStatus(LoginStatus.RESET_PASSWORD) }
                 )
 
@@ -183,7 +199,6 @@ fun LoginScreen(navController: NavHostController,
                     )
                 }
             }
-        }
 
         Box(
             contentAlignment = Alignment.Center,
@@ -193,7 +208,7 @@ fun LoginScreen(navController: NavHostController,
         ) {
             CustomCircularProgressBar()
         }
-    }
+    } // end of surface1
 }
 
 @Composable
@@ -204,7 +219,7 @@ fun ResetPasswordForm(email: String, emailError: String, updateEmail: (String) -
 
     Column(
         modifier = Modifier
-            .padding(top = 10.dp),
+            .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CustomTextField(
@@ -217,7 +232,7 @@ fun ResetPasswordForm(email: String, emailError: String, updateEmail: (String) -
         ErrorText(
             error = emailError,
             modifier = Modifier
-                .padding(top = 5.dp, bottom = 5.dp)
+                .padding(vertical = dimensionResource(id = R.dimen.top_bottom_error_padding))
         )
         CustomButton(
             label = stringResource(id = R.string.reset_password),
@@ -225,7 +240,7 @@ fun ResetPasswordForm(email: String, emailError: String, updateEmail: (String) -
             enable = enableSend && !loading,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 50.dp)
+                .padding(bottom = dimensionResource(id = R.dimen.page_bottom_padding_no_bar))
         )
     }
 }
@@ -283,6 +298,19 @@ fun ResetPassServerErrorDialog(onDismiss: () -> Unit) {
 }
 
 @Composable
+fun ResetPassSuccessDialog(onDismiss: () -> Unit) {
+    CustomDialog(
+        title = stringResource(R.string.reset_password),
+        message = stringResource(R.string.reset_pass_success_alert_desc),
+        positiveText = stringResource(R.string.ok),
+        onDismiss = { onDismiss.invoke() },
+        onPositive = { onDismiss.invoke() }
+    )
+
+}
+
+/*
+@Composable
 fun ResetPassEmailNotFoundDialog(onDismiss: () -> Unit) {
     CustomDialog(
         title = stringResource(R.string.reset_password),
@@ -294,15 +322,5 @@ fun ResetPassEmailNotFoundDialog(onDismiss: () -> Unit) {
 
 }
 
-@Composable
-fun ResetPassSuccessDialog(onDismiss: () -> Unit) {
-    CustomDialog(
-        title = stringResource(R.string.reset_password),
-        message = stringResource(R.string.reset_pass_success_alert_desc),
-        positiveText = stringResource(R.string.ok),
-        onDismiss = { onDismiss.invoke() },
-        onPositive = { onDismiss.invoke() }
-    )
-
-}
+ */
 

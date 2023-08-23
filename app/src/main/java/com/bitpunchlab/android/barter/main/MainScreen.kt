@@ -1,7 +1,9 @@
 package com.bitpunchlab.android.barter.main
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -56,6 +59,7 @@ import com.bitpunchlab.android.barter.util.DeleteAccountStatus
 import com.bitpunchlab.android.barter.util.MainStatus
 import kotlinx.coroutines.flow.map
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
@@ -77,6 +81,8 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val loadingAlpha by mainViewModel.loadingAlpha.collectAsState()
 
     val userName = currentUser?.name ?: "there!"
+
+    val resources = LocalContext.current.resources
 
     LaunchedEffect(key1 = loadingAlpha) {
         if (loadingAlpha == 100f) {
@@ -118,16 +124,14 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     painter = painterResource(id = R.mipmap.stall),
                     contentDescription = "main page icon",
                     modifier = Modifier
-                        .padding(top = 30.dp)
-                        .width(100.dp)
+                        .padding(top = dimensionResource(id = R.dimen.icon_padding))
+                        .width(dimensionResource(id = R.dimen.icon_size))
                 )
                 TitleText(
                     title = "Hello, ${userName}!",
                     modifier = Modifier
-                        .padding(top = 30.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
-
-
 
                 // display change password input field only upon the button clicked
                 if (mainStatus == MainStatus.NORMAL) {
@@ -136,12 +140,18 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         updateMainStatus = { mainViewModel.updateMainStatus(MainStatus.CHANGE_PASSWORD) },
                         modifier = Modifier
                             .background(BarterColor.lightGreen)
-                            .padding(top = 30.dp, bottom = 70.dp)
-                            .fillMaxWidth(0.8f)
-                            .fillMaxHeight(0.6f),
+                            .padding(
+                                top = dimensionResource(id = R.dimen.profile_top_padding),
+                                bottom = dimensionResource(id = R.dimen.profile_bottom_padding)
+                            )
+                            .fillMaxWidth(resources.getFloat(R.dimen.profile_width_portion))
+                            .fillMaxHeight(resources.getFloat(R.dimen.profile_height_portion)),
                         contentModifier = Modifier
                             .background(BarterColor.lightGreen)
-                            .padding(top = 30.dp, bottom = 30.dp),
+                            .padding(
+                                top = dimensionResource(R.dimen.profile_content_padding),
+                                bottom = dimensionResource(R.dimen.profile_content_padding)
+                            ),
                         updateDeleteStatus = { mainViewModel.updateDeleteAccountStatus(DeleteAccountStatus.CONFIRM_DELETE) },
                         updateShouldNavigateMessages = { mainViewModel.updateShouldNavigateMessages(true) }
                     )
@@ -162,14 +172,14 @@ fun MainScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         updateStatus = { mainViewModel.updateMainStatus(it) },
                         changePassword = { mainViewModel.changePassword() },
                         modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .fillMaxHeight(0.85f)
+                            .fillMaxWidth(resources.getFloat(R.dimen.change_password_width_portion))
+                            .fillMaxHeight(resources.getFloat(R.dimen.change_password_height_portion))
                             .background(BarterColor.lightGreen)
-                            .padding(top = 30.dp, bottom = 30.dp),
+                            .padding(vertical = dimensionResource(id = R.dimen.profile_content_padding)),
 
                         contentModifier = Modifier
                             .background(BarterColor.lightGreen)
-                            .padding(top = 30.dp, bottom = 30.dp),
+                            .padding(vertical = dimensionResource(id = R.dimen.profile_content_padding)),
                         loading = loading
                     )
 
@@ -238,26 +248,26 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = user?.name ?: "Loading...",
-                fontSize = 20.sp,
+                text = user?.name ?: stringResource(R.string.loading),
+                fontSize = dimensionResource(id = R.dimen.profile_font_size).value.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier
                     .padding()
             )
 
             Text(
-                text = user?.email ?: "Loading...",
-                fontSize = 20.sp,
+                text = user?.email ?: stringResource(R.string.loading),
+                fontSize = dimensionResource(id = R.dimen.profile_font_size).value.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
             )
 
             ChoiceButton(
                 title = stringResource(R.string.messages),
                 onClick = { updateShouldNavigateMessages() },
                 modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
             )
 
             CustomButton(
@@ -266,7 +276,7 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
                     updateMainStatus()
                 },
                 modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
             )
 
             CustomButton(
@@ -275,7 +285,7 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
                     updateDeleteStatus()
                 },
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
             )
         }
     }
@@ -292,7 +302,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
     CustomCard(modifier = modifier) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(0.85f)
+                .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_width_portion))
                 .verticalScroll(rememberScrollState())
                 .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -306,13 +316,13 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 },
                 hide = true,
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             ErrorText(
                 error = currentPassError,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .padding(top = 5.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             CustomTextField(
                 label = stringResource(R.string.new_password),
@@ -322,13 +332,13 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 },
                 hide = true,
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             ErrorText(
                 error = newPassError,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .padding(top = 5.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             CustomTextField(
                 label = stringResource(R.string.confirm_password),
@@ -338,13 +348,13 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 },
                 hide = true,
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             ErrorText(
                 error = confirmPassError,
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .padding(top = 10.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
 
             CustomButton(
@@ -355,7 +365,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 enable = readyChangePassword && !loading,
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
-                    .padding(top = 20.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
             CustomButton(
                 label = stringResource(R.string.cancel),
@@ -364,7 +374,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
-                    .padding(top = 10.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
         }
     }
@@ -410,7 +420,7 @@ fun ChangePassIncorrectPassDialog(onDismiss: () -> Unit) {
 fun ConfirmDeleteAccountDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     CustomDialog(
         title = stringResource(R.string.delete_account_confirmation),
-        message = "Please confirm that you want to delete your account.",
+        message = stringResource(R.string.confirm_delete_ac_alert_desc),
         positiveText = stringResource(R.string.confirm),
         negativeText = stringResource(id = R.string.cancel),
         onDismiss = { onDismiss.invoke() },
@@ -425,8 +435,8 @@ fun ConfirmDeleteAccountDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 @Composable
 fun DeleteAccountSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Delete Account Success",
-        message = "Your account is deleted from the server.",
+        title = stringResource(R.string.delete_account_success),
+        message = stringResource(R.string.delete_ac_success_alert_desc),
         positiveText = stringResource(R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
@@ -437,8 +447,8 @@ fun DeleteAccountSuccessDialog(onDismiss: () -> Unit) {
 @Composable
 fun DeleteAccountFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Delete Account Failed",
-        message = "We couldn't process your delete account request now.  There is an error in the server.  Please try again later.",
+        title = stringResource(R.string.delete_account_failed),
+        message = stringResource(R.string.delete_ac_failed_alert_desc),
         positiveText = stringResource(R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
@@ -446,13 +456,4 @@ fun DeleteAccountFailureDialog(onDismiss: () -> Unit) {
 
 }
 
-/*
-                    ChoiceButton(
-                        title = stringResource(R.string.messages),
-                        onClick = { mainViewModel.updateShouldNavigateMessages(true)},
-                        modifier = Modifier
-                            .padding(top = 30.dp)
-                    )
-
-                     */
 

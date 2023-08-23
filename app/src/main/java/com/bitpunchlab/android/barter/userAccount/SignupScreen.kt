@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -90,7 +91,7 @@ fun SignupScreen(navController: NavHostController,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BarterColor.lightGreen)
-                .padding(start = 70.dp, end = 70.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.icon_padding))
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
 
@@ -99,14 +100,14 @@ fun SignupScreen(navController: NavHostController,
                 painter = painterResource(id = R.mipmap.adduser),
                 contentDescription = "Sign up icon",
                 modifier = Modifier
-                    .width(120.dp)
-                    .padding(top = 30.dp)
+                    .width(dimensionResource(id = R.dimen.icon_size))
+                    .padding(top = dimensionResource(id = R.dimen.icon_padding))
             )
 
                 TitleText(
                     title = stringResource(R.string.sign_up),
                     modifier = Modifier
-                        .padding(top = 20.dp, bottom = 30.dp)
+                        .padding(vertical = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
 
                 CustomTextField(
@@ -114,13 +115,20 @@ fun SignupScreen(navController: NavHostController,
                     textValue = name,
                     onChange = { signupViewModel.updateName(it) },
                     modifier = Modifier
-                        .padding(top = 20.dp, bottom = 3.dp)
+                        .padding(
+                            top = dimensionResource(id = R.dimen.top_bottom_element_padding),
+                            bottom = dimensionResource(id = R.dimen.top_bottom_error_padding)
+                        )
                         .fillMaxWidth())
 
                 ErrorText(
                     error = nameError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp, start = 15.dp)
+                        .padding(
+                            bottom = dimensionResource(id = R.dimen.top_bottom_error_padding),
+                            start = dimensionResource(id = R.dimen.left_right_error_padding),
+                            end = dimensionResource(id = R.dimen.left_right_error_padding)
+                        )
                         .fillMaxWidth()
                 )
 
@@ -129,13 +137,17 @@ fun SignupScreen(navController: NavHostController,
                     textValue = email,
                     onChange = { signupViewModel.updateEmail(it) },
                     modifier = Modifier
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_error_padding))
                         .fillMaxWidth())
 
                 ErrorText(
                     error = emailError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp, start = 15.dp)
+                        .padding(
+                            bottom = dimensionResource(id = R.dimen.top_bottom_error_padding),
+                            start = dimensionResource(id = R.dimen.left_right_error_padding),
+                            end = dimensionResource(id = R.dimen.left_right_error_padding)
+                        )
                         .fillMaxWidth()
                 )
 
@@ -145,13 +157,17 @@ fun SignupScreen(navController: NavHostController,
                     onChange = { signupViewModel.updatePassword(it) },
                     hide = true,
                     modifier = Modifier
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_error_padding))
                         .fillMaxWidth())
 
                 ErrorText(
                     error = passError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp, start = 15.dp)
+                        .padding(
+                            bottom = dimensionResource(id = R.dimen.top_bottom_error_padding),
+                            start = dimensionResource(id = R.dimen.left_right_error_padding),
+                            end = dimensionResource(id = R.dimen.left_right_error_padding)
+                        )
                         .fillMaxWidth()
                 )
 
@@ -161,13 +177,17 @@ fun SignupScreen(navController: NavHostController,
                     onChange = { signupViewModel.updateConfirmPassword(it) },
                     hide = true,
                     modifier = Modifier
-                        .padding(bottom = 3.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_error_padding))
                         .fillMaxWidth())
 
                 ErrorText(
                     error = confirmPassError,
                     modifier = Modifier
-                        .padding(bottom = 10.dp, start = 15.dp)
+                        .padding(
+                            bottom = dimensionResource(id = R.dimen.top_bottom_error_padding),
+                            start = dimensionResource(id = R.dimen.left_right_error_padding),
+                            end = dimensionResource(id = R.dimen.left_right_error_padding)
+                        )
                         .fillMaxWidth()
                 )
 
@@ -175,7 +195,7 @@ fun SignupScreen(navController: NavHostController,
                     label = stringResource(id = R.string.send),
                     onClick = { signupViewModel.signup() },
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_button_padding))
                         .fillMaxWidth(),
                     enable = readySignup && !loading
                 )
@@ -187,7 +207,7 @@ fun SignupScreen(navController: NavHostController,
                         signupViewModel.updateShouldDismiss(true)
                               },
                     modifier = Modifier
-                        .padding(bottom = 50.dp)
+                        .padding(bottom = dimensionResource(id = R.dimen.page_bottom_padding_no_bar))
                         .fillMaxWidth(),
                 )
             }

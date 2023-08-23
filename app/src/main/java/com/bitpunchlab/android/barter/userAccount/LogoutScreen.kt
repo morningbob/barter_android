@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,12 +48,13 @@ fun LogoutScreen(navController: NavHostController) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BarterColor.lightGreen)
+                .background(BarterColor.lightGreen),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(R.string.logging_out),
                 fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
+                fontSize = dimensionResource(id = R.dimen.title_font_size).value.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier
                     .padding(top = 100.dp)

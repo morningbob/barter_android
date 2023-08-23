@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="icon_padding">40dp</dimen>
+    <dimen name="icon_size">100dp</dimen>
+    <dimen name="top_bottom_title_padding">30dp</dimen>
+    <dimen name="left_right_element_padding">60dp</dimen>
+    <dimen name="top_bottom_element_padding">20dp</dimen>
+    <dimen name="top_bottom_button_padding">15dp</dimen>
+    <dimen name="left_right_error_padding">15dp</dimen>
+    <dimen name="top_bottom_error_padding">5dp</dimen>
+    <dimen name="page_bottom_padding_no_bar">50dp</dimen>
+    <dimen name="page_bottom_padding_with_bar">100dp</dimen>
+    <dimen name="profile_top_padding">30dp</dimen>
+    <dimen name="profile_bottom_padding">70dp</dimen>
+    <dimen name="profile_content_padding">30dp</dimen>
+    <item name="profile_width_portion" format="float" type="dimen">0.7</item>
+    <item name="profile_height_portion" format="float" type="dimen">0.8</item>
+`   <item name="change_password_height_portion" format="float" type="dimen">0.8</item>
+    <item name="change_password_width_portion" format="float" type="dimen">0.85</item>
+    <item name="sell_screen_textfield_width" format="float" type="dimen">0.5</item>
+    <dimen name="sell_screen_in_between_element_padding">20dp</dimen>
+    <dimen name="sell_screen_left_right_padding">50dp</dimen>
+
+    <dimen name="title_font_size">35sp</dimen>
+    <dimen name="content_font_size">18sp</dimen>
+    <dimen name="profile_font_size">20sp</dimen>
+
+</resources>
