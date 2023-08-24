@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -82,7 +83,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     // confirm before execute
                     Column(
                         modifier = Modifier
-                            .padding(top = 10.dp),
+                            .padding(top = dimensionResource(id = R.dimen.list_page_top_bottom_margin)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     )
                     {
@@ -93,8 +94,6 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                                     AcceptBidStatus.TO_CONFIRM
                                 )
                             },
-                            modifier = Modifier
-                            //.padding()
                         )
                     }
                 }

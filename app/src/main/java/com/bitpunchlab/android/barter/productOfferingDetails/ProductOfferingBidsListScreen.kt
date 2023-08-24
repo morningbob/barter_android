@@ -18,10 +18,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.BidDetails
+import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.CustomCard
@@ -38,7 +40,6 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
           remember { ProductOfferingBidsListViewModel() }
     ) {
 
-    //val product by LocalDatabaseManager.productOfferingWithBids.collectAsState()
     val bids by LocalDatabaseManager.bids.collectAsState()
     val shouldShowBid by productOfferingBidsListViewModel.shouldShowBid.collectAsState()
     val shouldPopBids by productOfferingBidsListViewModel.shouldPopBids.collectAsState()
@@ -72,7 +73,11 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                 modifier = Modifier
                     .fillMaxSize()
                     .background(BarterColor.lightGreen)
-                    .padding(start = 40.dp, end = 40.dp, top = 5.dp)
+                    .padding(
+                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                        top = dimensionResource(id = R.dimen.list_page_top_bottom_margin)
+                    )
 
             ) {
                 items(bids, { bid -> bid.bidId }) { bid ->
@@ -97,14 +102,14 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BarterColor.lightGreen)
-                .padding(top = 8.dp, bottom = 8.dp)
+                .padding(vertical = dimensionResource(id = R.dimen.bid_row_top_bottom_padding))
 
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BarterColor.lightBrown)
-                    .padding(start = 20.dp, end = 20.dp)
+                    .padding(horizontal = dimensionResource(id = R.dimen.bid_row_left_right_padding))
                     .clickable { onClick.invoke(bid) }
                     .then(modifier)
             ) {
@@ -117,8 +122,8 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                             imageUrls = bid.bidProduct.images,
                             contentDes = "product's image",
                             modifier = Modifier
-                                .width(80.dp)
-                                .padding(top = 20.dp, bottom = 20.dp)
+                                .width(dimensionResource(id = R.dimen.bid_row_thumbnail_size))
+                                .padding(vertical = dimensionResource(id = R.dimen.bid_row_top_bottom_padding))
                         )
                     }
 
@@ -127,9 +132,12 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                     Text(
                         text = "For ${bid.bidProduct?.name}", //?: "Not Available",
                         color = BarterColor.textGreen,
-                        fontSize = 18.sp,
+                        fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                         modifier = Modifier
-                            .padding(top = 10.dp, start = 20.dp)
+                            .padding(
+                                top = dimensionResource(id = R.dimen.bid_row_top_bottom_padding),
+                                start = dimensionResource(id = R.dimen.bid_row_left_right_padding)
+                            )
                     )/*
                     Text(
                         text = bid.bidProduct?.category ?: "Not Available",
@@ -145,7 +153,9 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                             color = BarterColor.textGreen,
                             fontSize = 18.sp,
                             modifier = Modifier
-                                .padding(top = 10.dp, start = 20.dp)
+                                .padding(
+                                    top = dimensionResource(id = R.dimen.bid_row_top_bottom_padding),
+                                    start = dimensionResource(id = R.dimen.bid_row_left_right_padding))
                         )
                     }
                     /*
@@ -161,7 +171,11 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                     DateTimeInfo(
                         dateTimeString = bid.bidTime,
                         modifier = Modifier
-                            .padding(top = 10.dp, start = 20.dp)
+                            .padding(
+                                top = dimensionResource(id = R.dimen.bid_row_top_bottom_padding),
+                                start = dimensionResource(
+                                id = R.dimen.bid_row_left_right_padding
+                            ))
                     )
                 }
             }

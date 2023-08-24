@@ -15,6 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.Bid
@@ -62,18 +64,25 @@ fun ActiveBidsScreen(
             CancelCross(onCancel = { activeBidsViewModel.updateShouldDismiss(true) })
             TitleRow(
                 iconId = R.mipmap.list,
-                title = "Active Bids",
+                title = stringResource(R.string.active_bids),
                 modifier = Modifier
-                    .padding(top = 5.dp)
+                    .padding(top = dimensionResource(id = R.dimen.title_row_top_padding))
             )
             LazyColumn(
                 modifier = Modifier
                     .background(BarterColor.lightGreen)
-                    .padding(top = 5.dp, start = 40.dp, end = 40.dp)
+                    .padding(
+                        top = dimensionResource(id = R.dimen.title_row_top_padding),
+                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_margin)
+                    )
             ) {
                 items(chosenCurrentBid!!.currentBids, { activeBid -> activeBid.bidId} ) { activeBid ->
                     Row(modifier = Modifier
-                        .padding(top = 3.dp, bottom = 3.dp)) {
+                        .padding(
+                            top = dimensionResource(id = R.dimen.active_bids_row_padding),
+                            bottom = dimensionResource(id = R.dimen.active_bids_row_padding)
+                        )) {
                         BidRow(
                             bid = activeBid,
                             product = chosenCurrentBid!!.product,

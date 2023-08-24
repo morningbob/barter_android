@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -127,29 +129,33 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             imageUrls = product!!.images,
                             contentDes = "product's image",
                             modifier = Modifier
-                                .padding(top = 10.dp)
-                                .width(200.dp)
+                                .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
+                                .width(dimensionResource(id = R.dimen.detail_image_size))
                         )
                     }
 
                     Text(
                         text = product?.name ?: stringResource(R.string.not_available),
-                        fontSize = 20.sp,
+                        fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                         color = BarterColor.textGreen,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .padding(
-                                top = 20.dp, start = 50.dp, end = 50.dp
+                                top = dimensionResource(id = R.dimen.top_bottom_element_padding),
+                                start = dimensionResource(id = R.dimen.left_right_element_padding),
+                                end = dimensionResource(id = R.dimen.left_right_element_padding)
                             )
                     )
                     Text(
                         text = product?.category ?: stringResource(id = R.string.not_available),
-                        fontSize = 20.sp,
+                        fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                         color = BarterColor.textGreen,
                         //fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .padding(
-                                top = 20.dp, start = 50.dp, end = 50.dp
+                                top = dimensionResource(id = R.dimen.top_bottom_element_padding),
+                                start = dimensionResource(id = R.dimen.left_right_element_padding),
+                                end = dimensionResource(id = R.dimen.left_right_element_padding)
                             )
                     )
 
@@ -158,22 +164,25 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                             dateTimeString = it.dateCreated,
                             modifier = Modifier
                                 .padding(
-                                    top = 20.dp, start = 50.dp, end = 50.dp, bottom = 30.dp
+                                    top = dimensionResource(id = R.dimen.top_bottom_element_padding),
+                                    start = dimensionResource(id = R.dimen.left_right_element_padding),
+                                    end = dimensionResource(id = R.dimen.left_right_element_padding),
+                                    bottom = dimensionResource(id = R.dimen.start_menu_top_padding)
                                 )
                         )
                     }
-                    MenuBlock(modifier = Modifier, barHeight = 250.dp) {
+                    MenuBlock(
+                        modifier = Modifier, 
+                        barHeight = dimensionResource(id = R.dimen.menu_bar_height)) {
                         Column(
                             modifier = Modifier
-                                .padding(start = 20.dp)
+                                .padding(start = dimensionResource(id = R.dimen.start_menu_left_padding))
                         ) {
                             CustomButton(
                                 label = stringResource(R.string.images),
                                 onClick = {
                                     productDetailsViewModel.updateShouldDisplayImages(true)
                                 },
-                                modifier = Modifier
-                                    .padding(top = 0.dp)
                             )
                             CustomButton(
                                 label = stringResource(R.string.products_asked),
@@ -185,7 +194,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                     )
                                 },
                                 modifier = Modifier
-                                    .padding(top = 10.dp)
+                                    .padding(top = dimensionResource(id = R.dimen.menu_button_padding))
                             )
                             if (userMode == UserMode.OWNER_MODE) {
                                 CustomButton(
@@ -194,7 +203,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                         productDetailsViewModel.updateShouldShowBidsListStatus(1)
                                     },
                                     modifier = Modifier
-                                        .padding(top = 10.dp)
+                                        .padding(top = dimensionResource(id = R.dimen.menu_button_padding))
                                 )
                                 CustomButton(
                                     label = stringResource(R.string.delete_product),
@@ -202,7 +211,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                         productDetailsViewModel.confirmDelete()
                                     },
                                     modifier = Modifier
-                                        .padding(top = 10.dp)
+                                        .padding(top = dimensionResource(id = R.dimen.menu_button_padding))
                                 )
 
                             } else {
@@ -212,7 +221,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                         productDetailsViewModel.updateShouldBid(true)
                                     },
                                     modifier = Modifier
-                                        .padding(top = 10.dp)
+                                        .padding(top = dimensionResource(id = R.dimen.menu_button_padding))
                                 )
                             }
                         }

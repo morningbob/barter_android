@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -57,13 +58,6 @@ fun SendMessageScreen(navController: NavHostController,
         }
     }
 
-    //LaunchedEffect(key1 = product) {
-    //    if (product == null) {
-    //        navController.popBackStack()
-    //    }
-    //}
-
-
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -78,7 +72,7 @@ fun SendMessageScreen(navController: NavHostController,
             Column(
                 modifier = Modifier
                     .background(BarterColor.lightGreen)
-                    .padding(start = 40.dp, end = 40.dp),
+                    .padding(horizontal = dimensionResource(id = R.dimen.left_right_element_padding)),
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
@@ -86,22 +80,22 @@ fun SendMessageScreen(navController: NavHostController,
                     painter = painterResource(id = R.mipmap.chat),
                     contentDescription = "",
                     modifier = Modifier
-                        .padding(top = 10.dp)
-                        .width(120.dp)
+                        .padding(top = dimensionResource(id = R.dimen.send_message_element_top_bottom_padding))
+                        .width(dimensionResource(id = R.dimen.icon_size))
                 )
 
                 TitleText(
                     title = stringResource(R.string.send_message),
                     modifier = Modifier
-                        .padding(top = 10.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
 
                 Text(
-                    text = "To: ${name ?: "Loading"}",
-                    fontSize = 22.sp,
+                    text = "To: ${name ?: stringResource(id = R.string.loading)}",
+                    fontSize = dimensionResource(id = R.dimen.bigger_subtitle_font_size).value.sp,
                     color = BarterColor.textGreen,
                     modifier = Modifier
-                        .padding(top = 40.dp, bottom = 40.dp)
+                        .padding(vertical = dimensionResource(id = R.dimen.send_message_title_top_bottom_padding))
                 )
 
                 CustomTextArea(
@@ -109,12 +103,12 @@ fun SendMessageScreen(navController: NavHostController,
                     onChange = { sendMessageViewModel.updateMessageText(it) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp)
+                        .padding(top = dimensionResource(id = R.dimen.send_message_element_top_bottom_padding))
                 )
 
                 if (id != null && name != null) {
                     ChoiceButton(
-                        title = "Send",
+                        title = stringResource(id = R.string.send),
                         onClick = {
                             sendMessageViewModel.sendMessage(
                                 text = messageText,
@@ -123,7 +117,7 @@ fun SendMessageScreen(navController: NavHostController,
                             )
                         },
                         modifier = Modifier
-                            .padding(top = 20.dp)
+                            .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
                     )
                 }
             }
@@ -163,8 +157,8 @@ fun SendMessageScreen(navController: NavHostController,
 @Composable
 fun SendMessageInvalidDataDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Send Message",
-        message = "The message must not be empty.",
+        title = stringResource(id = R.string.send_message),
+        message = stringResource(R.string.send_message_invalid_data_alert_desc),
         positiveText = stringResource(R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
@@ -175,8 +169,8 @@ fun SendMessageInvalidDataDialog(onDismiss: () -> Unit) {
 @Composable
 fun SendMessageSuccessDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Send Message Success",
-        message = "The message was successfully sent to the server.  The server will send it to the user.",
+        title = stringResource(R.string.send_message_success),
+        message = stringResource(R.string.send_message_success_alert_desc),
         positiveText = stringResource(R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }
@@ -187,8 +181,8 @@ fun SendMessageSuccessDialog(onDismiss: () -> Unit) {
 @Composable
 fun SendMessageFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Send Message Failed",
-        message = "The message was not sent to the server.  There is an error.  Please make sure you have wifi and try again.",
+        title = stringResource(R.string.send_message_failed),
+        message = stringResource(R.string.send_message_failed_alert_desc),
         positiveText = stringResource(R.string.ok),
         onDismiss = { onDismiss.invoke() },
         onPositive = { onDismiss.invoke() }

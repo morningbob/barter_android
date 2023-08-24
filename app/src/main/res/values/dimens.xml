@@ -10,6 +10,19 @@
     <dimen name="top_bottom_error_padding">5dp</dimen>
     <dimen name="page_bottom_padding_no_bar">50dp</dimen>
     <dimen name="page_bottom_padding_with_bar">100dp</dimen>
+    <dimen name="list_page_left_right_margin">40dp</dimen>
+    <dimen name="list_page_top_bottom_margin">20dp</dimen>
+    <dimen name="double_column_left_right_padding">50dp</dimen>
+    <dimen name="mild_top_padding">20dp</dimen>
+    <dimen name="mild_start_padding">20dp</dimen>
+    <dimen name="list_page_item_top_padding">12dp</dimen>
+    <dimen name="card_row_item_top_padding"></dimen>
+
+    <item name="half_width" format="float" type="dimen">0.5</item>
+
+    <dimen name="thumbnail_padding">10dp</dimen>
+    <dimen name="detail_image_top_padding">20dp</dimen>
+    <dimen name="detail_image_size">200dp</dimen>
     <dimen name="profile_top_padding">30dp</dimen>
     <dimen name="profile_bottom_padding">70dp</dimen>
     <dimen name="profile_content_padding">30dp</dimen>
@@ -18,11 +31,79 @@
 `   <item name="change_password_height_portion" format="float" type="dimen">0.8</item>
     <item name="change_password_width_portion" format="float" type="dimen">0.85</item>
     <item name="sell_screen_textfield_width" format="float" type="dimen">0.5</item>
-    <dimen name="sell_screen_in_between_element_padding">20dp</dimen>
-    <dimen name="sell_screen_left_right_padding">50dp</dimen>
+
+
+    <dimen name="start_menu_top_padding">30dp</dimen>
+    <dimen name="start_menu_left_padding">20dp</dimen>
+    <dimen name="menu_button_padding">10dp</dimen>
+    <dimen name="menu_bar_height">250dp</dimen>
+    <dimen name="bid_row_top_bottom_padding">8dp</dimen>
+    <dimen name="bid_row_left_right_padding">20dp</dimen>
+    <dimen name="bid_row_thumbnail_padding">20dp</dimen>
+    <dimen name="bid_row_thumbnail_size">80dp</dimen>
+    <dimen name="dialog_top_bottom_padding">30dp</dimen>
+    <dimen name="dialog_left_right_padding">35dp</dimen>
+
+    <dimen name="dialog_title_top_bottom_padding">30dp</dimen>
+    <dimen name="dialog_button_padding">20dp</dimen>
+    <dimen name="round_corner_shape">12dp</dimen>
+    <dimen name="border_stroke">5dp</dimen>
+    <dimen name="textarea_height">150dp</dimen>
+    <dimen name="textarea_content_padding">25dp</dimen>
+    <dimen name="progress_bar_stroke">10dp</dimen>
+    <dimen name="progress_bar_size">80dp</dimen>
+    <dimen name="menu_bar_width">15dp</dimen>
+    <dimen name="menu_bar_left_padding">50dp</dimen>
+    <dimen name="menu_bar_right_padding">20dp</dimen>
+    <dimen name="cancel_cross_padding">20dp</dimen>
+    <dimen name="cancel_cross_size">40dp</dimen>
+    <dimen name="card_elevation">10dp</dimen>
+    <dimen name="product_row_top_bottom_padding">15dp</dimen>
+
+    <dimen name="product_row_item_padding">10dp</dimen>
+    <dimen name="product_row_image_size">100dp</dimen>
+    <dimen name="basic_bid_screen_top_padding">15dp</dimen>
+    <dimen name="basic_bid_screen_item_padding">30dp</dimen>
+    <dimen name="title_row_height">80dp</dimen>
+    <dimen name="thumbnail_right_padding">20dp</dimen>
+    <dimen name="choose_title_row_right_padding">15dp</dimen>
+    <dimen name="image_display_image_size">400dp</dimen>
+    <dimen name="image_display_remove_icon_padding">15dp</dimen>
+    <dimen name="image_display_remove_icon_size">25dp</dimen>
+    <dimen name="image_display_image_list_padding">15dp</dimen>
+    <dimen name="choose_title_row_top_padding">20dp</dimen>
+    <dimen name="title_row_top_padding">5dp</dimen>
+    <dimen name="title_row_bottom_padding">20dp</dimen>
+    <dimen name="title_row_left_right_padding">40dp</dimen>
+    <dimen name="current_bid_details_product_stroke">25dp</dimen>
+    <dimen name="current_bid_details_between_product_padding">30dp</dimen>
+    <dimen name="current_bid_pointer_size">80dp</dimen>
+    <dimen name="current_bid_exchange_size">150dp</dimen>
+    <dimen name="current_bid_exhange_left_padding">30dp</dimen>
+    <dimen name="active_bids_row_padding">3dp</dimen>
+    <dimen name="accept_bids_item_padding">12dp</dimen>
+    <dimen name="accept_bid_row_left_right_padding">20dp</dimen>
+    <dimen name="accept_bid_row_item_padding">5dp</dimen>
+    <dimen name="accept_bid_row_content_top_padding">10dp</dimen>
+    <dimen name="message_list_item_padding">8dp</dimen>
+    <dimen name="message_item_title_width">130dp</dimen>
+    <dimen name="message_item_message_width">200dp</dimen>
+    <dimen name="message_item_title_left_padding">10dp</dimen>
+    <dimen name="message_details_image_top_padding">10dp</dimen>
+    <dimen name="message_details_message_top_bottom_padding">20dp</dimen>
+    <dimen name="message_details_message_left_right_padding">13dp</dimen>
+    <dimen name="send_message_title_top_bottom_padding">40dp</dimen>
+    <dimen name="send_message_element_top_bottom_padding">10dp</dimen>
+    <dimen name="change_password_error_width">0.8</dimen>
+
 
     <dimen name="title_font_size">35sp</dimen>
+    <dimen name="subtitle_font_size">20sp</dimen>
+    <dimen name="bigger_subtitle_font_size">22sp</dimen>
     <dimen name="content_font_size">18sp</dimen>
-    <dimen name="profile_font_size">20sp</dimen>
+    <dimen name="dialog_title_font_size">20sp</dimen>
+    <dimen name="product_row_title_font_size">21sp</dimen>
+    <dimen name="date_time_font_size">16sp</dimen>
+    <dimen name="title_row_font_size">23sp</dimen>
 
 </resources>

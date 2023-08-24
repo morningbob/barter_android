@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -110,12 +111,12 @@ fun CustomButton(modifier: Modifier = Modifier,
             contentColor = BarterColor.green
             ),
         enabled = enable,
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corner_shape)),
 
     ) {
         Text(
             text = label,
-            fontSize = 18.sp,
+            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
             color = BarterColor.green,
             textAlign = TextAlign.Center
         )
@@ -126,7 +127,7 @@ fun CustomButton(modifier: Modifier = Modifier,
 fun TitleText(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        fontSize = 35.sp,
+        fontSize = dimensionResource(id = R.dimen.title_font_size).value.sp,
         color = BarterColor.textGreen,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
@@ -135,7 +136,7 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ContentText(content: String, textSize: TextUnit = 18.sp,
+fun ContentText(content: String, textSize: TextUnit = dimensionResource(id = R.dimen.content_font_size).value.sp,
                 textColor: Color = BarterColor.textGreen, modifier: Modifier) {
     Text(
         text = content,
@@ -150,7 +151,7 @@ fun ContentText(content: String, textSize: TextUnit = 18.sp,
 fun ErrorText(error: String, modifier: Modifier = Modifier) {
     Text(
         text = error,
-        fontSize = 18.sp,
+        fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
         color = BarterColor.errorRed,
         modifier = Modifier.then(modifier)
     )
@@ -164,17 +165,20 @@ fun CustomDialog(
         onDismissRequest = { onDismiss.invoke() }
     ) {
          Card(
-             shape = RoundedCornerShape(12.dp)
+             shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corner_shape))
          ) {
              Column(
                  modifier = Modifier
                      .background(BarterColor.lightGreen)
-                     .padding(top = 30.dp, bottom = 30.dp, start = 35.dp, end = 35.dp),
+                     .padding(
+                         vertical = dimensionResource(id = R.dimen.dialog_top_bottom_padding),
+                         horizontal = dimensionResource(id = R.dimen.dialog_left_right_padding)
+                     ),
                  horizontalAlignment = Alignment.CenterHorizontally
              ) {
                  Text(
                      text = title,
-                     fontSize = 25.sp,
+                     fontSize = dimensionResource(id = R.dimen.dialog_title_font_size).value.sp,
                      fontWeight = FontWeight.Bold,
                      color = BarterColor.textGreen,
                      modifier = Modifier
@@ -182,15 +186,15 @@ fun CustomDialog(
                  )
                  Text(
                      text = message,
-                     fontSize = 20.sp,
+                     fontSize = dimensionResource(id = R.dimen.dialog_title_font_size).value.sp,
                      color = BarterColor.green,
                      modifier = Modifier
                          .fillMaxWidth()
-                         .padding(top = 30.dp),
+                         .padding(top = dimensionResource(id = R.dimen.dialog_title_top_bottom_padding)),
                  )
                  Row(
                      modifier = Modifier
-                         .padding(top = 30.dp)
+                         .padding(top = dimensionResource(id = R.dimen.dialog_top_bottom_padding))
                  ) {
                      DialogButton(
                          title = positiveText, onPositive)
@@ -198,7 +202,7 @@ fun CustomDialog(
                          DialogButton(
                              title = negativeText, onNegative,
                              modifier = Modifier
-                                 .padding(start = 20.dp)
+                                 .padding(start = dimensionResource(id = R.dimen.dialog_button_padding))
                          )
                      }
                  }
@@ -220,7 +224,7 @@ fun DialogButton(title: String,
     ) {
         Text(
             text = title,
-            fontSize = 18.sp,
+            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
             color = Color.White
         )
     }
@@ -231,8 +235,8 @@ fun DialogButton(title: String,
 fun CustomTextArea(modifier: Modifier = Modifier, textInput: String, onChange: (String) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
 
-    val shape = RoundedCornerShape(10.dp)
-    val borderModifier = Modifier.border(8.dp, BarterColor.lightBlue, shape)
+    val shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corner_shape))
+    val borderModifier = Modifier.border(dimensionResource(id = R.dimen.border_stroke), BarterColor.lightBlue, shape)
 
     BasicTextField(
         value = textInput,
@@ -242,9 +246,9 @@ fun CustomTextArea(modifier: Modifier = Modifier, textInput: String, onChange: (
         modifier = borderModifier
             .background(BarterColor.lightYellow2, shape)
             .verticalScroll(rememberScrollState(), enabled = true)
-            .height(150.dp)
+            .height(dimensionResource(id = R.dimen.textarea_height))
             .then(modifier),
-        textStyle = TextStyle(fontSize = 18.sp),
+        textStyle = TextStyle(fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp),
         ) {
             innerTextField ->
             TextFieldDefaults.TextFieldDecorationBox(
@@ -255,8 +259,8 @@ fun CustomTextArea(modifier: Modifier = Modifier, textInput: String, onChange: (
                 visualTransformation = VisualTransformation.None,
                 interactionSource = interactionSource,
                 contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-                    start = 25.dp,
-                    end = 25.dp
+                    start = dimensionResource(id = R.dimen.textarea_content_padding),
+                    end = dimensionResource(id = R.dimen.textarea_content_padding)
                 ),
             )
     }
@@ -266,9 +270,9 @@ fun CustomTextArea(modifier: Modifier = Modifier, textInput: String, onChange: (
 fun CustomCircularProgressBar() {
     CircularProgressIndicator(
         modifier = Modifier
-            .size(80.dp),
+            .size(dimensionResource(id = R.dimen.progress_bar_size)),
         color = BarterColor.darkGreen,
-        strokeWidth = 10.dp
+        strokeWidth = dimensionResource(id = R.dimen.progress_bar_stroke)
     )
 }
 
@@ -277,7 +281,7 @@ fun MenuBlock(modifier: Modifier, barHeight: Dp = 100.dp, content: @Composable()
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 50.dp)
+            .padding(start = dimensionResource(id = R.dimen.menu_bar_left_padding))
             .then(modifier)
     ) {
         Row(
@@ -289,7 +293,7 @@ fun MenuBlock(modifier: Modifier, barHeight: Dp = 100.dp, content: @Composable()
                     .background(BarterColor.darkGreen)
                     .width(15.dp)
                     .height(barHeight)
-                    .padding(end = 20.dp)
+                    .padding(end = dimensionResource(id = R.dimen.menu_bar_right_padding))
             ) {
 
             }
@@ -303,7 +307,10 @@ fun CancelCross(modifier: Modifier = Modifier, onCancel: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 20.dp, top = 20.dp)
+            .padding(
+                end = dimensionResource(id = R.dimen.cancel_cross_padding),
+                top = dimensionResource(id = R.dimen.cancel_cross_padding)
+            )
             .then(modifier),
         horizontalArrangement = Arrangement.End
     ) {
@@ -311,7 +318,7 @@ fun CancelCross(modifier: Modifier = Modifier, onCancel: () -> Unit) {
             painter = painterResource(id = R.mipmap.cross),
             contentDescription = "cancel icon",
             modifier = Modifier
-                .width(40.dp)
+                .width(dimensionResource(id = R.dimen.cancel_cross_size))
                 .clickable {
                     onCancel()
                 },
@@ -366,22 +373,24 @@ fun ChoiceButton(modifier: Modifier = Modifier, title: String, enable: Boolean =
     ) {
         Text(
             text = title,
-            fontSize = 18.sp,
+            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
             color = Color.White,
         )
     }
 }
 
 @Composable
-fun CustomCard(modifier: Modifier = Modifier,
-               borderWidth: Dp = 3.dp,
-               borderColor: Color = BarterColor.textGreen,
-               content: @Composable() () -> Unit,) {
+fun CustomCard(
+    modifier: Modifier = Modifier,
+    borderWidth: Dp = dimensionResource(id = R.dimen.border_stroke),
+    borderColor: Color = BarterColor.textGreen,
+    content: @Composable() () -> Unit,
+) {
     Card(
         modifier = Modifier
             .then(modifier),
-        elevation = 10.dp,
-        shape = RoundedCornerShape(15.dp),
+        elevation = dimensionResource(id = R.dimen.card_elevation),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corner_shape)),
         border = BorderStroke(borderWidth, borderColor)
     ) {
         content()
@@ -397,7 +406,7 @@ fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifi
             modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(bottom = 15.dp)
+                .padding(bottom = dimensionResource(id = R.dimen.product_row_top_bottom_padding))
                 .clickable { onClick.invoke(product) }
                 .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -413,33 +422,33 @@ fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifi
                     imageUrls = product.images,
                     contentDes = "product's image",
                     modifier = Modifier
-                        .padding(start = 20.dp)
-                        .width(100.dp)
+                        .padding(start = dimensionResource(id = R.dimen.mild_start_padding))
+                        .width(dimensionResource(id = R.dimen.product_row_image_size))
                 )
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.Transparent)
-                        .padding(start = 20.dp, end = 20.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.mild_start_padding))
 
                 ) {
                     Text(
                         text = product.name,
                         color = BarterColor.textGreen,
-                        fontSize = 21.sp,
+                        fontSize = dimensionResource(id = R.dimen.product_row_title_font_size).value.sp,
                         modifier = Modifier
-                            .padding(top = 10.dp)
+                            .padding(top = dimensionResource(id = R.dimen.product_row_item_padding))
                     )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.product_row_item_padding)),
                     ) {
                         Text(
                             text = stringResource(R.string.category_row),
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.product_row_title_font_size).value.sp,
                             textAlign = TextAlign.Start
                         )
                     }
@@ -451,41 +460,41 @@ fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifi
                         Text(
                             text = product.category,
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.product_row_title_font_size).value.sp,
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.product_row_item_padding)),
                     ) {
                         Text(
                             text = stringResource(R.string.selling_duration_row),
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.product_row_title_font_size).value.sp,
                             textAlign = TextAlign.Start
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.product_row_item_padding)),
                     ) {
                         Text(
                             text = "${product.duration} days",
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.product_row_title_font_size).value.sp,
                             color = BarterColor.textGreen,
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.product_row_item_padding)),
                     ) {
                         Text(
                             text = stringResource(R.string.asking_products_row),
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.product_row_title_font_size).value.sp,
                             textAlign = TextAlign.Start
                         )
                     }
@@ -495,7 +504,7 @@ fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifi
             Row(
                 modifier = Modifier
                     .background(Color.Transparent)
-                    .padding(top = 8.dp),
+                    .padding(top = dimensionResource(id = R.dimen.product_row_item_padding)),
                 horizontalArrangement = Arrangement.Center
             ) {
                 DateTimeInfo(
@@ -519,13 +528,13 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
         if (dateTime != null) {
             Text(
                 text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
-                fontSize = 16.sp,
+                fontSize = dimensionResource(id = R.dimen.date_time_font_size).value.sp,
                 color = Color.Blue
             )
         } else {
             Text(
                 text = stringResource(R.string.date_and_time_info_not_available),
-                fontSize = 16.sp,
+                fontSize = dimensionResource(id = R.dimen.date_time_font_size).value.sp,
                 color = Color.Blue
             )
         }
@@ -569,9 +578,9 @@ fun BasicBidScreen(productName: String, productCategory: String,
     ) {
         TitleRow(
             iconId = R.mipmap.hammer,
-            title = "Bid Details",
+            title = stringResource(R.string.bid_details),
             modifier = Modifier
-                .padding(top = 15.dp)
+                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
         )
 /*
         Image(
@@ -589,40 +598,40 @@ fun BasicBidScreen(productName: String, productCategory: String,
                 bitmap = images[0].image!!.asImageBitmap(),
                 contentDescription = "product's image",
                 modifier = Modifier
-                    .padding(top = 30.dp)
-                    .width(200.dp)
+                    .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_item_padding))
+                    .width(dimensionResource(id = R.dimen.detail_image_size))
             )
         } else {
             Image(
                 painter = painterResource(id = R.mipmap.imageplaceholder),
                 contentDescription = "image placeholder",
                 modifier = Modifier
-                    .padding(top = 30.dp)
-                    .width(200.dp)
+                    .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_item_padding))
+                    .width(dimensionResource(id = R.dimen.detail_image_size))
             )
         }
 
         Text(
             text = productName,
-            fontSize = 20.sp,
+            fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
-                .padding(top = 30.dp)
+                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_item_padding))
         )
         Text(
             text = productCategory,
-            fontSize = 20.sp,
+            fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             color = BarterColor.textGreen,
             modifier = Modifier
-                .padding(top = 30.dp)
+                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_item_padding))
         )
         CustomButton(
-            label = "Show All Images",
+            label = stringResource(R.string.show_all_images),
             onClick = {
                 updateShouldDisplayImages(true)
             },
             modifier = Modifier
-                .padding(top = 25.dp)
+                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_item_padding))
         )
     }
 }
@@ -640,17 +649,17 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
         Text(
             text = stringResource(R.string.product_offered_row),
             color = Color.Black,
-            fontSize = 20.sp,
+            fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             modifier = Modifier
-                .padding(top = 15.dp)
+                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
         )
         if (productOfferingImages.isNotEmpty()) {
             Image(
                 bitmap = productOfferingImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
                 modifier = Modifier
-                    .width(200.dp)
-                    .padding(top = 20.dp)
+                    .width(dimensionResource(id = R.dimen.detail_image_size))
+                    .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
             )
             CustomButton(
                 label = stringResource(R.string.view_images),
@@ -659,31 +668,31 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     updateShouldDisplayImages(true)
                 },
                 modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
         } else {
             Text(
                 text = "Image not available",
                 color = BarterColor.textGreen,
-                fontSize = 20.sp,
+                fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 modifier = Modifier
-                    .padding(top = 15.dp)
+                    .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
             )
         }
         Text(
             text = stringResource(R.string.product_in_exchange_row),
             color = Color.Black,
-            fontSize = 20.sp,
+            fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             modifier = Modifier
-                .padding(top = 15.dp)
+                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
         )
         if (productInExchangeImages.isNotEmpty()) {
             Image(
                 bitmap = productInExchangeImages[0].image!!.asImageBitmap(),
                 contentDescription = "first product image",
                 modifier = Modifier
-                    .width(200.dp)
-                    .padding(top = 20.dp)
+                    .width(dimensionResource(id = R.dimen.detail_image_size))
+                    .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
             )
             CustomButton(
                 label = stringResource(id = R.string.view_images),
@@ -694,15 +703,15 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     //updateShouldDisplayImages.invoke(viewModel, true)
                 },
                 modifier = Modifier
-                    .padding(top = 20.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
         } else {
             Text(
                 text = "Image not available",
                 color = BarterColor.textGreen,
-                fontSize = 20.sp,
+                fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 modifier = Modifier
-                    .padding(top = 15.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
         }
     }
@@ -713,7 +722,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
 fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
     Row(
         modifier = Modifier
-            .height(80.dp)
+            .height(dimensionResource(id = R.dimen.title_row_height))
             .padding()
             .then(modifier),
         verticalAlignment = Alignment.CenterVertically,
@@ -723,8 +732,8 @@ fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
             painter = painterResource(id = iconId),
             contentDescription = title,
             modifier = Modifier
-                .width(80.dp)
-                .padding(end = 20.dp)
+                .width(dimensionResource(id = R.dimen.title_row_height))
+                .padding(end = dimensionResource(id = R.dimen.detail_image_top_padding))
         )
         Column(
             modifier = Modifier
@@ -734,7 +743,7 @@ fun TitleRow(modifier: Modifier = Modifier, iconId: Int, title: String) {
         ) {
             Text(
                 text = title,
-                fontSize = 23.sp,
+                fontSize = dimensionResource(id = R.dimen.title_row_font_size).value.sp,
                 fontWeight = FontWeight.Bold,
                 color = BarterColor.textGreen,
                 modifier = Modifier,
@@ -750,7 +759,7 @@ fun ChooseTitlesRow(modifier: Modifier = Modifier, contentDes: String, iconId: I
 
     Row(
         modifier = Modifier
-            .height(80.dp)
+            .height(dimensionResource(id = R.dimen.title_row_height))
             .padding()
             .then(modifier),
         verticalAlignment = Alignment.CenterVertically,
@@ -760,8 +769,8 @@ fun ChooseTitlesRow(modifier: Modifier = Modifier, contentDes: String, iconId: I
             painter = painterResource(id = iconId),
             contentDescription = contentDes,
             modifier = Modifier
-                .width(80.dp)
-                .padding(end = 20.dp)
+                .width(dimensionResource(id = R.dimen.title_row_height))
+                .padding(end = dimensionResource(id = R.dimen.thumbnail_right_padding))
         )
         Column(
             modifier = Modifier
@@ -771,7 +780,7 @@ fun ChooseTitlesRow(modifier: Modifier = Modifier, contentDes: String, iconId: I
 
             Text(
                 text = titleOne,
-                fontSize = 20.sp,
+                fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (bidMode) BarterColor.textGreen else BarterColor.medGreen,
                 modifier = Modifier
@@ -780,12 +789,12 @@ fun ChooseTitlesRow(modifier: Modifier = Modifier, contentDes: String, iconId: I
             )
             Text(
                 text = titleTwo,
-                fontSize = 20.sp,
+                fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (bidMode) BarterColor.medGreen else BarterColor.textGreen,
                 modifier = Modifier
                     .clickable { onClickTwo.invoke() }
-                    .padding(start = 15.dp),
+                    .padding(start = dimensionResource(id = R.dimen.choose_title_row_right_padding)),
                 textAlign = TextAlign.Start
             )
         }

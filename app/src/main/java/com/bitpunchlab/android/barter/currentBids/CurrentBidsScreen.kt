@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -65,15 +66,19 @@ fun CurrentBidsScreen(navController: NavHostController,
                     iconId = R.mipmap.records,
                     title = stringResource(id = R.string.current_bids),
                     modifier = Modifier
-                        .padding(top = 30.dp)
+                        .padding(top = dimensionResource(id = R.dimen.list_page_top_bottom_margin))
                         .background(BarterColor.lightGreen)
                 )
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(BarterColor.lightGreen)
-                        .padding(start = 40.dp, end = 40.dp, top = 5.dp, bottom = 100.dp)
-                    //.verticalScroll(rememberScrollState())
+                        .padding(
+                            start = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                            end = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                            top = dimensionResource(id = R.dimen.list_page_top_bottom_margin),
+                            bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
+                        )
 
                 ) {
                     items(currentBids.value, { details -> details.bid.bidId }) { details ->

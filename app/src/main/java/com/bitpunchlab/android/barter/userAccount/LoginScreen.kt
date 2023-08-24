@@ -164,7 +164,6 @@ fun LoginScreen(navController: NavHostController,
                     onClick = { loginViewModel.login() },
                     enable = readyLogin && !loading,
                     modifier = Modifier
-                        //.padding(bottom = 10.dp)
                         .fillMaxWidth()
                 )
 

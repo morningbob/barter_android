@@ -99,4 +99,22 @@
     <string name="grant_permission">Grant Permission</string>
     <string name="set_asking_product">Set Asking Product</string>
     <string name="done">Done</string>
+    <string name="show_all_images">Show All Images</string>
+    <string name="bid_details">Bid Details</string>
+    <string name="remove">Remove</string>
+    <string name="remove_confirm_alert_desc">Are you sure to remove the image?</string>
+    <string name="current_bid_details">Current Bid Details</string>
+    <string name="active_bids">Active Bids</string>
+    <string name="deletion_failed">Deletion Failed</string>
+    <string name="delete_product_failed_alert_desc">The product was not deleted.  There was an error in the server.  Please also make sure you have wifi.</string>
+    <string name="accepted_bids">Accepted Bids</string>
+    <string name="bids_accepted">Bids Accepted</string>
+    <string name="reply">Reply</string>
+    <string name="send_message_invalid_data_alert_desc">The message must not be empty.</string>
+    <string name="send_message_success">Send Message Success</string>
+    <string name="send_message_success_alert_desc">The message was successfully sent to the server.  The server will send it to the user.</string>
+    <string name="send_message_failed">Send Message Failed</string>
+    <string name="send_message_failed_alert_desc">The message was not sent to the server.  There is an error.  Please make sure you have wifi and try again.</string>
+    <string name="sell">Sell</string>
+    <string name="duration">Duration</string>
 </resources>

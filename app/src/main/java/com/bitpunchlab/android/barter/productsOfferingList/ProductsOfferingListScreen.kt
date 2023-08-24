@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -72,7 +73,11 @@ fun ProductsOfferingListScreen(navController: NavHostController,
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 40.dp, end = 40.dp, top = 20.dp),
+                    .padding(
+                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_margin),
+                        top = dimensionResource(id = R.dimen.list_page_top_bottom_margin)
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TitleRow(
@@ -83,13 +88,13 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                 LazyColumn(
                     // the bottom navigation bar has 80dp height
                     modifier = Modifier
-                        .padding(top = 10.dp, bottom = 110.dp),
+                        .padding(vertical = dimensionResource(id = R.dimen.list_page_top_bottom_margin)),
                     //contentPadding = PaddingValues(horizontal = 0.dp, vertical = 30.dp),
                 ) {
                     items(products.value, { product -> product.productId }) { each ->
                         Column(
                             modifier = Modifier
-                                .padding(top = 12.dp, bottom = 12.dp)
+                                .padding(vertical = dimensionResource(id = R.dimen.list_page_item_top_padding))
                         ) {
                             ProductRow(
                                 product = each,

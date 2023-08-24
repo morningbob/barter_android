@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -90,7 +91,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                     modifier = Modifier
                         .fillMaxSize()
                         .background(BarterColor.lightGreen),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
+                    contentPadding = PaddingValues(dimensionResource(id = R.dimen.list_page_top_bottom_margin)),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     itemsIndexed(askingProducts, { pos : Int, product : ProductAsking -> product.productId }) {
@@ -102,16 +103,16 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     bitmap = bitmap.value!!.asImageBitmap(),
                                     contentDescription = "product's image",
                                     modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(top = 10.dp)
+                                        .width(dimensionResource(id = R.dimen.detail_image_size))
+                                        .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
                                 )
                             } else {
                                 Image(
                                     painter = painterResource(id = R.mipmap.imageplaceholder),
                                     contentDescription = "product image not available",
                                     modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(top = 10.dp)
+                                        .width(dimensionResource(id = R.dimen.detail_image_size))
+                                        .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
                                 )
                             }
                         } else if (askingImages.isNotEmpty()) {
@@ -120,16 +121,16 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     bitmap = askingImages[index][0].image!!.asImageBitmap(),
                                     contentDescription = "product's image",
                                     modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(top = 10.dp)
+                                        .width(dimensionResource(id = R.dimen.detail_image_size))
+                                        .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
                                 )
                             } else {
                                 Image(
                                     painter = painterResource(id = R.mipmap.imageplaceholder),
                                     contentDescription = "product image not available",
                                     modifier = Modifier
-                                        .width(200.dp)
-                                        .padding(top = 10.dp)
+                                        .width(dimensionResource(id = R.dimen.detail_image_size))
+                                        .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
                                 )
                             }
                         } else {
@@ -137,20 +138,20 @@ fun AskingProductsListScreen(navController: NavHostController,
                                 painter = painterResource(id = R.mipmap.imageplaceholder),
                                 contentDescription = "product image not available",
                                 modifier = Modifier
-                                    .width(200.dp)
-                                    .padding(top = 10.dp)
+                                    .width(dimensionResource(id = R.dimen.detail_image_size))
+                                    .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
                             )
                         }
 
                         Text(
                             text = product.name,
                             modifier = Modifier
-                                .padding(top = 20.dp)
+                                .padding(top = dimensionResource(id = R.dimen.mild_top_padding))
                         )
                         Text(
                             text = product.category,
                             modifier = Modifier
-                                .padding(top = 20.dp)
+                                .padding(top = dimensionResource(id = R.dimen.mild_top_padding))
                         )
                         if (userMode == UserMode.OWNER_MODE) {
                             ChoiceButton(
@@ -160,7 +161,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                                     askingProductsListViewModel.updateDeleteProductStatus(DeleteProductStatus.CONFIRM)
                                 },
                                 modifier = Modifier
-                                    .padding(top = 20.dp)
+                                    .padding(top = dimensionResource(id = R.dimen.mild_top_padding))
                             )
                         }
                     }
@@ -236,8 +237,8 @@ fun DeleteProductSuccessDialog(onDismiss: () -> Unit) {
 @Composable
 fun DeleteProductFailureDialog(onDismiss: () -> Unit) {
     CustomDialog(
-        title = "Deletion Failed",
-        message = "The product was not deleted.  There was an error in the server.  Please also make sure you have wifi.",
+        title = stringResource(R.string.deletion_failed),
+        message = stringResource(R.string.delete_product_failed_alert_desc),
         positiveText = stringResource(id = R.string.ok),
         onDismiss = { onDismiss() },
         onPositive = { onDismiss() },

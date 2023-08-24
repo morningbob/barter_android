@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -82,8 +83,6 @@ fun AcceptBidDetailsScreen(
                     .replace("{id}", otherUserId)
                     .replace("{name}", otherUserName)
             )
-            //navController.currentBackStackEntry?.arguments?.putParcelable("product", bidDetails?.product)
-            //navController.navigate(SendMessage.route)
         } else {
             // app error, should restart app
         }
@@ -99,7 +98,7 @@ fun AcceptBidDetailsScreen(
                     .fillMaxSize()
                     .background(BarterColor.lightGreen)
                     .verticalScroll(rememberScrollState())
-                    .padding(bottom = 100.dp),
+                    .padding(bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CancelCross {
@@ -109,13 +108,11 @@ fun AcceptBidDetailsScreen(
                 TitleRow(
                     iconId = R.mipmap.recorddetails,
                     title = stringResource(R.string.transaction_details),
-                    modifier = Modifier
-                        .padding(top = 0.dp)
                 )
 
                 BasicRecordScreen(
                     modifier = Modifier
-                        .padding(top = 20.dp),
+                        .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding)),
                     productOfferingImages = productOfferingImages,
                     productInExchangeImages = productInExchangeImages,
                     prepareImages = { acceptBidDetailsViewModel.prepareImagesDisplay(it) },
@@ -134,12 +131,12 @@ fun AcceptBidDetailsScreen(
                         acceptBidDetailsViewModel.updateShouldNavigateSend(true)
                     },
                     modifier = Modifier
-                        .padding(top = 20.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
                 )
 
                 ChoiceButton(
-                    title = bidStatus?.label ?: "Getting Status",
-                    onClick = { if (bidStatus != null && bidDetails != null) {
+                    title = bidStatus.label,
+                    onClick = { if (bidDetails != null) {
                         acceptBidDetailsViewModel.updateBidStatus(
                             bidStatus,
                             bidDetails.acceptBid!!
@@ -147,7 +144,7 @@ fun AcceptBidDetailsScreen(
                     }
                               },
                     modifier = Modifier
-                        .padding(top = 15.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
                 )
             }
             if (shouldDisplayImages) {

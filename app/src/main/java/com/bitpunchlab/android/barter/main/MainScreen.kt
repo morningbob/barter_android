@@ -249,7 +249,7 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
         ) {
             Text(
                 text = user?.name ?: stringResource(R.string.loading),
-                fontSize = dimensionResource(id = R.dimen.profile_font_size).value.sp,
+                fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier
                     .padding()
@@ -257,7 +257,7 @@ fun UserProfile(modifier: Modifier = Modifier, contentModifier: Modifier = Modif
 
             Text(
                 text = user?.email ?: stringResource(R.string.loading),
-                fontSize = dimensionResource(id = R.dimen.profile_font_size).value.sp,
+                fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 color = BarterColor.textGreen,
                 modifier = Modifier
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
@@ -321,7 +321,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
             ErrorText(
                 error = currentPassError,
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_error_width))
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             CustomTextField(
@@ -337,7 +337,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
             ErrorText(
                 error = newPassError,
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_error_width))
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
             CustomTextField(
@@ -353,7 +353,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
             ErrorText(
                 error = confirmPassError,
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_error_width))
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
             )
 
@@ -364,7 +364,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 },
                 enable = readyChangePassword && !loading,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_error_width))
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
             CustomButton(
@@ -373,7 +373,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                     updateStatus(MainStatus.NORMAL)
                 },
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_error_width))
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
             )
         }

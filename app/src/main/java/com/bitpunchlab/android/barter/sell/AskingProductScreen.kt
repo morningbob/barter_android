@@ -83,7 +83,7 @@ fun AskingProductScreen(navController: NavHostController,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BarterColor.lightGreen)
-                    .padding(horizontal = dimensionResource(id = R.dimen.sell_screen_left_right_padding))
+                    .padding(horizontal = dimensionResource(id = R.dimen.double_column_left_right_padding))
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -129,7 +129,7 @@ fun AskingProductScreen(navController: NavHostController,
                             askingProductViewModel.processAskingProduct()
                         },
                         modifier = Modifier
-                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
 
                     )
                     ChoiceButton(
@@ -141,7 +141,7 @@ fun AskingProductScreen(navController: NavHostController,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-                                start = dimensionResource(id = R.dimen.sell_screen_left_right_padding),
+                                start = dimensionResource(id = R.dimen.top_bottom_button_padding),
                                 bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
                             )
                     )

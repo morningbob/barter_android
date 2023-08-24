@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -84,13 +85,13 @@ fun MessageDetailsScreen(navController: NavHostController, messageMode: Boolean?
                 painter = painterResource(id = R.mipmap.comment),
                 contentDescription = "",
                 modifier = Modifier
-                    .padding(top = 10.dp)
-                    .width(120.dp)
+                    .padding(top = dimensionResource(id = R.dimen.message_details_image_top_padding))
+                    .width(dimensionResource(id = R.dimen.icon_size))
             )
             TitleText(
                 title = title,
                 modifier = Modifier
-                    .padding(top = 30.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
             /*
             Text(
@@ -105,30 +106,31 @@ fun MessageDetailsScreen(navController: NavHostController, messageMode: Boolean?
             CustomCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp)
-                    .padding(start = 40.dp, end = 40.dp)
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
+                    .padding(horizontal = dimensionResource(id = R.dimen.list_page_left_right_margin))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(BarterColor.lightOrange)
-                        .padding(start = 40.dp, end = 40.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.list_page_left_right_margin))
                 ) {
                     Text(
-                        text = message?.messageText ?: "Loading",
-                        fontSize = 18.sp,
+                        text = message?.messageText ?: stringResource(id = R.string.loading),
+                        fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                         color = BarterColor.textGreen,
                         modifier = Modifier
-                            .padding(top = 20.dp, bottom = 20.dp, start = 13.dp, end = 13.dp)
+                            .padding(
+                                vertical = dimensionResource(id = R.dimen.message_details_message_top_bottom_padding),
+                                horizontal = dimensionResource(id = R.dimen.message_details_message_left_right_padding)
+                            )
                     )
-
                 }
-
             }
             ChoiceButton(
-                title = "Reply",
+                title = stringResource(R.string.reply),
                 modifier = Modifier
-                    .padding(top = 20.dp),
+                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding)),
                 onClick = { messageDetailsViewModel.updateShouldSendMessage(true) }
             )
         }

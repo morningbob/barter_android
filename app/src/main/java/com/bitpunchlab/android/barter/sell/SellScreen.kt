@@ -113,7 +113,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.sell_screen_left_right_padding))
+                    .padding(horizontal = dimensionResource(id = R.dimen.double_column_left_right_padding))
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -128,7 +128,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 )
 
                 TitleText(
-                    title = "Sell",
+                    title = stringResource(R.string.sell),
                     modifier = Modifier
                         .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
@@ -159,21 +159,24 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
                 ) {
                     ChoiceButton(
                         title = stringResource(id = R.string.send),
                         onClick = { sellViewModel.onSendClicked() },
                         enable = !loading,
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
                         )
                     ChoiceButton(
                         title = stringResource(id = R.string.cancel),
                         onClick = { shouldCancel = true },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 20.dp, bottom = 100.dp)
+                            .padding(
+                                start = dimensionResource(id = R.dimen.mild_start_padding),
+                                bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
+                            )
                     )
                 }
             }
@@ -184,7 +187,6 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
                     deleteStatus = deleteImageStatus,
                     updateDeleteStatus = { sellViewModel.updateDeleteImageStatus(it)},
                     deleteImage = { sellViewModel.deleteImage(it) },
-                    //triggerImageUpdate = { sellViewModel.updateTriggerImageUpdate(true) }
                 )
             }
             if (processSellingStatus != ProcessSellingStatus.NORMAL) {
@@ -251,11 +253,11 @@ fun ProductForm(modifier: Modifier = Modifier, productName: String,
                     textValue = sellingDuration.label,
                     onChange = {},
                     modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
                 )
 
                 CustomDropDown(
-                    title = "Duration",
+                    title = stringResource(R.string.duration),
                     shouldExpand = shouldExpandDuration,
                     onClickButton = {
                                     updateShouldExpandDuration(!shouldExpandDuration)
@@ -268,14 +270,14 @@ fun ProductForm(modifier: Modifier = Modifier, productName: String,
                     items = listOf(SellingDuration.ONE_DAY, SellingDuration.TWO_DAYS),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 20.dp)
+                        .padding(start = dimensionResource(id = R.dimen.mild_start_padding))
                 )
             }
             Row(
                 verticalAlignment = Alignment.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp),
+                    .padding(top = dimensionResource(id = R.dimen.mild_top_padding)),
 
             ) {
                 CustomButton(
@@ -288,7 +290,7 @@ fun ProductForm(modifier: Modifier = Modifier, productName: String,
                         updateShouldShowAsking(true)
                     },
                     modifier = Modifier
-                        .fillMaxWidth(0.5f)
+                        .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
                 )
                 ChoiceButton(
                     title = "Add",
@@ -297,7 +299,10 @@ fun ProductForm(modifier: Modifier = Modifier, productName: String,
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 20.dp, bottom = 20.dp)
+                        .padding(
+                            start = dimensionResource(id = R.dimen.mild_start_padding),
+                            bottom = dimensionResource(id = R.dimen.mild_top_padding)
+                        )
                 )
             }
     }
@@ -337,7 +342,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                 textValue = productCategory.label,
                 onChange = {},
                 modifier = Modifier
-                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
             )
 
             CustomDropDown(
@@ -354,7 +359,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                 items = listOf(Category.DICTIONARY, Category.TOYS, Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = dimensionResource(id = R.dimen.sell_screen_in_between_element_padding))
+                    .padding(start = dimensionResource(id = R.dimen.mild_start_padding))
             )
         }
         Row(
@@ -371,7 +376,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                     updateShouldDisplayImages(true)
                 },
                 modifier = Modifier
-                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width)),
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width)),
 
                 )
             ChoiceButton(
@@ -380,8 +385,8 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = dimensionResource(id = R.dimen.sell_screen_in_between_element_padding),
-                        bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
+                        start = dimensionResource(id = R.dimen.mild_start_padding),
+                        bottom = dimensionResource(id = R.dimen.mild_top_padding)
                     )
             )
         }

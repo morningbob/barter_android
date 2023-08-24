@@ -27,11 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +72,7 @@ fun ImagesDisplayDialog(
                 bitmap = image.image!!.asImageBitmap(),
                 contentDescription = "A product image",
                 modifier = Modifier
-                    .width(400.dp)
+                    .width(dimensionResource(id = R.dimen.image_display_image_size))
             )
 
 
@@ -77,13 +80,13 @@ fun ImagesDisplayDialog(
                 Card(
                     modifier = Modifier
                         .background(Color.Transparent),
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = 10.dp
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.round_corner_shape)),
+                    elevation = dimensionResource(id = R.dimen.card_elevation)
                 ) {
                     Column(
                         modifier = Modifier
                             .background(Color.Gray)
-                            .padding(15.dp)
+                            .padding(dimensionResource(id = R.dimen.image_display_remove_icon_padding))
                             .clickable {
                                 updateDeleteStatus?.let {
                                     it(1)
@@ -96,13 +99,13 @@ fun ImagesDisplayDialog(
                             painter = painterResource(id = R.mipmap.remove),
                             contentDescription = "remove icon",
                             modifier = Modifier
-                                .width(25.dp)
+                                .width(dimensionResource(id = R.dimen.image_display_remove_icon_size))
                                 .background(Color.Gray)
                         )
                         Text(
-                            text = "Remove",
+                            text = stringResource(R.string.remove),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
+                            fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                             modifier = Modifier
                                 .background(Color.Gray),
                             color = BarterColor.lightGreen
@@ -124,7 +127,6 @@ fun ImagesDisplayDialog(
 
     Dialog(
         onDismissRequest = {  },
-        //properties = DialogProperties(decorFitsSystemWindows = true),
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
 
@@ -139,31 +141,20 @@ fun ImagesDisplayDialog(
             ) {
                 // when the user exit the images list, we send the info to the view model to
                 // indicate if there should be an image update.
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 40.dp, end = 25.dp, top = 25.dp, bottom = 15.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Image(
-                        painter = painterResource(id = R.mipmap.cross),
-                        contentDescription = "cancel icon",
-                        modifier = Modifier
-                            .width(40.dp)
-                            .clickable {
-                                triggerImageUpdate?.let {
-                                    it(shouldTriggerImageUpdate)
-                                }
-                                onDismiss.invoke()
-                            },
-                    )
+                CancelCross {
+                    triggerImageUpdate?.let {
+                        it(shouldTriggerImageUpdate)
+                    }
+                    onDismiss.invoke()
                 }
 
                 if (imageToShow != null) {
                     showImage(image = imageToShow!!, deleteStatus)
                 } else {
                     LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 15.dp),
+                        contentPadding = PaddingValues(
+                            horizontal = dimensionResource(id = R.dimen.image_display_image_list_padding),
+                            vertical = dimensionResource(id = R.dimen.image_display_image_list_padding)),
                         verticalArrangement = Arrangement.spacedBy(30.dp),
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -196,10 +187,10 @@ fun ImagesDisplayDialog(
 fun ConfirmDeleteDialog(updateDeleteStatus: (Int) -> Unit, imageToBeDeleted: ProductImageToDisplay,
     deleteImage: (ProductImageToDisplay) -> Unit, removeShow: () -> Unit, shouldTriggerUpdate: (Boolean) -> Unit) {
     CustomDialog(
-        title = "Remove Confirmation",
-        message = "Are you sure to remove the image?",
-        positiveText = "Delete",
-        negativeText = "Cancel",
+        title = stringResource(R.string.remove_confirmation),
+        message = stringResource(R.string.remove_confirm_alert_desc),
+        positiveText = stringResource(id = R.string.delete),
+        negativeText = stringResource(id = R.string.cancel),
         onDismiss = { updateDeleteStatus(0) },
         onPositive = {
             shouldTriggerUpdate(true)

@@ -25,6 +25,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,7 +47,6 @@ import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewModel: AcceptBidsListViewModel =
     remember { AcceptBidsListViewModel() }) {
 
-    //val bidsDetail by LocalDatabaseManager.bidsDetail.collectAsState()
     val acceptedBids by LocalDatabaseManager.acceptedBidsDetail.collectAsState()
     val bidsAccepted by LocalDatabaseManager.bidsAcceptedDetail.collectAsState()
     val shouldDisplayDetails by acceptBidsListViewModel.shouldDisplayDetails.collectAsState()
@@ -69,7 +70,6 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
             navController.navigate(
                 "AcceptBidDetails/{mode}"
                     .replace(oldValue = "{mode}", newValue = bidMode.value.toString())
-                    //.replace(oldValue = "{id}", newValue = chosenBidDetails.value!!.acceptBid!!.acceptId)
             )
         }
     }
@@ -83,14 +83,18 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
             Column(modifier = Modifier
                 .fillMaxSize()
                 .background(BarterColor.lightGreen)
-                .padding(top = 20.dp, start = 40.dp, end = 40.dp),
+                .padding(
+                    top = dimensionResource(id = R.dimen.choose_title_row_top_padding),
+                    start = dimensionResource(id = R.dimen.title_row_left_right_padding),
+                    end = dimensionResource(id = R.dimen.title_row_left_right_padding)
+                ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ChooseTitlesRow(
-                    contentDes = "Accepted Bids",
+                    contentDes = stringResource(R.string.accepted_bids),
                     iconId = R.mipmap.acceptbid,
-                    titleOne = "Accepted Bids",
-                    titleTwo = "Bids Accepted",
+                    titleOne = stringResource(R.string.accepted_bids),
+                    titleTwo = stringResource(R.string.bids_accepted),
                     onClickOne = { bidMode.value = true },
                     onClickTwo = { bidMode.value = false },
                     bidMode = bidMode.value
@@ -99,14 +103,14 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(bottom = 100.dp),
+                        .padding(bottom = dimensionResource(R.dimen.page_bottom_padding_with_bar)),
                     horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
                     items(bidsDetail, { bid -> bid.bid.acceptBidId } ) {bidDetail ->
                         Column(
                         modifier = Modifier
-                            .padding(top = 12.dp, bottom = 12.dp)
+                            .padding(vertical = dimensionResource(id = R.dimen.accept_bids_item_padding))
                         ) {
 
                             // for the list, we show the product name and pic only
@@ -135,7 +139,7 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
             modifier
                 .fillMaxSize()
                 .background(BarterColor.lightYellow)
-                .padding(bottom = 15.dp)
+                .padding(bottom = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
                 .clickable { onClick.invoke(acceptBid) }
                 .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -151,79 +155,79 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
                     imageUrls = acceptBid.product.images,
                     contentDes = "product's image",
                     modifier = Modifier
-                        .padding(start = 20.dp)
-                        .width(100.dp)
+                        .padding(start = dimensionResource(id = R.dimen.bid_row_thumbnail_padding))
+                        .width(dimensionResource(id = R.dimen.bid_row_thumbnail_size))
                 )
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.Transparent)
-                        .padding(start = 20.dp, end = 20.dp)
+                        .padding(horizontal = dimensionResource(id = R.dimen.accept_bid_row_left_right_padding))
 
                 ) {
                     Text(
                         text = acceptBid.product.name,
                         color = BarterColor.textGreen,
-                        fontSize = 21.sp,
+                        fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                         modifier = Modifier
-                            .padding(top = 10.dp)
+                            .padding(top = dimensionResource(id = R.dimen.accept_bid_row_content_top_padding))
                     )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding)),
                     ) {
                         Text(
                             text = "Category: ",
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                             textAlign = TextAlign.Start
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding)),
                     ) {
                         Text(
                             text = acceptBid.product.category,
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding)),
                     ) {
                         Text(
                             text = "Selling Duration: ",
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                             textAlign = TextAlign.Start
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding)),
                     ) {
                         Text(
                             text = "${acceptBid.product.duration} days",
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                             color = BarterColor.textGreen,
                         )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 5.dp),
+                            .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding)),
                     ) {
                         Text(
                             text = "Asking Products: ",
                             color = BarterColor.textGreen,
-                            fontSize = 18.sp,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                             textAlign = TextAlign.Start
                         )
                     }
@@ -232,13 +236,13 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
             Row(
                 modifier = Modifier
                     .background(Color.Transparent)
-                    .padding(top = 8.dp),
+                    .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding)),
                 horizontalArrangement = Arrangement.Center
             ) {
                 DateTimeInfo(
                     dateTimeString = acceptBid.acceptBid!!.acceptTime,
                     modifier = Modifier
-                        .padding(top = 5.dp)
+                        .padding(top = dimensionResource(id = R.dimen.accept_bid_row_item_padding))
                 )
             }
         }

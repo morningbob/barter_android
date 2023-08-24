@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -112,7 +113,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                 modifier = Modifier
                     .fillMaxSize()
                     .background(BarterColor.lightGreen)
-                    .padding(start = 50.dp, end = 50.dp)
+                    .padding(horizontal = dimensionResource(id = R.dimen.double_column_left_right_padding))
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -121,8 +122,8 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                     painter = painterResource(id = R.mipmap.hammer),
                     contentDescription = "Bid Product icon",
                     modifier = Modifier
-                        .padding(top = 40.dp)
-                        .width(120.dp)
+                        .padding(top = dimensionResource(id = R.dimen.icon_padding))
+                        .width(dimensionResource(id = R.dimen.icon_size))
                 )
 
                 CustomTextField(
@@ -131,13 +132,13 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                     onChange = { bidFormViewModel.updateBidProductName(it) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 30.dp)
+                        .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
                 )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp),
+                        .padding(top = dimensionResource(id = R.dimen.mild_top_padding)),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -146,7 +147,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         textValue = bidProductCategory.label,
                         onChange = {  },
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
                     )
                     CustomDropDown(
                         title = stringResource(id = R.string.category),
@@ -160,14 +161,14 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         items = listOf(Category.DICTIONARY, Category.TOYS, Category.TOOLS, Category.COLLECTIBLES, Category.OTHERS),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 25.dp)
+                            .padding(start = dimensionResource(id = R.dimen.mild_start_padding))
                     )
                 }
                 Row(
                     verticalAlignment = Alignment.Top,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp),
+                        .padding(top = dimensionResource(id = R.dimen.mild_start_padding)),
 
                     ) {
                     CustomButton(
@@ -175,21 +176,21 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         onClick = { bidFormViewModel.updateShouldDisplayImages(true) },
 
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
                     )
                     ChoiceButton(
                         title = stringResource(id = R.string.upload),
                         onClick = { pickImageLauncher.launch("image/*") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 20.dp)
+                            .padding(start = dimensionResource(id = R.dimen.mild_start_padding))
                     )
                 }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp)
+                        .padding(top = dimensionResource(id = R.dimen.mild_start_padding))
                 ) {
                     ChoiceButton(
                         title = stringResource(id = R.string.send),
@@ -204,14 +205,17 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         },
                         enable = !loading,
                         modifier = Modifier
-                            .fillMaxWidth(0.5f)
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
                     )
                     ChoiceButton(
                         title = stringResource(id = R.string.cancel),
                         onClick = { updateShouldStartBidding(false) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 20.dp, bottom = 100.dp)
+                            .padding(
+                                start = dimensionResource(id = R.dimen.mild_start_padding),
+                                bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
+                            )
                     )
                 }
 
