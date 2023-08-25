@@ -173,7 +173,9 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                     }
                     MenuBlock(
                         modifier = Modifier, 
-                        barHeight = dimensionResource(id = R.dimen.menu_bar_height)) {
+                        barHeight = dimensionResource(id = R.dimen.menu_bar_height),
+                        barWidth = dimensionResource(id = R.dimen.menu_bar_width),
+                        ) {
                         Column(
                             modifier = Modifier
                                 .padding(start = dimensionResource(id = R.dimen.start_menu_left_padding))

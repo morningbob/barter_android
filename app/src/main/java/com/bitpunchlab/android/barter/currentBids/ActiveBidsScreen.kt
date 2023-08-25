@@ -73,15 +73,15 @@ fun ActiveBidsScreen(
                     .background(BarterColor.lightGreen)
                     .padding(
                         top = dimensionResource(id = R.dimen.title_row_top_padding),
-                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                        end = dimensionResource(id = R.dimen.list_page_left_right_margin)
+                        start = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_padding)
                     )
             ) {
                 items(chosenCurrentBid!!.currentBids, { activeBid -> activeBid.bidId} ) { activeBid ->
                     Row(modifier = Modifier
                         .padding(
-                            top = dimensionResource(id = R.dimen.active_bids_row_padding),
-                            bottom = dimensionResource(id = R.dimen.active_bids_row_padding)
+                            top = dimensionResource(id = R.dimen.list_item_top_padding),
+                            bottom = dimensionResource(id = R.dimen.list_item_top_padding)
                         )) {
                         BidRow(
                             bid = activeBid,

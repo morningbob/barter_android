@@ -66,7 +66,7 @@ fun CurrentBidsScreen(navController: NavHostController,
                     iconId = R.mipmap.records,
                     title = stringResource(id = R.string.current_bids),
                     modifier = Modifier
-                        .padding(top = dimensionResource(id = R.dimen.list_page_top_bottom_margin))
+                        .padding(top = dimensionResource(id = R.dimen.list_page_top_bottom_padding))
                         .background(BarterColor.lightGreen)
                 )
                 LazyColumn(
@@ -74,9 +74,9 @@ fun CurrentBidsScreen(navController: NavHostController,
                         .fillMaxSize()
                         .background(BarterColor.lightGreen)
                         .padding(
-                            start = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                            end = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                            top = dimensionResource(id = R.dimen.list_page_top_bottom_margin),
+                            start = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                            end = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                            top = dimensionResource(id = R.dimen.list_page_top_bottom_padding),
                             bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
                         )
 
@@ -90,8 +90,7 @@ fun CurrentBidsScreen(navController: NavHostController,
                                 LocalDatabaseManager.updateChosenCurrentBid(details)
                                 currentBidsViewModel.updateShouldDisplayDetails(true)
                             },
-                            //modifier = Modifier
-                            //.padding(bottom = 8.dp)
+
                         )
                     }
                 }

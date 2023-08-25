@@ -27,6 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.CancelCross
@@ -91,7 +92,7 @@ fun AskingProductsListScreen(navController: NavHostController,
                     modifier = Modifier
                         .fillMaxSize()
                         .background(BarterColor.lightGreen),
-                    contentPadding = PaddingValues(dimensionResource(id = R.dimen.list_page_top_bottom_margin)),
+                    contentPadding = PaddingValues(dimensionResource(id = R.dimen.list_page_top_bottom_padding)),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     itemsIndexed(askingProducts, { pos : Int, product : ProductAsking -> product.productId }) {
@@ -145,11 +146,15 @@ fun AskingProductsListScreen(navController: NavHostController,
 
                         Text(
                             text = product.name,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
+                            color = BarterColor.textGreen,
                             modifier = Modifier
                                 .padding(top = dimensionResource(id = R.dimen.mild_top_padding))
                         )
                         Text(
                             text = product.category,
+                            fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
+                            color = BarterColor.textGreen,
                             modifier = Modifier
                                 .padding(top = dimensionResource(id = R.dimen.mild_top_padding))
                         )

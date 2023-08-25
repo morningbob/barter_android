@@ -74,9 +74,9 @@ fun ProductOfferingBidsListScreen(navController: NavHostController,
                     .fillMaxSize()
                     .background(BarterColor.lightGreen)
                     .padding(
-                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                        end = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                        top = dimensionResource(id = R.dimen.list_page_top_bottom_margin)
+                        start = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                        top = dimensionResource(id = R.dimen.list_page_top_bottom_padding)
                     )
 
             ) {
@@ -102,14 +102,17 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BarterColor.lightGreen)
-                .padding(vertical = dimensionResource(id = R.dimen.bid_row_top_bottom_padding))
+                .padding(vertical = dimensionResource(id = R.dimen.list_item_top_padding))
 
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BarterColor.lightBrown)
-                    .padding(horizontal = dimensionResource(id = R.dimen.bid_row_left_right_padding))
+                    .padding(
+                        horizontal = dimensionResource(id = R.dimen.list_item_left_right_padding),
+                        vertical = dimensionResource(id = R.dimen.list_item_top_padding),
+                        )
                     .clickable { onClick.invoke(bid) }
                     .then(modifier)
             ) {
@@ -122,8 +125,8 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                             imageUrls = bid.bidProduct.images,
                             contentDes = "product's image",
                             modifier = Modifier
-                                .width(dimensionResource(id = R.dimen.bid_row_thumbnail_size))
-                                .padding(vertical = dimensionResource(id = R.dimen.bid_row_top_bottom_padding))
+                                .width(dimensionResource(id = R.dimen.thumbnail_size))
+                                .padding(vertical = dimensionResource(id = R.dimen.list_item_top_padding))
                         )
                     }
 
@@ -135,8 +138,7 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                         fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                         modifier = Modifier
                             .padding(
-                                top = dimensionResource(id = R.dimen.bid_row_top_bottom_padding),
-                                start = dimensionResource(id = R.dimen.bid_row_left_right_padding)
+                                start = dimensionResource(id = R.dimen.list_item_left_right_padding)
                             )
                     )/*
                     Text(
@@ -154,8 +156,8 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                             fontSize = 18.sp,
                             modifier = Modifier
                                 .padding(
-                                    top = dimensionResource(id = R.dimen.bid_row_top_bottom_padding),
-                                    start = dimensionResource(id = R.dimen.bid_row_left_right_padding))
+                                    top = dimensionResource(id = R.dimen.list_item_top_padding),
+                                    start = dimensionResource(id = R.dimen.list_item_left_right_padding))
                         )
                     }
                     /*
@@ -172,9 +174,9 @@ fun BidRow(modifier: Modifier = Modifier, bid: Bid, product: ProductOffering? = 
                         dateTimeString = bid.bidTime,
                         modifier = Modifier
                             .padding(
-                                top = dimensionResource(id = R.dimen.bid_row_top_bottom_padding),
+                                top = dimensionResource(id = R.dimen.list_item_top_padding),
                                 start = dimensionResource(
-                                id = R.dimen.bid_row_left_right_padding
+                                id = R.dimen.list_item_left_right_padding
                             ))
                     )
                 }

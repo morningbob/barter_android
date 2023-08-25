@@ -84,8 +84,8 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                 .fillMaxSize()
                 .background(BarterColor.lightGreen)
                 .padding(
-                    top = dimensionResource(id = R.dimen.choose_title_row_top_padding),
-                    start = dimensionResource(id = R.dimen.title_row_left_right_padding),
+                    top = dimensionResource(id = R.dimen.list_page_top_bottom_padding),
+                    start = dimensionResource(id = R.dimen.list_page_left_right_padding),
                     end = dimensionResource(id = R.dimen.title_row_left_right_padding)
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -110,7 +110,7 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                     items(bidsDetail, { bid -> bid.bid.acceptBidId } ) {bidDetail ->
                         Column(
                         modifier = Modifier
-                            .padding(vertical = dimensionResource(id = R.dimen.accept_bids_item_padding))
+                            .padding(vertical = dimensionResource(id = R.dimen.list_item_big_top_padding))
                         ) {
 
                             // for the list, we show the product name and pic only
@@ -139,7 +139,7 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
             modifier
                 .fillMaxSize()
                 .background(BarterColor.lightYellow)
-                .padding(bottom = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
+                .padding(bottom = dimensionResource(id = R.dimen.basic_screen_top_padding))
                 .clickable { onClick.invoke(acceptBid) }
                 .then(contentModifier),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -156,7 +156,7 @@ fun AcceptBidRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modi
                     contentDes = "product's image",
                     modifier = Modifier
                         .padding(start = dimensionResource(id = R.dimen.bid_row_thumbnail_padding))
-                        .width(dimensionResource(id = R.dimen.bid_row_thumbnail_size))
+                        .width(dimensionResource(id = R.dimen.thumbnail_size))
                 )
 
                 Column(

@@ -569,15 +569,4 @@ object LocalDatabaseManager {
         }
     }
 
-    private fun prepareMessages() {
-        CoroutineScope(Dispatchers.IO).launch {
-            allMessages.collect() { messages ->
-                if (messages.isNotEmpty()) {
-                    _messagesReceived.value = messages.filter { !it.sender }.toMutableStateList()
-                    _messagesSent.value = messages.filter { it.sender }.toMutableStateList()
-                }
-            }
-        }
-    }
-
 }

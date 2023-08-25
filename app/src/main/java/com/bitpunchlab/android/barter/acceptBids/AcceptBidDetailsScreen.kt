@@ -112,7 +112,7 @@ fun AcceptBidDetailsScreen(
 
                 BasicRecordScreen(
                     modifier = Modifier
-                        .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding)),
+                        .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding)),
                     productOfferingImages = productOfferingImages,
                     productInExchangeImages = productInExchangeImages,
                     prepareImages = { acceptBidDetailsViewModel.prepareImagesDisplay(it) },

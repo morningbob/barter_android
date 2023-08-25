@@ -117,4 +117,5 @@
     <string name="send_message_failed_alert_desc">The message was not sent to the server.  There is an error.  Please make sure you have wifi and try again.</string>
     <string name="sell">Sell</string>
     <string name="duration">Duration</string>
+    <string name="show_current_bids">Show Current Bids</string>
 </resources>

@@ -56,7 +56,6 @@ fun SignupScreen(navController: NavHostController,
         if (signUpStatusFirebase == 2) {
             signupViewModel.clearFields()
             signupViewModel.updateCreateACStatus(SignUpStatus.NORMAL)
-            //signupViewModel.updateShouldDismiss(false)
             FirebaseClient.updateSignUpResult(0)
             navController.navigate(Main.route)
             Log.i("sign up", "assigned success")
@@ -70,12 +69,6 @@ fun SignupScreen(navController: NavHostController,
         loading = loadingAlpha == 100f
     }
 
-    // LaunchedEffect is used to run code that won't trigger recomposition of the view
-    LaunchedEffect(key1 = createACStatus) {
-        if (createACStatus == SignUpStatus.SUCCESS) {
-            //navController.navigate(Main.route)
-        }
-    }
 
     LaunchedEffect(key1 = shouldDismiss) {
         if (shouldDismiss) {
@@ -91,7 +84,7 @@ fun SignupScreen(navController: NavHostController,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BarterColor.lightGreen)
-                .padding(horizontal = dimensionResource(id = R.dimen.icon_padding))
+                .padding(horizontal = dimensionResource(id = R.dimen.left_right_element_padding))
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
 
@@ -195,7 +188,10 @@ fun SignupScreen(navController: NavHostController,
                     label = stringResource(id = R.string.send),
                     onClick = { signupViewModel.signup() },
                     modifier = Modifier
-                        .padding(bottom = dimensionResource(id = R.dimen.top_bottom_button_padding))
+                        .padding(
+                            top = dimensionResource(id = R.dimen.signup_send_top_padding),
+                            bottom = dimensionResource (id = R.dimen.top_bottom_button_padding)
+                        )
                         .fillMaxWidth(),
                     enable = readySignup && !loading
                 )

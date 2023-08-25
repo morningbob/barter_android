@@ -147,7 +147,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         textValue = bidProductCategory.label,
                         onChange = {  },
                         modifier = Modifier
-                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
                     )
                     CustomDropDown(
                         title = stringResource(id = R.string.category),
@@ -176,7 +176,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         onClick = { bidFormViewModel.updateShouldDisplayImages(true) },
 
                         modifier = Modifier
-                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
                     )
                     ChoiceButton(
                         title = stringResource(id = R.string.upload),
@@ -205,7 +205,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         },
                         enable = !loading,
                         modifier = Modifier
-                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.sell_screen_textfield_width))
+                            .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.half_width))
                     )
                     ChoiceButton(
                         title = stringResource(id = R.string.cancel),

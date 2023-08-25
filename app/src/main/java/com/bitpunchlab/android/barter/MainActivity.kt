@@ -244,19 +244,13 @@ fun BarterNavigation(mainViewModel: MainViewModel, sellViewModel: SellViewModel,
             MessageDetailsScreen(navController, navBackStackEntry.arguments?.getBoolean("messageMode"))
         }
 
-        //composable(SendMessage.route) {
-        //    SendMessageScreen(navController)
-        //}
-
         composable("SendMessage/{id}/{name}",
             arguments = listOf(
                 navArgument("id") {
                 type = NavType.StringType
-                //defaultValue = true
             },
                 navArgument("name") {
                     type = NavType.StringType
-                    //defaultValue = true
                 },
                 )) { navBackStackEntry ->
             SendMessageScreen(

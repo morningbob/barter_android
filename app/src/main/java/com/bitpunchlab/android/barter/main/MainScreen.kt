@@ -317,6 +317,8 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 hide = true,
                 modifier = Modifier
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_width_portion))
+
             )
             ErrorText(
                 error = currentPassError,
@@ -333,6 +335,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 hide = true,
                 modifier = Modifier
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_width_portion))
             )
             ErrorText(
                 error = newPassError,
@@ -349,6 +352,7 @@ fun ChangePasswordComponent(modifier: Modifier = Modifier, contentModifier: Modi
                 hide = true,
                 modifier = Modifier
                     .padding(top = dimensionResource(id = R.dimen.top_bottom_error_padding))
+                    .fillMaxWidth(LocalContext.current.resources.getFloat(R.dimen.change_password_width_portion))
             )
             ErrorText(
                 error = confirmPassError,

@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.messages
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +55,10 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
     val shouldShowDetails by messageListViewModel.shouldShowDetails.collectAsState()
     val chosenMessage by messageListViewModel.chosenMessage.collectAsState()
 
+    if (chosenMessage != null) {
+        Log.i("message list", "chosen message other user id ${chosenMessage!!.otherUserId}")
+    }
+
     val messageMode = rememberSaveable {
         mutableStateOf(true)
     }
@@ -101,9 +106,9 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
             LazyColumn(
                 modifier = Modifier
                     .padding(
-                        top = dimensionResource(id = R.dimen.list_page_top_bottom_margin),
-                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                        end = dimensionResource(id = R.dimen.list_page_left_right_margin)
+                        top = dimensionResource(id = R.dimen.list_page_top_bottom_padding),
+                        start = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_padding)
                     )
             ) {
 
@@ -112,7 +117,7 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = dimensionResource(id = R.dimen.message_list_item_padding))
+                            .padding(vertical = dimensionResource(id = R.dimen.list_item_top_padding))
                             .clickable {
                                 messageListViewModel.updateChosenMessage(message)
                                 messageListViewModel.updateShouldShowDetails(true)
@@ -133,7 +138,7 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
                                     "From: ${message.otherName}"
                                 Row(
                                     modifier = Modifier
-                                        .padding(top = dimensionResource(id = R.dimen.message_list_item_padding))
+                                        .padding(top = dimensionResource(id = R.dimen.list_item_top_padding))
                                         .fillMaxWidth()
                                 ) {
                                     Text(
@@ -155,7 +160,7 @@ fun MessageListScreen(navController: NavHostController, messageListViewModel: Me
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = dimensionResource(id = R.dimen.message_list_item_padding)),
+                                        .padding(vertical = dimensionResource(id = R.dimen.list_item_top_padding)),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
 

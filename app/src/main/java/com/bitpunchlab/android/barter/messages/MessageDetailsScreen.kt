@@ -1,10 +1,12 @@
 package com.bitpunchlab.android.barter.messages
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Surface
@@ -37,15 +39,16 @@ fun MessageDetailsScreen(navController: NavHostController, messageMode: Boolean?
         MessageDetailsViewModel()
     }) {
 
-    // message mode, received = true, sent = false
     val shouldSendMessage by messageDetailsViewModel.shouldSendMessage.collectAsState()
     val shouldDismiss by messageDetailsViewModel.shouldDismiss.collectAsState()
 
     val message = navController.previousBackStackEntry?.arguments?.getParcelable<Message>("message")
+
     var title = ""
 
     message?.let {
         title = if (messageMode == true) "From  ${message.otherName}" else "To  ${message.otherName}"
+        Log.i("message details screen", "other user id ${message.otherUserId}")
     }
 
     LaunchedEffect(key1 = shouldSendMessage) {
@@ -85,7 +88,7 @@ fun MessageDetailsScreen(navController: NavHostController, messageMode: Boolean?
                 painter = painterResource(id = R.mipmap.comment),
                 contentDescription = "",
                 modifier = Modifier
-                    .padding(top = dimensionResource(id = R.dimen.message_details_image_top_padding))
+                    .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding_cross))
                     .width(dimensionResource(id = R.dimen.icon_size))
             )
             TitleText(
@@ -106,14 +109,15 @@ fun MessageDetailsScreen(navController: NavHostController, messageMode: Boolean?
             CustomCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
-                    .padding(horizontal = dimensionResource(id = R.dimen.list_page_left_right_margin))
+                    .padding(top = dimensionResource(id = R.dimen.message_details_reply_top_padding))
+                    .padding(horizontal = dimensionResource(id = R.dimen.list_page_left_right_padding))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(BarterColor.lightOrange)
-                        .padding(horizontal = dimensionResource(id = R.dimen.list_page_left_right_margin))
+                        .height(dimensionResource(id = R.dimen.message_details_textarea_height))
+                        //.padding(horizontal = dimensionResource(id = R.dimen.list_page_left_right_padding))
                 ) {
                     Text(
                         text = message?.messageText ?: stringResource(id = R.string.loading),
@@ -130,7 +134,7 @@ fun MessageDetailsScreen(navController: NavHostController, messageMode: Boolean?
             ChoiceButton(
                 title = stringResource(R.string.reply),
                 modifier = Modifier
-                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding)),
+                    .padding(top = dimensionResource(id = R.dimen.message_details_reply_top_padding)),
                 onClick = { messageDetailsViewModel.updateShouldSendMessage(true) }
             )
         }

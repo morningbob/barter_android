@@ -1,5 +1,6 @@
 package com.bitpunchlab.android.barter.util
 
+import android.util.Log
 import com.bitpunchlab.android.barter.firebase.models.BidFirebase
 import com.bitpunchlab.android.barter.firebase.models.MessageFirebase
 import com.bitpunchlab.android.barter.firebase.models.ProductAskingFirebase
@@ -142,6 +143,7 @@ fun convertMessageToMessageFirebase(message: Message) : MessageFirebase {
 }
 
 fun convertMessageFirebaseToMessage(messageFirebase: MessageFirebase) : Message {
+    Log.i("convert message firebase to message", "other user id ${messageFirebase.otherUserId}")
     return Message(id = messageFirebase.id, messageText = messageFirebase.messageText,
         ownerUserId = messageFirebase.ownerUserId,
         otherUserId = messageFirebase.otherUserId, sender = messageFirebase.sender,

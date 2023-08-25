@@ -165,6 +165,7 @@ fun LoginScreen(navController: NavHostController,
                     enable = readyLogin && !loading,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(top = dimensionResource(id = R.dimen.login_login_top_padding))
                 )
 
                 CustomButton(

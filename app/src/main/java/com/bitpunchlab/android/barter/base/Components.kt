@@ -78,6 +78,7 @@ fun CustomTextField(modifier: Modifier = Modifier, label: String, textValue: Str
         label = {
                 Text(
                     text = label,
+                    fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp,
                     color = BarterColor.textGreen
                 )
         },
@@ -85,6 +86,7 @@ fun CustomTextField(modifier: Modifier = Modifier, label: String, textValue: Str
         onValueChange = { value: String -> onChange.invoke(value) },
         visualTransformation = if (!hide) VisualTransformation.None else PasswordVisualTransformation(),
         modifier = Modifier.then(modifier),
+        textStyle = TextStyle(fontSize = dimensionResource(id = R.dimen.content_font_size).value.sp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = BarterColor.green,
             unfocusedBorderColor = BarterColor.green,
@@ -132,18 +134,6 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
         modifier = Modifier.then(modifier)
-    )
-}
-
-@Composable
-fun ContentText(content: String, textSize: TextUnit = dimensionResource(id = R.dimen.content_font_size).value.sp,
-                textColor: Color = BarterColor.textGreen, modifier: Modifier) {
-    Text(
-        text = content,
-        color = textColor,
-        fontSize = textSize,
-        modifier = Modifier
-            .then(modifier)
     )
 }
 
@@ -277,7 +267,8 @@ fun CustomCircularProgressBar() {
 }
 
 @Composable
-fun MenuBlock(modifier: Modifier, barHeight: Dp = 100.dp, content: @Composable() () -> Unit) {
+fun MenuBlock(modifier: Modifier, barHeight: Dp = 100.dp, barWidth: Dp = 15.dp,
+              content: @Composable() () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -291,7 +282,7 @@ fun MenuBlock(modifier: Modifier, barHeight: Dp = 100.dp, content: @Composable()
             Column(
                 modifier = Modifier
                     .background(BarterColor.darkGreen)
-                    .width(15.dp)
+                    .width(barWidth)
                     .height(barHeight)
                     .padding(end = dimensionResource(id = R.dimen.menu_bar_right_padding))
             ) {
@@ -580,7 +571,7 @@ fun BasicBidScreen(productName: String, productCategory: String,
             iconId = R.mipmap.hammer,
             title = stringResource(R.string.bid_details),
             modifier = Modifier
-                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
+                .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding))
         )
 /*
         Image(
@@ -651,7 +642,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             color = Color.Black,
             fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             modifier = Modifier
-                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
+                .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding))
         )
         if (productOfferingImages.isNotEmpty()) {
             Image(
@@ -676,7 +667,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 color = BarterColor.textGreen,
                 fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 modifier = Modifier
-                    .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
+                    .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding))
             )
         }
         Text(
@@ -684,7 +675,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             color = Color.Black,
             fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             modifier = Modifier
-                .padding(top = dimensionResource(id = R.dimen.basic_bid_screen_top_padding))
+                .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding))
         )
         if (productInExchangeImages.isNotEmpty()) {
             Image(

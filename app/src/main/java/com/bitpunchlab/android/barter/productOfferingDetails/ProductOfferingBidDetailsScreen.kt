@@ -83,7 +83,7 @@ fun ProductOfferingBidDetailsScreen(navController: NavHostController,
                     // confirm before execute
                     Column(
                         modifier = Modifier
-                            .padding(top = dimensionResource(id = R.dimen.list_page_top_bottom_margin)),
+                            .padding(top = dimensionResource(id = R.dimen.list_page_top_bottom_padding)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     )
                     {

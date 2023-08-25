@@ -74,9 +74,10 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                        end = dimensionResource(id = R.dimen.list_page_left_right_margin),
-                        top = dimensionResource(id = R.dimen.list_page_top_bottom_margin)
+                        start = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                        end = dimensionResource(id = R.dimen.list_page_left_right_padding),
+                        top = dimensionResource(id = R.dimen.list_page_top_bottom_padding),
+                        bottom = dimensionResource(id = R.dimen.page_bottom_padding_with_bar)
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -88,13 +89,13 @@ fun ProductsOfferingListScreen(navController: NavHostController,
                 LazyColumn(
                     // the bottom navigation bar has 80dp height
                     modifier = Modifier
-                        .padding(vertical = dimensionResource(id = R.dimen.list_page_top_bottom_margin)),
+                        .padding(vertical = dimensionResource(id = R.dimen.list_page_top_bottom_padding)),
                     //contentPadding = PaddingValues(horizontal = 0.dp, vertical = 30.dp),
                 ) {
                     items(products.value, { product -> product.productId }) { each ->
                         Column(
                             modifier = Modifier
-                                .padding(vertical = dimensionResource(id = R.dimen.list_page_item_top_padding))
+                                .padding(vertical = dimensionResource(id = R.dimen.list_item_big_top_padding))
                         ) {
                             ProductRow(
                                 product = each,

@@ -99,7 +99,7 @@ fun CurrentBidDetailsScreen(navController: NavHostController,
                             .background(Color.Transparent)
                             .fillMaxWidth()
                             .padding(
-                                top = dimensionResource(id = R.dimen.left_right_element_padding),
+                                top = dimensionResource(id = R.dimen.detail_image_top_padding),
                                 start = dimensionResource(id = R.dimen.left_right_element_padding),
                                 end = dimensionResource(id = R.dimen.left_right_element_padding)
                             ),
@@ -156,7 +156,7 @@ fun CurrentBidDetailsScreen(navController: NavHostController,
                 )
 
                 CustomButton(
-                    label = "Show Current Bids",
+                    label = stringResource(R.string.show_current_bids),
                     onClick = { currentBidDetailsViewModel.updateShouldShowActiveBids(true) },
                     modifier = Modifier
                         .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))

@@ -103,7 +103,7 @@ object FirebaseClient {
                             prepareProductsOffering()
                             prepareProductsInUserForLocalDatabase(currentUser)
                             prepareOpenTransactions(currentUser)
-                            prepareTransactionRecords(currentUser)
+                            //prepareTransactionRecords(currentUser)
                             prepareMessages(currentUser)
                             saveSampleProductImage()
                         }
@@ -511,10 +511,12 @@ object FirebaseClient {
 
         val messagesReceived = currentUser.userMessagesReceived.map { (messageKey, messageValue) ->
             messageValue.sender = false
+            Log.i("prepare messages", "other user id ${messageValue.otherUserId}")
             convertMessageFirebaseToMessage(messageValue)
         }
         val messagesSent = currentUser.userMessagesSent.map { (messageKey, messageValue) ->
             messageValue.sender = true
+            Log.i("prepare messages", "other user id ${messageValue.otherUserId}")
             convertMessageFirebaseToMessage(messageValue)
         }
         val allMessages = messagesReceived + messagesSent
@@ -550,19 +552,6 @@ object FirebaseClient {
                 }
         }
 
-    private suspend fun prepareTransactionRecords(currentUser: UserFirebase) {
-        val acceptedBids =
-            currentUser.userAcceptedBids.map { (key, value) ->
-                //convertAcceptBidFirebaseToAcceptBid(value)
-            }
-        val bidsAccepted =
-        currentUser.userBidsAccepted.map { (key, value) ->
-            //convertAcceptBidFirebaseToAcceptBid(value)
-        }
-
-        //localDatabase!!.barterDao.insertAcceptedBids(*acceptedBids.toTypedArray())
-        //localDatabase!!.barterDao.insertAcceptedBids(*bidsAccepted.toTypedArray())
-    }
 
     suspend fun processSelling(productOffering: ProductOffering,
                                productImages: List<ProductImageToDisplay>,
