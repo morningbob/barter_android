@@ -831,14 +831,17 @@ object FirebaseClient {
 
         // turn  the product offering into waiting status in collection
         // update user object (buyers and seller) for waiting transaction
+        val acceptBidId = UUID.randomUUID().toString()
+        val bid = convertBidToBidFirebase(bid)
+        bid.acceptBidId = acceptBidId
 
         // let buyer and seller send exchange message
         val acceptBid = AcceptBidFirebase(
-            acceptId = UUID.randomUUID().toString(),
+            acceptId = acceptBidId,
             // we provide empty asking products and empty bids
             // we only need the other info
             productOffering = convertProductOfferingToFirebase(product, listOf(), listOf()),
-            theBid = convertBidToBidFirebase(bid),
+            theBid = bid,
             time = getCurrentDateTime(),
             stat = 0
         )
@@ -1010,19 +1013,14 @@ object FirebaseClient {
 
     }
 
-    suspend fun processTransaction(id: String, bidStatus: BidStatus) : Boolean =
-        //val path = when (bidMode) {
-        //    BidMode.REQUEST -> "requestTransaction"
-        //    BidMode.CONFIRM -> "confirmTransaction"
-       //     BidMode.CLOSE -> "closeTransaction"
-        //    else -> ""
-        //}
+    suspend fun processTransaction(bidId: String, bidStatus: BidStatus, userId: String) : Boolean =
+
         suspendCancellableCoroutine { cancellableContinuation ->
         //CoroutineScope(Dispatchers.IO).async {
             Firebase.firestore
                 .collection("processTransactionStatus")
-                .document(id)
-                .set(mapOf("id" to id, "status" to bidStatus.ordinal.toString()))
+                .document(bidId)
+                .set(mapOf("id" to bidId, "status" to bidStatus.ordinal, "userId" to userId))
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.i("transaction processes", "success")

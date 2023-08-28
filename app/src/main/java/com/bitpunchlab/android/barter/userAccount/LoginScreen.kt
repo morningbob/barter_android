@@ -71,9 +71,7 @@ fun LoginScreen(navController: NavHostController,
     }
 
     LaunchedEffect(key1 = loadingAlpha) {
-        if (loadingAlpha == 100f) {
-            loading = true
-        }
+        loading = loadingAlpha == 100f
     }
 
     //val config = LocalConfiguration.current

@@ -124,9 +124,7 @@ class AcceptBidDetailsViewModel : ViewModel() {
 
             // send to firestore before saving in database
             CoroutineScope(Dispatchers.IO).launch {
-                //FirebaseClient.uploadAcceptBid(acceptBid.)
-                //val bidMode = if (newStatus == BidStatus.REQUESTED_CLOSE) BidMode.REQUEST
-                if (FirebaseClient.processTransaction(acceptBid.acceptId, newStatus)) {
+                if (FirebaseClient.processTransaction(acceptBid.acceptId, newStatus, FirebaseClient.currentUserFirebase.value!!.id)) {
                     Log.i("process update bid status", "success")
                 } else {
                     Log.i("process update bid status", "failed")

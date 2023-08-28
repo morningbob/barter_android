@@ -86,7 +86,7 @@ fun AcceptBidsListScreen(navController: NavHostController, acceptBidsListViewMod
                 .padding(
                     top = dimensionResource(id = R.dimen.list_page_top_bottom_padding),
                     start = dimensionResource(id = R.dimen.list_page_left_right_padding),
-                    end = dimensionResource(id = R.dimen.title_row_left_right_padding)
+                    end = dimensionResource(id = R.dimen.list_page_left_right_padding)
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

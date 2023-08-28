@@ -10,20 +10,20 @@
     <dimen name="top_bottom_error_padding">8dp</dimen>
     <dimen name="page_bottom_padding_no_bar">50dp</dimen>
     <dimen name="page_bottom_padding_with_bar">100dp</dimen>
-    <dimen name="list_page_left_right_padding">70dp</dimen>
+    <dimen name="list_page_left_right_padding">180dp</dimen>
     <dimen name="list_page_top_bottom_padding">22dp</dimen>
     <dimen name="list_page_left_right_padding_cross">40dp</dimen>
     <dimen name="list_page_top_bottom_padding_cross">20dp</dimen>
     <dimen name="double_column_left_right_padding">100dp</dimen>
     <dimen name="mild_top_padding">25dp</dimen>
     <dimen name="mild_start_padding">25dp</dimen>
-    <dimen name="list_item_big_top_padding">12dp</dimen>
-    <dimen name="list_item_top_padding">8dp</dimen>
-    <dimen name="list_item_left_right_padding">28dp</dimen>
+    <dimen name="list_item_big_top_padding">20dp</dimen>
+    <dimen name="list_item_top_padding">15dp</dimen>
+    <dimen name="list_item_left_right_padding">33dp</dimen>
     <dimen name="basic_screen_top_padding">20dp</dimen>
     <dimen name="title_row_top_padding_cross">0dp</dimen>
     <dimen name="title_row_top_padding">5dp</dimen>
-    <dimen name="title_row_height">100dp</dimen>
+    <dimen name="title_row_height">120dp</dimen>
     <dimen name="title_row_bottom_padding">20dp</dimen>
     <dimen name="title_row_left_right_padding">40dp</dimen>
     <dimen name="thumbnail_size">80dp</dimen>
@@ -102,6 +102,6 @@
     <dimen name="dialog_title_font_size">20sp</dimen>
     <dimen name="product_row_title_font_size">21sp</dimen>
     <dimen name="date_time_font_size">20sp</dimen>
-    <dimen name="title_row_font_size">27sp</dimen>
+    <dimen name="title_row_font_size">33sp</dimen>
 
 </resources>
