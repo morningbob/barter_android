@@ -832,20 +832,20 @@ object FirebaseClient {
         // turn  the product offering into waiting status in collection
         // update user object (buyers and seller) for waiting transaction
         val acceptBidId = UUID.randomUUID().toString()
-        val bid = convertBidToBidFirebase(bid)
-        bid.acceptBidId = acceptBidId
+        val acceptBid = convertBidToBidFirebase(bid)
+        acceptBid.acceptBidId = acceptBidId
 
         // let buyer and seller send exchange message
-        val acceptBid = AcceptBidFirebase(
+        val acceptBidFirebase = AcceptBidFirebase(
             acceptId = acceptBidId,
             // we provide empty asking products and empty bids
             // we only need the other info
             productOffering = convertProductOfferingToFirebase(product, listOf(), listOf()),
-            theBid = bid,
+            theBid = acceptBid,
             time = getCurrentDateTime(),
             stat = 0
         )
-        return uploadAcceptBid(acceptBid)
+        return uploadAcceptBid(acceptBidFirebase)
     }
 
     suspend fun processDeleteProduct(product: ProductOffering) : Boolean {
@@ -900,7 +900,7 @@ object FirebaseClient {
         return false
     }
 
-    suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase)
+    private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase)
                                          =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
 
@@ -1016,10 +1016,9 @@ object FirebaseClient {
     suspend fun processTransaction(bidId: String, bidStatus: BidStatus, userId: String) : Boolean =
 
         suspendCancellableCoroutine { cancellableContinuation ->
-        //CoroutineScope(Dispatchers.IO).async {
             Firebase.firestore
                 .collection("processTransactionStatus")
-                .document(bidId)
+                .document()
                 .set(mapOf("id" to bidId, "status" to bidStatus.ordinal, "userId" to userId))
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -1030,6 +1029,5 @@ object FirebaseClient {
                         cancellableContinuation.resume(false) {}
                     }
                 }
-        //}
     }
 }

@@ -642,7 +642,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             color = Color.Black,
             fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             modifier = Modifier
-                .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding))
+                .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
         )
         if (productOfferingImages.isNotEmpty()) {
             Image(
@@ -650,7 +650,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 contentDescription = "first product image",
                 modifier = Modifier
                     .width(dimensionResource(id = R.dimen.detail_image_size))
-                    .padding(top = dimensionResource(id = R.dimen.detail_image_top_padding))
+                    .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
             )
             CustomButton(
                 label = stringResource(R.string.view_images),
@@ -659,7 +659,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     updateShouldDisplayImages(true)
                 },
                 modifier = Modifier
-                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
+                    .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
             )
         } else {
             Text(
@@ -675,7 +675,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
             color = Color.Black,
             fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
             modifier = Modifier
-                .padding(top = dimensionResource(id = R.dimen.basic_screen_top_padding))
+                .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
         )
         if (productInExchangeImages.isNotEmpty()) {
             Image(
@@ -694,7 +694,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                     //updateShouldDisplayImages.invoke(viewModel, true)
                 },
                 modifier = Modifier
-                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
+                    .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
             )
         } else {
             Text(
@@ -702,7 +702,7 @@ fun BasicRecordScreen(modifier: Modifier = Modifier, productOfferingImages: List
                 color = BarterColor.textGreen,
                 fontSize = dimensionResource(id = R.dimen.subtitle_font_size).value.sp,
                 modifier = Modifier
-                    .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
+                    .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
             )
         }
     }

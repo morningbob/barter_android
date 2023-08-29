@@ -131,7 +131,7 @@ fun AcceptBidDetailsScreen(
                         acceptBidDetailsViewModel.updateShouldNavigateSend(true)
                     },
                     modifier = Modifier
-                        .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
+                        .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
                 )
 
                 ChoiceButton(
@@ -144,7 +144,7 @@ fun AcceptBidDetailsScreen(
                     }
                               },
                     modifier = Modifier
-                        .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
+                        .padding(top = dimensionResource(id = R.dimen.accept_bid_details_element_padding))
                 )
             }
             if (shouldDisplayImages) {

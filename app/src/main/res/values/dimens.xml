@@ -17,6 +17,8 @@
     <dimen name="double_column_left_right_padding">50dp</dimen>
     <dimen name="mild_top_padding">20dp</dimen>
     <dimen name="mild_start_padding">20dp</dimen>
+    <dimen name="more_top_padding">20dp</dimen>
+    <dimen name="sell_element_padding">20dp</dimen>
     <dimen name="list_item_big_top_padding">12dp</dimen>
     <dimen name="list_item_top_padding">8dp</dimen>
     <dimen name="list_item_left_right_padding">20dp</dimen>
@@ -27,6 +29,8 @@
     <dimen name="title_row_bottom_padding">20dp</dimen>
     <dimen name="title_row_left_right_padding">40dp</dimen>
     <dimen name="thumbnail_size">80dp</dimen>
+    <dimen name="current_bid_details_top_padding">5dp</dimen>
+    <dimen name="current_bid_details_product_left_right_padding">60dp</dimen>
     <dimen name="current_bid_details_product_stroke">25dp</dimen>
     <dimen name="current_bid_details_between_product_padding">30dp</dimen>
     <dimen name="current_bid_pointer_size">80dp</dimen>
@@ -59,6 +63,7 @@
     <dimen name="image_display_remove_icon_size">25dp</dimen>
     <dimen name="image_display_image_list_padding">15dp</dimen>
     <dimen name="bid_row_thumbnail_padding">20dp</dimen>
+    <dimen name="accept_bid_details_element_padding">15dp</dimen>
     <dimen name="accept_bid_row_left_right_padding">20dp</dimen>
     <dimen name="active_bids_row_padding1">3dp</dimen>
     <dimen name="accept_bids_item_padding1">12dp</dimen>

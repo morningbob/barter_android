@@ -100,8 +100,8 @@ fun CurrentBidDetailsScreen(navController: NavHostController,
                             .fillMaxWidth()
                             .padding(
                                 top = dimensionResource(id = R.dimen.detail_image_top_padding),
-                                start = dimensionResource(id = R.dimen.left_right_element_padding),
-                                end = dimensionResource(id = R.dimen.left_right_element_padding)
+                                start = dimensionResource(id = R.dimen.current_bid_details_product_left_right_padding),
+                                end = dimensionResource(id = R.dimen.current_bid_details_product_left_right_padding)
                             ),
                         borderWidth = dimensionResource(id = R.dimen.current_bid_details_product_stroke),
                         borderColor = Color.Yellow
@@ -146,20 +146,21 @@ fun CurrentBidDetailsScreen(navController: NavHostController,
                             contentDes = "the product user offered",
                             modifier = Modifier
                                 .fillMaxSize()
+                                .background(Color.Yellow)
                         )
                     }
                 }
                 DateTimeInfo(
                     dateTimeString = chosenCurrentBid!!.bid.bidTime,
                     modifier = Modifier
-                        .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding))
+                        .padding(top = dimensionResource(id = R.dimen.current_bid_details_top_padding))
                 )
 
                 CustomButton(
                     label = stringResource(R.string.show_current_bids),
                     onClick = { currentBidDetailsViewModel.updateShouldShowActiveBids(true) },
                     modifier = Modifier
-                        .padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding))
+                        .padding(top = dimensionResource(id = R.dimen.current_bid_details_top_padding))
                 )
 
             }

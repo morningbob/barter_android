@@ -135,7 +135,7 @@ fun SellScreen(navController: NavHostController, sellViewModel: SellViewModel) {
 
                 // a form to get the product's detail
                 ProductForm(
-                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.top_bottom_button_padding)),
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.more_top_padding)),
                     productName = productName,
                     pickImageLauncher = pickImageLauncher,
                     shouldExpandCat = shouldExpandCategory,
@@ -277,7 +277,7 @@ fun ProductForm(modifier: Modifier = Modifier, productName: String,
                 verticalAlignment = Alignment.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = dimensionResource(id = R.dimen.mild_top_padding)),
+                    .padding(top = dimensionResource(id = R.dimen.sell_element_padding)),
 
             ) {
                 CustomButton(
@@ -333,7 +333,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding)),
+                .padding(top = dimensionResource(id = R.dimen.sell_element_padding)),
             horizontalArrangement = Arrangement.Start
 
         ) {
@@ -366,7 +366,7 @@ fun BaseProductForm(productName: String, productCategory: Category, shouldExpand
             verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(id = R.dimen.top_bottom_element_padding)),
+                .padding(top = dimensionResource(id = R.dimen.sell_element_padding)),
 
             ) {
             CustomButton(

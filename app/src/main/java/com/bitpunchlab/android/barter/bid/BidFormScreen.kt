@@ -40,6 +40,8 @@ import com.bitpunchlab.android.barter.base.CustomTextField
 import com.bitpunchlab.android.barter.models.Bid
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
+import com.bitpunchlab.android.barter.base.TitleRow
+import com.bitpunchlab.android.barter.base.TitleText
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.BiddingStatus
@@ -66,8 +68,6 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
     val imagesDisplay = bidFormViewModel.imagesDisplay.collectAsState()
     val deleteImageStatus by bidFormViewModel.deleteImageStatus.collectAsState()
     val createdBid by bidFormViewModel.createdBid.collectAsState()
-
-    //val imagesDisplay = bidFormViewModel.imagesDisplay
 
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()) { uri ->
@@ -125,6 +125,12 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                         .padding(top = dimensionResource(id = R.dimen.icon_padding))
                         .width(dimensionResource(id = R.dimen.icon_size))
                 )
+                
+                TitleText(
+                    title = stringResource(id = R.string.bid),
+                    modifier = Modifier
+                        .padding(top = dimensionResource(id = R.dimen.sell_element_padding))
+                )
 
                 CustomTextField(
                     label = stringResource(id = R.string.product_name),
@@ -132,13 +138,13 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                     onChange = { bidFormViewModel.updateBidProductName(it) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = dimensionResource(id = R.dimen.top_bottom_title_padding))
+                        .padding(top = dimensionResource(id = R.dimen.sell_element_padding))
                 )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = dimensionResource(id = R.dimen.mild_top_padding)),
+                        .padding(top = dimensionResource(id = R.dimen.sell_element_padding)),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -168,7 +174,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                     verticalAlignment = Alignment.Top,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = dimensionResource(id = R.dimen.mild_start_padding)),
+                        .padding(top = dimensionResource(id = R.dimen.sell_element_padding)),
 
                     ) {
                     CustomButton(
@@ -190,7 +196,7 @@ fun BidFormScreen(bidFormViewModel: BidFormViewModel = remember { BidFormViewMod
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = dimensionResource(id = R.dimen.mild_start_padding))
+                        .padding(top = dimensionResource(id = R.dimen.sell_element_padding))
                 ) {
                     ChoiceButton(
                         title = stringResource(id = R.string.send),
@@ -283,7 +289,6 @@ fun BidConfirmationAlert(onConfirm: () -> Unit,
         onDismiss = { onCancel() },
         onPositive = {
             onConfirm()
-            //onCancel()
                      },
         onNegative = { onCancel() }
     )
