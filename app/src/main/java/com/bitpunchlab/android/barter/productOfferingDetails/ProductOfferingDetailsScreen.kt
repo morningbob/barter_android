@@ -264,7 +264,7 @@ fun ProductOfferingDetailsScreen(navController: NavHostController,
                                 CoroutineScope(Dispatchers.IO).launch {
                                     productDetailsViewModel.deleteProduct(product)
                                     CoroutineScope(Dispatchers.IO).launch {
-                                        BarterRepository.deleteProductOffering(product)
+                                        BarterRepository.deleteProductOffering(listOf(product))
                                     }.join()
                                     LocalDatabaseManager.reloadUserAndProductOffering()
                                 }

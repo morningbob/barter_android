@@ -141,15 +141,14 @@ fun SendMessageScreen(navController: NavHostController,
                     else -> 0
                 }
             }
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(loadingAlpha)
-            ) {
-                CustomCircularProgressBar()
-            }
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(loadingAlpha)
+        ) {
+            CustomCircularProgressBar()
         }
     }
 }

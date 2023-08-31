@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'com.bitpunchlab.android.barter'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.bitpunchlab.android.barter"
         minSdk 29
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 

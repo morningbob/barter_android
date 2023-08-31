@@ -171,9 +171,6 @@ object LocalDatabaseManager {
     }
 
     private fun sortProductsOffering(products: List<ProductOffering>) : List<ProductOffering> {
-        //val result = products.sortedByDescending { parseDateTime(it.dateCreated) }
-        //Log.i("sorting products", "no ${result.size}")
-        //return result
         return products.sortedByDescending { parseDateTime(it.dateCreated) }
     }
 
@@ -214,6 +211,7 @@ object LocalDatabaseManager {
         }
     }
 
+    // we take out the expired products here, ie status = 5, or 6
     fun reloadUserAndProductOffering() {
         CoroutineScope(Dispatchers.IO).launch {
             val userAndProductOffering = CoroutineScope(Dispatchers.IO).async {
@@ -222,7 +220,7 @@ object LocalDatabaseManager {
             if (!userAndProductOffering.isNullOrEmpty()) {
                 // here we sort the products offering,
                 _userProductsOffering.value =
-                    sortProductsOffering(userAndProductOffering.get(0).productsOffering)
+                    sortProductsOffering(userAndProductOffering.get(0).productsOffering).filter { it.status != 5 && it.status != 6 }
                 Log.i(
                     "local database manager",
                     "got user's products ${userAndProductOffering.get(0).productsOffering.size}"

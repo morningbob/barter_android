@@ -267,7 +267,7 @@ fun ProductForm(modifier: Modifier = Modifier, productName: String,
                         updateShouldExpandDuration(false)
                     },
                     onDismiss = { },
-                    items = listOf(SellingDuration.ONE_DAY, SellingDuration.TWO_DAYS),
+                    items = listOf(SellingDuration.ONE, SellingDuration.TWO, SellingDuration.THREE),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = dimensionResource(id = R.dimen.mild_start_padding))

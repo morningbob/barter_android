@@ -116,8 +116,10 @@ object ImageHandler {
              uri?.let {
                  currentContext!!.contentResolver.openOutputStream(it, "wt").use { outputStream ->
                      //outputStream.flush()
-                     if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)) {
-                         throw IOException("couldn't save image")
+                     if (outputStream != null) {
+                         if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)) {
+                             throw IOException("couldn't save image")
+                         }
                      }
                  } ?: throw IOException("failed to create media store entry")
 

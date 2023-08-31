@@ -20,7 +20,6 @@ import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.models.ProductOfferingAndBids
 import com.bitpunchlab.android.barter.models.ProductOfferingAndProductsAsking
 import com.bitpunchlab.android.barter.models.User
-import com.bitpunchlab.android.barter.util.BidMode
 import com.bitpunchlab.android.barter.util.BidStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.LoginStatus
@@ -37,6 +36,7 @@ import com.bitpunchlab.android.barter.util.convertProductFirebaseToProduct
 import com.bitpunchlab.android.barter.util.convertProductOfferingToFirebase
 import com.bitpunchlab.android.barter.util.convertUserFirebaseToUser
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
+import com.bitpunchlab.android.barter.util.parseDateTime
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -45,6 +45,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -103,9 +106,8 @@ object FirebaseClient {
                             prepareProductsOffering()
                             prepareProductsInUserForLocalDatabase(currentUser)
                             prepareOpenTransactions(currentUser)
-                            //prepareTransactionRecords(currentUser)
                             prepareMessages(currentUser)
-                            saveSampleProductImage()
+                            deleteExpiredProducts()
                         }
                     }
                 }
@@ -121,30 +123,6 @@ object FirebaseClient {
 
     init {
         auth.addAuthStateListener(authStateListener)
-    }
-
-    // testing
-    private suspend fun saveSampleProductImage() {
-        //val productImage = ProductImageToDisplay(
-        //    imageUrlCloud = "https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0"
-        //)
-        //CoroutineScope(Dispatchers.IO).launch {
-        //    BarterRepository.insertImages(listOf(productImage))
-        //}.join()
-
-        //delay(10000)
-
-        val resultList = CoroutineScope(Dispatchers.IO).async {
-            BarterRepository.getImage("https://firebasestorage.googleapis.com/v0/b/barter-a84a2.appspot.com/o/images%2F1aa2c01c-9f90-494b-9f9f-24f7985c5cce_0.jpg?alt=media&token=5be717b0-b9cd-4647-b30d-4e6148764ee0")
-        }.await()
-
-        if (resultList.isNullOrEmpty()) {
-            Log.i("firebase", "couldn't get 1111")
-
-        } else {
-            Log.i("firebase", "got 1111")
-            Log.i("firebase", "imageUrlLocal ${resultList[0].imageUrlLocal}")
-        }
     }
 
     suspend fun login(email: String, password: String) : LoginStatus =
@@ -378,6 +356,18 @@ object FirebaseClient {
         //Log.i("prepare product offering", "no of bids ${bids.size}")
     }
 
+    // the function change the status of the product offering to -1 if it is expired
+    // we'll delete it in the next startup of the app
+
+    private fun checkStatusExpiredProduct(product: ProductOfferingFirebase) : Int {
+        val expiryOfProduct = parseDateTime(product.dateCreated)?.plusDays(product.sellingDuration.toLong())
+        val dateNow = LocalDateTime.now()
+        if (expiryOfProduct != null && expiryOfProduct.isBefore(dateNow)) {
+            return ChronoUnit.DAYS.between(expiryOfProduct, dateNow).toInt()
+        }
+        return -1
+    }
+
     private suspend fun decomposeProductOfferingFirebase(productsOfferingFirebase: List<ProductOfferingFirebase>) :
         ProductOfferingDecomposed
     {
@@ -388,12 +378,21 @@ object FirebaseClient {
             productsOfferingFirebase.map { product ->
                 product.askingProducts.map { (askingKey, asking) ->
                     Log.i("decompose product offering", "processing product ${product.name}")
-                    Log.i("decompose product offering", "got asking product ${asking.name}")
+                    //Log.i("decompose product offering", "got asking product ${asking.name}")
                     askingProducts.add(convertProductAskingFirebaseToProductAsking(asking))
                 }
                 product.currentBids.map { (bidKey, bid) ->
-                    Log.i("decompose product offering", "got bid ${bid.userName}")
+                    //Log.i("decompose product offering", "got bid ${bid.userName}")
                     bids.add(convertBidFirebaseToBid(bid))
+                }
+                //Log.i("decompose product", "product name ${product.name} ")
+                // change the status of the product to -1 if expired
+                val expiredDays = checkStatusExpiredProduct(product)
+                if (expiredDays > 20 && product.status != 5 && product.status != 6) {
+                    product.status = -2
+                    //product.dateCreated = "Expired"
+                } else if (expiredDays > 0 && product.status != 5 && product.status != 6) {
+                    product.status = -1
                 }
                 // before we create a new product image,
                 // we try to retrieve the image locally by the imageUrlCloud
@@ -419,6 +418,22 @@ object FirebaseClient {
             bids = bids,
             images = productImages
         )
+    }
+
+    // -1 is expired, -2 means should be deleted
+    private fun deleteExpiredProducts() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val allProducts = CoroutineScope(Dispatchers.IO).async {
+                BarterRepository.getAllProductOfferingByList()
+            }.await()
+
+            val deleteList = allProducts?.filter { it.status == -2 }
+
+            deleteList?.let {
+                Log.i("delete is not empty", deleteList.size.toString())
+                BarterRepository.deleteProductOffering(deleteList)
+            }
+        }
     }
 
     // when we first got the product from firestore, we try to load the image locally,

@@ -507,7 +507,7 @@ fun ProductRow(modifier: Modifier = Modifier, contentModifier: Modifier = Modifi
 }
 
 @Composable
-fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
+fun DateTimeInfo(modifier: Modifier = Modifier, dateTimeString: String, expired: Boolean = false) {
 
     val dateTime = parseDateTime(dateTimeString)
 
@@ -516,15 +516,21 @@ fun DateTimeInfo(dateTimeString: String, modifier: Modifier = Modifier) {
             .then(modifier)
 
     ) {
-        if (dateTime != null) {
+        if (dateTime != null && !expired) {
             Text(
                 text = "${dateTime.month} ${dateTime.dayOfMonth}, ${dateTime.year}  ${dateTime.hour}:${dateTime.minute}",
                 fontSize = dimensionResource(id = R.dimen.date_time_font_size).value.sp,
                 color = Color.Blue
             )
-        } else {
+        } else if (dateTime == null && !expired){
             Text(
                 text = stringResource(R.string.date_and_time_info_not_available),
+                fontSize = dimensionResource(id = R.dimen.date_time_font_size).value.sp,
+                color = Color.Blue
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.expired),
                 fontSize = dimensionResource(id = R.dimen.date_time_font_size).value.sp,
                 color = Color.Blue
             )

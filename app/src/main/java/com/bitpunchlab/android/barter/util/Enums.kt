@@ -11,8 +11,9 @@ enum class Category(var label: String) {
 
 enum class SellingDuration(val label: String, val value: Int) {
     NOT_SET(label = "not set", value = 0),
-    ONE_DAY(label = "One", value = 1),
-    TWO_DAYS(label = "Two", value = 2),
+    ONE(label = "One Week", value = 7),
+    TWO(label = "Two Weeks", value = 14),
+    THREE(label = "Three Weeks", value = 21)
 }
 
 enum class AppStatus {
@@ -111,21 +112,10 @@ enum class BidStatus(var label: String) {
     CLOSED(label = "Transaction Closed")
 }
 
-enum class BidMode {
-    ACCEPT,
-    REQUEST,
-    CONFIRM,
-    CLOSE
-}
 
 enum class ImageType {
     PRODUCT_IMAGE,
     ASKING_IMAGE
-}
-
-enum class ProductType {
-    PRODUCT,
-    ASKING_PRODUCT
 }
 
 enum class UserMode {

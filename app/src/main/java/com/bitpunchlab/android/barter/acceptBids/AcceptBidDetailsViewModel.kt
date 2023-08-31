@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
-import com.bitpunchlab.android.barter.util.BidMode
 import com.bitpunchlab.android.barter.util.BidStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
 import com.bitpunchlab.android.barter.util.acceptBidStatusMap

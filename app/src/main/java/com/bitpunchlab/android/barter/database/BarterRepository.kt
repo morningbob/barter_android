@@ -45,6 +45,10 @@ object BarterRepository {
 
     }
 
+    fun getAllProductOfferingByList() : List<ProductOffering>? {
+        return database?.barterDao?.getAllProductOfferingByList()
+    }
+
     suspend fun getProductOfferingById(id: String) : ProductOffering? {
         return CoroutineScope(Dispatchers.IO).async {
             database?.barterDao?.getProductOfferingById(id)
@@ -57,9 +61,9 @@ object BarterRepository {
         }
     }
 
-    fun deleteProductOffering(product: ProductOffering) {
+    fun deleteProductOffering(products: List<ProductOffering>) {
         CoroutineScope(Dispatchers.IO).launch {
-            database?.barterDao?.deleteProductOffering(product)
+            database?.barterDao?.deleteProductOffering(*products.toTypedArray())
         }
     }
 

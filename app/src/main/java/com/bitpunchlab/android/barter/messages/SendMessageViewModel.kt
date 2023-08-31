@@ -41,6 +41,10 @@ class SendMessageViewModel : ViewModel() {
         _messageText.value = text
     }
 
+    private fun clearFields() {
+        _messageText.value = ""
+    }
+
     fun sendMessage(text: String, otherUserId: String, otherUserName: String) {
         _loadingAlpha.value = 100f
         if (text != "") {
@@ -61,10 +65,12 @@ class SendMessageViewModel : ViewModel() {
                     }.await())
                     SendMessageStatus.SUCCESS else
                         SendMessageStatus.FAILURE
+                clearFields()
                 _loadingAlpha.value = 0f
             }
         } else {
             _sendMessageStatus.value = SendMessageStatus.INVALID_INPUT
+            clearFields()
             _loadingAlpha.value = 0f
         }
 

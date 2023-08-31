@@ -39,8 +39,11 @@ interface BarterDao {
     @Query("SELECT * FROM products_offering WHERE :id == productId LIMIT 1")
     fun getProductOfferingById(id: String) : ProductOffering
 
-    @Query("SELECT * FROM products_offering")
+    @Query("SELECT * FROM products_offering WHERE status != 5 AND status != 6")
     fun getAllProductOffering() : Flow<List<ProductOffering>>
+
+    @Query("SELECT * FROM products_offering")
+    fun getAllProductOfferingByList() : List<ProductOffering>
 
     @Query("SELECT * FROM products_offering WHERE :id = productId LIMIT 1")
     fun getProductOffering(id: String) : Flow<ProductOffering>

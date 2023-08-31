@@ -118,4 +118,5 @@
     <string name="sell">Sell</string>
     <string name="duration">Duration</string>
     <string name="show_current_bids">Show Current Bids</string>
+    <string name="expired">Expired</string>
 </resources>
