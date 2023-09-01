@@ -2,7 +2,6 @@ package com.bitpunchlab.android.barter.firebase
 
 import android.graphics.Bitmap
 import android.util.Log
-import com.bitpunchlab.android.barter.BarterNavigation
 import com.bitpunchlab.android.barter.database.BarterDatabase
 import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.models.AcceptBidFirebase
@@ -45,11 +44,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.collections.HashMap
 
 object FirebaseClient {
 
@@ -843,6 +840,7 @@ object FirebaseClient {
 
     suspend fun processAcceptBid(product: ProductOffering, bid: Bid) : Boolean {
         // write to accept bid collection
+        Log.i("process accept bid", "started")
 
         // turn  the product offering into waiting status in collection
         // update user object (buyers and seller) for waiting transaction
@@ -918,7 +916,7 @@ object FirebaseClient {
     private suspend fun uploadAcceptBid(acceptBidFirebase: AcceptBidFirebase)
                                          =
         suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
-
+            //Log.i("upload accept bid", "started")
             Firebase.firestore
                 .collection("acceptBids")
                 .document(acceptBidFirebase.id)

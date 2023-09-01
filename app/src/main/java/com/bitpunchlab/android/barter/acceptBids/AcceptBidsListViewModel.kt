@@ -1,24 +1,12 @@
 package com.bitpunchlab.android.barter.acceptBids
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.database.BarterRepository
-import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.AcceptBid
-import com.bitpunchlab.android.barter.models.BidAndAcceptBid
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
-import com.bitpunchlab.android.barter.util.ImageHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
-import java.util.UUID
 
 class AcceptBidsListViewModel : ViewModel() {
     val _acceptBids = MutableStateFlow<List<AcceptBid>>(listOf())

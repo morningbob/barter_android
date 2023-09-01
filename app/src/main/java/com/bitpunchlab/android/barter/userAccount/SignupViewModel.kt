@@ -7,8 +7,6 @@ import com.bitpunchlab.android.barter.util.SignUpStatus
 import com.bitpunchlab.android.barter.util.validateConfirmPassword
 import com.bitpunchlab.android.barter.util.validateEmail
 import com.bitpunchlab.android.barter.util.validatePassword
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

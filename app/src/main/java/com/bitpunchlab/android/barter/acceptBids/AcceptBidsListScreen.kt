@@ -28,19 +28,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.bitpunchlab.android.barter.AcceptBidDetails
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.ChooseTitlesRow
 import com.bitpunchlab.android.barter.base.CustomCard
 import com.bitpunchlab.android.barter.base.DateTimeInfo
 import com.bitpunchlab.android.barter.base.LoadedImageOrPlaceholder
+import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.database.LocalDatabaseManager
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

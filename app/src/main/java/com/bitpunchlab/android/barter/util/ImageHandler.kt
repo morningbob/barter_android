@@ -1,20 +1,16 @@
 package com.bitpunchlab.android.barter.util
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.bitpunchlab.android.barter.R
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bumptech.glide.Glide
@@ -23,20 +19,13 @@ import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
-import java.io.File
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
-import kotlinx.coroutines.async
 import java.io.IOException
-import java.lang.IllegalStateException
 
 // the image loader is so important for the app to display images
 // keeping a context in it while the app is active
@@ -62,7 +51,7 @@ object ImageHandler {
                     }
 
                     override fun onLoadFailed(erroryDrawable: Drawable?) {
-                        cancellableContinuation.resume(createPlaceholderImage(currentContext!!)) {}
+                        cancellableContinuation.resume(null) {}
                     }
                 })
         }

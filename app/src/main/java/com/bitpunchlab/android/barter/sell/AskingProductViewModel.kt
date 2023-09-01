@@ -1,24 +1,17 @@
 package com.bitpunchlab.android.barter.sell
 
 import android.graphics.Bitmap
-import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
-import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.Category
-import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bitpunchlab.android.barter.util.SetAskingProductStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.*
-import kotlin.collections.HashMap
+import java.util.UUID
 
 class AskingProductViewModel : ViewModel() {
 

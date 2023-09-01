@@ -1,6 +1,5 @@
 package com.bitpunchlab.android.barter.database
 
-import com.bitpunchlab.android.barter.askingProducts.ConfirmDeleteProductDialog
 import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndBid
 import com.bitpunchlab.android.barter.models.AcceptBidAndProduct

@@ -3,7 +3,6 @@ package com.bitpunchlab.android.barter.base
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,11 +16,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +26,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -42,21 +37,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.bitpunchlab.android.barter.R
-import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
-import com.bitpunchlab.android.barter.util.Category
 import com.bitpunchlab.android.barter.util.ImageHandler
+import com.bitpunchlab.android.barter.util.ImageHandler.createPlaceholderImage
 import com.bitpunchlab.android.barter.util.ImageHandler.loadImage
-import com.bitpunchlab.android.barter.util.SellingDuration
 import com.bitpunchlab.android.barter.util.parseDateTime
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -64,12 +54,6 @@ import com.bumptech.glide.request.transition.Transition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.broadcast
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import java.nio.file.attribute.BasicFileAttributeView
-import kotlin.math.min
-import kotlin.reflect.KClass
 
 @Composable
 fun CustomTextField(modifier: Modifier = Modifier, label: String, textValue: String, onChange: (String) -> Unit,
@@ -837,6 +821,10 @@ fun LoadedImageOrPlaceholder(modifier: Modifier = Modifier, imageUrls: List<Stri
                     if (bitmap != null) {
                         ImageHandler.saveImageExternalStorage(imageUrls[0], bitmap!!)
                         Log.i("load image or placeholder", "saved image from cloud")
+                    } else {
+                        // can't load image, maybe fetch error externally
+                        Log.i("load image or placeholder", "couldn't load image")
+                        bitmap = createPlaceholderImage()
                     }
                 }
 

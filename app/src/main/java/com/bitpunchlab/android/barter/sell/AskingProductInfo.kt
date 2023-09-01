@@ -1,12 +1,7 @@
 package com.bitpunchlab.android.barter.sell
 
-import android.graphics.Bitmap
 import com.bitpunchlab.android.barter.models.ProductAsking
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
-import com.bitpunchlab.android.barter.models.ProductOffering
-import com.bitpunchlab.android.barter.productsOfferingList.ProductInfo
-import com.bitpunchlab.android.barter.util.Category
-import com.bitpunchlab.android.barter.util.SellingDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

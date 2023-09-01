@@ -93,8 +93,8 @@
     <dimen name="menu_bar_width">15dp</dimen>
     <dimen name="menu_bar_left_padding">50dp</dimen>
     <dimen name="menu_bar_right_padding">20dp</dimen>
-    <dimen name="cancel_cross_padding">30dp</dimen>
-    <dimen name="cancel_cross_size">50dp</dimen>
+    <dimen name="cancel_cross_padding">15dp</dimen>
+    <dimen name="cancel_cross_size">35dp</dimen>
     <dimen name="card_elevation">10dp</dimen>
     <dimen name="thumbnail_right_padding">20dp</dimen>
 

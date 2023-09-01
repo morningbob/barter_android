@@ -153,29 +153,6 @@ fun convertMessageFirebaseToMessage(messageFirebase: MessageFirebase) : Message 
 }
 
 
-/*
-fun convertAcceptBidFirebaseToAcceptBid(acceptBidFirebase: AcceptBidFirebase) : AcceptBid {
-
-    val productImages = sortElements(acceptBidFirebase.product!!.images)
-    val productBidImages = sortElements(acceptBidFirebase.bid!!.bidProduct!!.images)
-
-    return AcceptBid(
-        acceptId = acceptBidFirebase.id,
-        productId = acceptBidFirebase.product!!.id,
-        productName = acceptBidFirebase.product!!.name,
-        productCategory = acceptBidFirebase.product!!.category,
-        productImages = productImages,
-        productSellerName = acceptBidFirebase.product!!.userName,
-        productBidName = acceptBidFirebase.bid!!.bidProduct!!.name,
-        productBidCategory = acceptBidFirebase.bid!!.bidProduct!!.category,
-        productBidImages = productBidImages,
-        productBidderName = acceptBidFirebase.bid!!.userName,
-        bidDate = acceptBidFirebase.bid!!.bidTime
-    )
-}
-
- */
-
 fun <T> sortElements(productsMap: HashMap<String, T>) : List<T>{
     val listOfSortProduct = mutableListOf<SortHelpObject<T>>()
     for ((key, value) in productsMap) {

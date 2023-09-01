@@ -1,10 +1,8 @@
 package com.bitpunchlab.android.barter.messages
 
 import androidx.lifecycle.ViewModel
-import com.bitpunchlab.android.barter.database.BarterRepository
 import com.bitpunchlab.android.barter.firebase.FirebaseClient
 import com.bitpunchlab.android.barter.models.Message
-import com.bitpunchlab.android.barter.models.ProductOffering
 import com.bitpunchlab.android.barter.util.SendMessageStatus
 import com.bitpunchlab.android.barter.util.getCurrentDateTime
 import kotlinx.coroutines.CoroutineScope

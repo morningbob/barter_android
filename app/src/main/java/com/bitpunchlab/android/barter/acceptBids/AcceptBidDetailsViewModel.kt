@@ -10,7 +10,6 @@ import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.ProductImageToDisplay
 import com.bitpunchlab.android.barter.util.BidStatus
 import com.bitpunchlab.android.barter.util.ImageHandler
-import com.bitpunchlab.android.barter.util.acceptBidStatusMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

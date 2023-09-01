@@ -1,6 +1,5 @@
 package com.bitpunchlab.android.barter.acceptBids
 
-import com.bitpunchlab.android.barter.models.AcceptBid
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

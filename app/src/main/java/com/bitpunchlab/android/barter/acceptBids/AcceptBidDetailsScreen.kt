@@ -1,7 +1,6 @@
 package com.bitpunchlab.android.barter.acceptBids
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,18 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.bitpunchlab.android.barter.Bid
 import com.bitpunchlab.android.barter.R
-import com.bitpunchlab.android.barter.SendMessage
 import com.bitpunchlab.android.barter.base.BasicRecordScreen
 import com.bitpunchlab.android.barter.base.BottomBarNavigation
 import com.bitpunchlab.android.barter.base.CancelCross
 import com.bitpunchlab.android.barter.base.ChoiceButton
-import com.bitpunchlab.android.barter.base.CustomButton
-import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.base.ImagesDisplayDialog
+import com.bitpunchlab.android.barter.base.TitleRow
 import com.bitpunchlab.android.barter.models.BidWithDetails
 import com.bitpunchlab.android.barter.ui.theme.BarterColor
 import com.bitpunchlab.android.barter.util.BidStatus
